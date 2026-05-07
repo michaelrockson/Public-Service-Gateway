@@ -32,7 +32,7 @@ A Flask REST API for managing blog articles. Built as a foundational project to 
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/Personal-Blogging-Platform-Flask-API.git
+git clone https://github.com/michaelrockson/Personal-Blogging-Platform-Flask-API.git
 cd Personal-Blogging-Platform-Flask-API
 ````
 
