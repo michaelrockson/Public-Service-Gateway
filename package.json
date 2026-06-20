@@ -1,0 +1,27 @@
+{
+  "name": "Public_Services_API_Gateway",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/michaelrockson/Personal-Blogging-Platform-Flask-API.git",
+  "author": "rocksoncodes <michaelrockszn@gmail.com>",
+  "license": "MIT",
+  "types": "module",
+  "scripts": {
+    "dev": "ts-node-dev --respawn src/server.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.0.0",
+    "prettier": "^3.8.4",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
+}
