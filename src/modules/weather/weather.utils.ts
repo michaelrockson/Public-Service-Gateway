@@ -33,7 +33,7 @@ export function handleRequestErrors(error: unknown) {
   );
 }
 
-export function parseWeatherParams(req: Request, res: Response) {
+export function parseWeatherParams(req: Request) {
   const lat = Number(req.query.lat);
   const lon = Number(req.query.lon);
 
