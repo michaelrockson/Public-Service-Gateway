@@ -1,1 +1,2 @@
-DATABASE_URL = "mysql+pymysql://root:password@localhost:3306/database_name"
+WEATHER_API_KEY=
+WEATHER_API_URL=
