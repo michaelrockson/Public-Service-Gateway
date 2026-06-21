@@ -4,6 +4,9 @@ import weatherController, { WeatherController } from "./weather.controller";
 export const weatherRouter = Router();
 const requestHandler: WeatherController = weatherController;
 
-weatherRouter.get("/current", async (req: Request, res: Response) => {
-  await requestHandler.handleCurrentWeatherRequest(req, res);
-});
+weatherRouter.get(
+  "/current",
+  async (req: Request, res: Response): Promise<void> => {
+    await requestHandler.handleCurrentWeatherRequest(req, res);
+  },
+);

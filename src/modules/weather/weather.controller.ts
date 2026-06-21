@@ -13,7 +13,7 @@ export class WeatherController {
   }
 
   async handleCurrentWeatherRequest(req: any, res: any) {
-    const weatherParams = parseWeatherParams(req, res);
+    const weatherParams = parseWeatherParams(req);
 
     validateWeatherParams(weatherParams, res);
 

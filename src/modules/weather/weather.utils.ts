@@ -2,6 +2,13 @@ import axios from "axios";
 import { Request, Response } from "express";
 import { CurrentWeatherParams } from "./weather.model";
 
+/**
+ * Fetches current weather data from the external weather API.
+ *
+ * @param weatherParams - Coordinates to request weather for.
+ * @param weatherApiUrl - Base URL for the weather API.
+ * @param weatherApiKey - API key for authenticating the request.
+ */
 export async function makeCurrentWeatherRequest(
   weatherParams: CurrentWeatherParams,
   weatherApiUrl: string,
@@ -16,6 +23,11 @@ export async function makeCurrentWeatherRequest(
   });
 }
 
+/**
+ * Normalizes errors from Axios requests and throws a readable Error.
+ *
+ * @param error - The caught error from an API request.
+ */
 export function handleRequestErrors(error: unknown) {
   if (axios.isAxiosError(error)) {
     if (error.response) {
@@ -33,6 +45,11 @@ export function handleRequestErrors(error: unknown) {
   );
 }
 
+/**
+ * Parses latitude and longitude from the request query string.
+ *
+ * @param req - Incoming Express request.
+ */
 export function parseWeatherParams(req: Request) {
   const lat = Number(req.query.lat);
   const lon = Number(req.query.lon);
@@ -40,6 +57,12 @@ export function parseWeatherParams(req: Request) {
   return { lat, lon };
 }
 
+/**
+ * Validates that weather query parameters are present and numeric.
+ *
+ * @param weatherParams - Parsed weather query parameters.
+ * @param res - Express response object.
+ */
 export function validateWeatherParams(
   weatherParams: CurrentWeatherParams,
   res: Response,
@@ -52,6 +75,12 @@ export function validateWeatherParams(
   }
 }
 
+/**
+ * Validates that the weather response exists before sending it.
+ *
+ * @param weatherResponse - Response data from the weather API.
+ * @param res - Express response object.
+ */
 export function validateWeatherResponse(
   weatherResponse: unknown,
   res: Response,
