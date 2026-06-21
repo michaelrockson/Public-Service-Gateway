@@ -1,6 +1,6 @@
 # Public Services API Gateway
 
-A public service API gateway built with Express and TypeScript. The gateway is designed to consume multiple public APIs and expose unified endpoints for downstream clients.
+An API gateway for public services that is developed on top of Express and TypeScript. The main idea of the gateway is to interact with several public APIs and provide uniform endpoints to downstream clients.
 
 ## Features
 
