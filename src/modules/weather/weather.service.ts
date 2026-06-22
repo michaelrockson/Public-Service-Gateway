@@ -3,7 +3,8 @@ import { CurrentWeatherParams } from "./weather.model";
 import {
   handleRequestErrors,
   makeCurrentWeatherRequest,
-} from "./weather.utils";
+  makeWeatherForecastRequest,
+} from "./utils/weather.service.utils";
 
 dotenv.config();
 
@@ -25,6 +26,19 @@ export class WeatherService {
   async getCurrentWeather(weatherParams: CurrentWeatherParams) {
     try {
       const response = await makeCurrentWeatherRequest(
+        weatherParams,
+        this.weatherApiUrl,
+        this.weatherApiKey,
+      );
+      return response.data;
+    } catch (error) {
+      handleRequestErrors(error);
+    }
+  }
+
+  async getWeatherForecast(weatherParams: CurrentWeatherParams) {
+    try {
+      const response = await makeWeatherForecastRequest(
         weatherParams,
         this.weatherApiUrl,
         this.weatherApiKey,

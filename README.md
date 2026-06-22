@@ -83,7 +83,7 @@ Fetches current weather data for a given latitude and longitude.
 - `src/modules/weather/weather.routes.ts` - Weather router
 - `src/modules/weather/weather.controller.ts` - Controller handling request flow
 - `src/modules/weather/weather.service.ts` - Service calling the external weather API
-- `src/modules/weather/weather.utils.ts` - Utility functions for parsing, validation, and error handling
+- `src/modules/weather/weather.controller.utils.ts` - Utility functions for parsing, validation, and error handling
 - `src/modules/weather/weather.model.ts` - Weather request parameter types
 
 ## Notes
