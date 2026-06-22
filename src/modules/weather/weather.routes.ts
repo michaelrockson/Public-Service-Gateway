@@ -10,3 +10,10 @@ weatherRouter.get(
     await requestHandler.handleCurrentWeatherRequest(req, res);
   },
 );
+
+weatherRouter.get(
+  "/forecast",
+  async (req: Request, res: Response): Promise<void> => {
+    await requestHandler.handleForecastWeatherRequest(req, res);
+  },
+);
