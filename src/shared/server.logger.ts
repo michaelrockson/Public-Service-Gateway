@@ -3,6 +3,29 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const isProduction = process.env.ENVIRONMENT === "prod";
+
+const transports: winston.transport[] = [
+  new winston.transports.Console({
+    format: winston.format.combine(
+      winston.format.colorize(),
+      winston.format.simple(),
+    ),
+  }),
+];
+
+if (isProduction) {
+  transports.push(
+    new winston.transports.File({
+      filename: "logs/error.log",
+      level: "error",
+    }),
+    new winston.transports.File({
+      filename: "logs/combined.log",
+    }),
+  );
+}
+
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || "info",
   exitOnError: false,
@@ -11,23 +34,7 @@ const logger = winston.createLogger({
     winston.format.errors({ stack: true }),
     winston.format.json(),
   ),
-  transports: [
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple(),
-      ),
-    }),
-    new winston.transports.File({ filename: "logs/error.log", level: "error" }),
-    new winston.transports.File({ filename: "logs/combined.log" }),
-  ],
+  transports,
 });
-
-if (process.env.ENVIRONMENT === "production") {
-  logger.add(
-    new winston.transports.File({ filename: "logs/error.log", level: "error" }),
-  );
-  logger.add(new winston.transports.File({ filename: "logs/combined.log" }));
-}
 
 export default logger;
