@@ -53,6 +53,7 @@ export class WeatherController {
         { [responseKey]: weatherResponse },
       );
     } catch (error) {
+      console.log(error);
       this.responseHandler.internalServerError(
         res,
         "Failed to process weather request",

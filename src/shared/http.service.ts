@@ -1,9 +1,5 @@
 import axios from "axios";
 
-interface ApiParams {
-  [key: string]: string | number | boolean | undefined;
-}
-
 export class HttpService {
   private readonly apiUrl: string;
   private readonly apiKey: string;
@@ -38,16 +34,29 @@ export class HttpService {
   public handleServiceErrors(error: unknown): never {
     if (axios.isAxiosError(error)) {
       if (error.response) {
+        const method = error.config?.method?.toUpperCase();
+        const url = error.config?.url;
+        const params = this.safetyCheckApiKey(error.config?.params);
+
         throw new Error(
-          `API request failed [${this.apiUrl}]: 
-        ${error.response.status} 
-        ${JSON.stringify(error.response.data)}`,
+          [
+            "External API request failed",
+            `Method : ${method}`,
+            `URL    : ${url}`,
+            `Params : ${JSON.stringify(params, null, 2)}`,
+            `Status : ${error.response.status}`,
+            `Body   : ${JSON.stringify(error.response.data, null, 2)}`,
+          ].join("\n"),
         );
       }
 
       if (error.request) {
         throw new Error(
-          `API did not respond [${this.apiUrl}] (network/timeout)`,
+          [
+            "External API did not respond",
+            `URL : ${error.config?.url}`,
+            `Params : ${JSON.stringify(error.config?.params, null, 2)}`,
+          ].join("\n"),
         );
       }
     }
@@ -55,5 +64,21 @@ export class HttpService {
       `Unexpected error during API request [${this.apiUrl}]: 
     ${(error as Error).message}`,
     );
+  }
+
+  private safetyCheckApiKey(
+    params: Record<string, unknown> = {},
+  ): Record<string, unknown> {
+    const sanitized = { ...(params ?? {}) };
+
+    if (!(this.apiKeyName in sanitized)) {
+      sanitized[this.apiKeyName] = "[MISSING]";
+      return sanitized;
+    }
+
+    sanitized[this.apiKeyName] =
+      sanitized[this.apiKeyName] === this.apiKey ? "[REDACTED]" : "[INVALID]";
+
+    return sanitized;
   }
 }

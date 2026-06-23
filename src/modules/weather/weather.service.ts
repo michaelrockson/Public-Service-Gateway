@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import { CurrentWeatherParams } from "./weather.model";
-import { HttpService } from "../../shared/exceptions/service.exception";
+import { HttpService } from "../../shared/http.service";
 
 dotenv.config();
 
@@ -27,7 +27,10 @@ export class WeatherService {
 
   async getCurrentWeather(weatherParams: CurrentWeatherParams) {
     try {
-      const response = await this.httpService.makeApiRequest("", weatherParams);
+      const response = await this.httpService.makeApiRequest(
+        "weather",
+        weatherParams,
+      );
       return response.data;
     } catch (error) {
       this.httpService.handleServiceErrors(error);

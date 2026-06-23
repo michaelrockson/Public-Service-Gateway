@@ -1,12 +1,24 @@
+import dotenv from "dotenv";
 import express, { type Express } from "express";
-import { weatherRouter } from "./modules/weather/weather.routes";
+import morgan from "morgan";
+import logger from "./shared/server.logger";
+import { apiRouter } from "./modules/routes.registry";
 
-const app: Express = express();
-const port: number = 3000;
+dotenv.config();
 
-app.use(express.json());
-app.use("/api/weather", weatherRouter);
+const server: Express = express();
+const port: number = Number(process.env.PORT) || 3000;
+server.use(
+  morgan("combined", {
+    stream: { write: (message) => logger.info(message.trim()) },
+  }),
+);
 
-app.listen(port, (): void => {
-  console.log(`Server has started port ${port}`);
+server.use(express.json());
+server.use("/api", apiRouter);
+
+server.listen(port, (): void => {
+  logger.info(`Server running on ${port}`, {
+    serverEnvironment: process.env.ENVIRONMENT ?? "dev",
+  });
 });
