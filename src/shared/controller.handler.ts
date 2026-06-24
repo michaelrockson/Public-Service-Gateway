@@ -1,4 +1,5 @@
 import { Response } from "express";
+import { config } from "../utils/env.config";
 
 export class ControllerResponseHandler {
   constructor() {}
@@ -24,13 +25,37 @@ export class ControllerResponseHandler {
   }
 
   /**
+   * Parses error instances for extra context.
+   *
+   * @param error - Request error object.
+   */
+  private getErrorDetails(error: unknown):
+    | {
+        context: string;
+      }
+    | undefined {
+    if (config.environment === "prod") {
+      return undefined;
+    }
+
+    if (error instanceof Error) {
+      return { context: error.message };
+    }
+    return { context: String(error) };
+  }
+
+  /**
    * Send a 200 success response.
    *
    * @param res - Express response object.
    * @param message - Optional success message.
    * @param details - Optional additional response details.
    */
-  successResponse(res: Response, message = "Success", details?: unknown): void {
+  successResponse(
+    res: Response,
+    message = "Success!",
+    details?: unknown,
+  ): void {
     this.send(res, 200, message, details);
   }
 
@@ -42,7 +67,7 @@ export class ControllerResponseHandler {
    * @param details - Optional additional response details.
    */
   badRequest(res: Response, message = "Bad Request", details?: unknown): void {
-    this.send(res, 400, message, details);
+    this.send(res, 400, message, this.getErrorDetails(details));
   }
 
   /**
@@ -53,7 +78,7 @@ export class ControllerResponseHandler {
    * @param details - Optional additional response details.
    */
   notFound(res: Response, message = "Not Found", details?: unknown): void {
-    this.send(res, 404, message, details);
+    this.send(res, 404, message, this.getErrorDetails(details));
   }
 
   /**
@@ -68,7 +93,7 @@ export class ControllerResponseHandler {
     message = "Failed to fetch upstream data",
     details?: unknown,
   ): void {
-    this.send(res, 502, message, details);
+    this.send(res, 502, message, this.getErrorDetails(details));
   }
 
   /**
@@ -81,9 +106,9 @@ export class ControllerResponseHandler {
   internalServerError(
     res: Response,
     message = "Internal Server Error",
-    details?: any,
+    details?: unknown,
   ): void {
-    this.send(res, 500, message, details);
+    this.send(res, 500, message, this.getErrorDetails(details));
   }
 }
 

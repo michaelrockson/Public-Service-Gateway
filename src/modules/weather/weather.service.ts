@@ -1,8 +1,6 @@
-import dotenv from "dotenv";
 import { CurrentWeatherParams } from "./weather.model";
 import { HttpService } from "../../shared/http.service";
-
-dotenv.config();
+import { config } from "../../utils/env.config";
 
 export class WeatherService {
   private readonly weatherApiUrl: string;
@@ -10,7 +8,8 @@ export class WeatherService {
   private readonly httpService: HttpService;
 
   constructor() {
-    const { WEATHER_API_KEY, WEATHER_API_URL } = process.env;
+    const WEATHER_API_KEY = config.weatherApiKey;
+    const WEATHER_API_URL = config.weatherApiUrl;
 
     if (!WEATHER_API_KEY || !WEATHER_API_URL) {
       throw new Error("Missing weather module environment variables");

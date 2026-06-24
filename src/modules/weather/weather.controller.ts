@@ -57,6 +57,7 @@ export class WeatherController {
       this.responseHandler.internalServerError(
         res,
         "Failed to process weather request",
+        error,
       );
     }
   }

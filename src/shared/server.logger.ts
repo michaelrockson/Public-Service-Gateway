@@ -1,9 +1,7 @@
 import winston from "winston";
-import dotenv from "dotenv";
+import { config } from "../utils/env.config";
 
-dotenv.config();
-
-const isProduction = process.env.ENVIRONMENT === "prod";
+const isProduction = config.isProduction;
 
 const transports: winston.transport[] = [
   new winston.transports.Console({
@@ -27,10 +25,10 @@ if (isProduction) {
 }
 
 const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || "info",
+  level: config.logLevel || "info",
   exitOnError: false,
   format: winston.format.combine(
-    winston.format.timestamp(),
+    winston.format.timestamp({ format: "HH:mm:ss" }),
     winston.format.errors({ stack: true }),
     winston.format.json(),
   ),
