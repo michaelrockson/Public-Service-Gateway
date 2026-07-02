@@ -1,47 +1,45 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { config } from "../env.config";
+import {
+  parseParams,
+  validateParams,
+  validateResponse,
+} from "./utils/controller.utils";
 
 export class ControllerResponseHandler {
   constructor() {}
 
   /**
-   * Send a JSON response with a given HTTP status code.
+   * Configurable method for handling incoming HTTP Requests
+   * and returning a response.
    *
-   * @param res - Express response object.
-   * @param statusCode - HTTP status code to send.
-   * @param message - Primary error or success message.
-   * @param details - Optional additional response details.
-   */
-  private send(
+   * @param req - Express Request object
+   * @param res - Express Response object
+   * @param fetchFunction - Function that executes the request
+   * @param responseKey - Data label for the returned data
+   * @param attributeList - List of required parameters
+   * */
+  public async handleRequest(
+    req: Request,
     res: Response,
-    statusCode: number,
-    message: string,
-    details?: unknown,
-  ): void {
-    res.status(statusCode).json({
-      message: message,
-      ...(details ? { details: details } : {}),
-    });
-  }
+    fetchFunction: (params: any) => Promise<any>,
+    responseKey: string,
+    attributeList: string[],
+  ) {
+    try {
+      const requestParams = parseParams(req, attributeList);
+      validateParams(requestParams, res);
 
-  /**
-   * Parses error instances for extra context.
-   *
-   * @param error - Request error object.
-   */
-  private getErrorDetails(error: unknown):
-    | {
-        context: string;
-      }
-    | undefined {
-    if (config.environment === "prod") {
-      return undefined;
-    }
+      const serviceResponse = await fetchFunction(requestParams);
 
-    if (error instanceof Error) {
-      return { context: error.message };
+      validateResponse(serviceResponse, res);
+
+      return this.successResponse(res, "Data fetched successfully", {
+        [responseKey]: serviceResponse,
+      });
+    } catch (error) {
+      this.internalServerError(res, "Failed to process request", error);
     }
-    return { context: String(error) };
   }
 
   /**
@@ -109,6 +107,46 @@ export class ControllerResponseHandler {
     details?: unknown,
   ): void {
     this.send(res, 500, message, this.getErrorDetails(details));
+  }
+
+  /**
+   * Send a JSON response with a given HTTP status code.
+   *
+   * @param res - Express response object.
+   * @param statusCode - HTTP status code to send.
+   * @param message - Primary error or success message.
+   * @param details - Optional additional response details.
+   */
+  private send(
+    res: Response,
+    statusCode: number,
+    message: string,
+    details?: unknown,
+  ): void {
+    res.status(statusCode).json({
+      message: message,
+      ...(details ? { details: details } : {}),
+    });
+  }
+
+  /**
+   * Parses error instances for extra context.
+   *
+   * @param error - Request error object.
+   */
+  private getErrorDetails(error: unknown):
+    | {
+        context: string;
+      }
+    | undefined {
+    if (config.environment === "prod") {
+      return undefined;
+    }
+
+    if (error instanceof Error) {
+      return { context: error.message };
+    }
+    return { context: String(error) };
   }
 }
 

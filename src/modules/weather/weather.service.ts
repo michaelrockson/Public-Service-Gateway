@@ -32,7 +32,7 @@ export class WeatherService {
       );
       return response.data;
     } catch (error) {
-      this.httpService.handleServiceErrors(error);
+      this.httpService.handleApiErrors(error);
     }
   }
 
@@ -44,7 +44,7 @@ export class WeatherService {
       );
       return response.data;
     } catch (error) {
-      this.httpService.handleServiceErrors(error);
+      this.httpService.handleApiErrors(error);
     }
   }
 }
