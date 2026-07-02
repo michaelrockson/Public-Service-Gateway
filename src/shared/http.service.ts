@@ -31,7 +31,7 @@ export class HttpService {
    *
    * @param error - The caught error from an API request.
    */
-  public handleServiceErrors(error: unknown): never {
+  public handleApiErrors(error: unknown): never {
     if (axios.isAxiosError(error)) {
       if (error.response) {
         const method = error.config?.method?.toUpperCase();

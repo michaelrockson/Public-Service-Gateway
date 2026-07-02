@@ -1,6 +1,9 @@
 import dotenv from "dotenv";
+import path from "path";
 
-dotenv.config();
+dotenv.config({
+  path: path.join(__dirname, "../.env"),
+});
 
 function getEnvVar(key: string, fallback?: string): string {
   const value: string | undefined = process.env[key] ?? fallback;
