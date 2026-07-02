@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import weatherService, { WeatherService } from "./weather.service";
-import { ControllerResponseHandler } from "../../shared/routes.controller";
+import { ControllerResponseHandler } from "../../shared/http.controller";
 
 export class WeatherController {
   private readonly httpClient: WeatherService;
