@@ -22,13 +22,17 @@ export class ControllerResponseHandler {
   public async handleRequest(
     req: Request,
     res: Response,
-    fetchFunction: (params: any) => Promise<any>,
+    fetchFunction: (params?: any) => Promise<any>,
     responseKey: string,
-    attributeList: string[],
+    attributeList?: string[],
   ) {
     try {
-      const requestParams = parseParams(req, attributeList);
-      validateParams(requestParams, res);
+      let requestParams;
+
+      if (attributeList?.length) {
+        requestParams = parseParams(req, attributeList);
+        validateParams(requestParams, res);
+      }
 
       const serviceResponse = await fetchFunction(requestParams);
 

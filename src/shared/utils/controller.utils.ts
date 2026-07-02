@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import responseHandler from "../controller.handler";
+import responseHandler from "../routes.controller";
 
 /**
  * Parses parameters from the request query string.

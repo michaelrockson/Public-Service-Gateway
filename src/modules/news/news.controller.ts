@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import newsService, { NewsService } from "./news.service";
-import { ControllerResponseHandler } from "../../shared/controller.handler";
+import { ControllerResponseHandler } from "../../shared/routes.controller";
 import { NewsSearchParams } from "./news.model";
 
 export class NewsController {
@@ -12,12 +12,16 @@ export class NewsController {
     this.responseHandler = new ControllerResponseHandler();
   }
 
-  async handleGetAllNewsArticlesRequest(req: Request, res: Response) {}
-
-  private async handleNewsRequest(
-    req: Request,
-    res: Response,
-    fetchFunction: (params: NewsSearchParams) => Promise<any>,
-    responseKey: string,
-  ) {}
+  async handleGetAllNewsArticlesRequest(req: Request, res: Response) {
+    return this.responseHandler.handleRequest(
+      req,
+      res,
+      (params: NewsSearchParams) => this.httpClient.getAllNewsArticles(params),
+      "Related Article(s)",
+      ["q"],
+    );
+  }
 }
+
+let newsController = new NewsController();
+export default newsController;

@@ -24,10 +24,10 @@ export class NewsService {
     );
   }
 
-  async getAllNewsArticles(newsParams: NewsSearchParams) {
+  async getAllNewsArticles(newsParams?: NewsSearchParams) {
     try {
       const response = await this.httpService.makeApiRequest(
-        "v2/everything",
+        "/everything",
         newsParams,
       );
       return response.data;
