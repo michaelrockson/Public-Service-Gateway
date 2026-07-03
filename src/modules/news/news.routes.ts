@@ -5,5 +5,12 @@ export const newsRouter = Router();
 const newsRequestHandler: NewsController = newsController;
 
 newsRouter.get("/topic", async (req: Request, res: Response): Promise<void> => {
-  await newsRequestHandler.handleGetAllNewsArticlesRequest(req, res);
+  await newsRequestHandler.handleGetNewsArticlesRequest(req, res);
 });
+
+newsRouter.get(
+  "/top-headlines",
+  async (req: Request, res: Response): Promise<void> => {
+    await newsRequestHandler.handleGetTopHeadlines(req, res);
+  },
+);

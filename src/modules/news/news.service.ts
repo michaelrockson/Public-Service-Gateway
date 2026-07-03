@@ -18,11 +18,23 @@ export class NewsService {
     );
   }
 
-  async getNewsArticles(newsParams?: NewsSearchParams) {
+  async getNewsArticles(newsParams: NewsSearchParams) {
     try {
       const response = await this.httpService.makeApiRequest(
         "/everything",
         newsParams,
+      );
+      return response.data;
+    } catch (error) {
+      this.httpService.handleApiErrors(error);
+    }
+  }
+
+  async getTopHeadlines(newsParams: NewsSearchParams) {
+    try {
+      const response = await this.httpService.makeApiRequest(
+          "/top-headlines",
+          newsParams,
       );
       return response.data;
     } catch (error) {

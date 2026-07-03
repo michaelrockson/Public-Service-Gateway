@@ -12,7 +12,7 @@ export class NewsController {
     this.responseHandler = new ControllerResponseHandler();
   }
 
-  async handleGetAllNewsArticlesRequest(req: Request, res: Response) {
+  async handleGetNewsArticlesRequest(req: Request, res: Response) {
     return this.responseHandler.handleRequest(
       req,
       res,
@@ -21,6 +21,17 @@ export class NewsController {
       ["q"],
     );
   }
+
+  async handleGetTopHeadlines(req: Request, res: Response) {
+    return this.responseHandler.handleRequest(
+        req,
+        res,
+        (params: NewsSearchParams) => this.httpClient.getTopHeadlines(params),
+        "Top Headlines",
+        ["country"],
+    )
+  }
+
 }
 
 let newsController = new NewsController();
