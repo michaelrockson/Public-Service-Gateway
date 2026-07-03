@@ -46,3 +46,10 @@ export function getEnvNumber(key: string, fallback?: number): number {
   }
   return parsed;
 }
+ export function validateInfisicalCredentials(clientId: string, clientSecret: string) {
+
+  if (!clientId || !clientSecret) {
+    throw new Error("Missing infisical credentials for authentication")
+  }
+
+ }
