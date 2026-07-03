@@ -17,18 +17,22 @@ export class ControllerResponseHandler {
    * @param res - Express Response object
    * @param fetchFunction - Function that executes the request
    * @param responseKey - Data label for the returned data
-   * @param attributeList - List of required parameters
+   * @param requiredParams - Required parameters need for the endpoint
    * */
   public async handleRequest(
     req: Request,
     res: Response,
-    fetchFunction: (params: any) => Promise<any>,
+    fetchFunction: (params?: any) => Promise<any>,
     responseKey: string,
-    attributeList: string[],
+    requiredParams?: string[],
   ) {
     try {
-      const requestParams = parseParams(req, attributeList);
-      validateParams(requestParams, res);
+      let requestParams;
+
+      if (requiredParams?.length) {
+        requestParams = parseParams(req, requiredParams);
+        validateParams(requestParams, res);
+      }
 
       const serviceResponse = await fetchFunction(requestParams);
 

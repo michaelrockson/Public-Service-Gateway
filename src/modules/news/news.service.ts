@@ -8,15 +8,9 @@ export class NewsService {
   private readonly httpService: HttpService;
 
   constructor() {
-    const NEWS_API_KEY = config.newsApiKey;
-    const NEWS_API_URL = config.newsApiUrl;
 
-    if (!NEWS_API_KEY || !NEWS_API_URL) {
-      throw new Error("Missing news module environment variables");
-    }
-
-    this.newsApiKey = NEWS_API_KEY;
-    this.newsApiUrl = NEWS_API_URL;
+    this.newsApiKey =  config.newsApiKey;
+    this.newsApiUrl = config.newsApiUrl;
     this.httpService = new HttpService(
       this.newsApiUrl,
       this.newsApiKey,
@@ -24,11 +18,23 @@ export class NewsService {
     );
   }
 
-  async getAllNewsArticles(newsParams: NewsSearchParams) {
+  async getNewsArticles(newsParams: NewsSearchParams) {
     try {
       const response = await this.httpService.makeApiRequest(
-        "v2/everything",
+        "/everything",
         newsParams,
+      );
+      return response.data;
+    } catch (error) {
+      this.httpService.handleApiErrors(error);
+    }
+  }
+
+  async getTopHeadlines(newsParams: NewsSearchParams) {
+    try {
+      const response = await this.httpService.makeApiRequest(
+          "/top-headlines",
+          newsParams,
       );
       return response.data;
     } catch (error) {
