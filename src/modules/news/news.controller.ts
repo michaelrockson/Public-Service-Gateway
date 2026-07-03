@@ -16,7 +16,7 @@ export class NewsController {
     return this.responseHandler.handleRequest(
       req,
       res,
-      (params: NewsSearchParams) => this.httpClient.getAllNewsArticles(params),
+      (params: NewsSearchParams) => this.httpClient.getNewsArticles(params),
       "Related Article(s)",
       ["q"],
     );
@@ -24,4 +24,5 @@ export class NewsController {
 }
 
 let newsController = new NewsController();
+
 export default newsController;

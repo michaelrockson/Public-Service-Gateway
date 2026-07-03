@@ -8,15 +8,8 @@ export class WeatherService {
   private readonly httpService: HttpService;
 
   constructor() {
-    const WEATHER_API_KEY = config.weatherApiKey;
-    const WEATHER_API_URL = config.weatherApiUrl;
-
-    if (!WEATHER_API_KEY || !WEATHER_API_URL) {
-      throw new Error("Missing weather module environment variables");
-    }
-
-    this.weatherApiKey = WEATHER_API_KEY;
-    this.weatherApiUrl = WEATHER_API_URL;
+    this.weatherApiKey = config.weatherApiKey;
+    this.weatherApiUrl = config.weatherApiUrl;
     this.httpService = new HttpService(
       this.weatherApiUrl,
       this.weatherApiKey,
