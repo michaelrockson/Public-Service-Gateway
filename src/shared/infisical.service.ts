@@ -25,19 +25,6 @@ export class InfisicalService {
     this.projectId = this.infisicalConfig.projectId;
   }
 
-  private getInfisicalConfig() {
-    const config = {
-      siteUrl: getEnvVar("INFISICAL_SITE_URL"),
-      clientId: getEnvVar("INFISICAL_CLIENT_ID"),
-      clientSecret: getEnvVar("INFISICAL_CLIENT_SECRET"),
-      environment: getEnvVar("INFISICAL_ENVIRONMENT"),
-      projectId: getEnvVar("INFISICAL_PROJECT_ID"),
-    } as const;
-
-    validateSecrets(config);
-    return config;
-  }
-
   async authenticate_infisical_client() {
     validateInfisicalCredentials(this.clientId, this.clientSecret);
 
@@ -61,6 +48,19 @@ export class InfisicalService {
     } catch (error) {
       throw new Error(`Error fetching Infisical Secrets: ${error}`);
     }
+  }
+
+  private getInfisicalConfig() {
+    const config = {
+      siteUrl: getEnvVar("INFISICAL_SITE_URL"),
+      clientId: getEnvVar("INFISICAL_CLIENT_ID"),
+      clientSecret: getEnvVar("INFISICAL_CLIENT_SECRET"),
+      environment: getEnvVar("INFISICAL_ENVIRONMENT"),
+      projectId: getEnvVar("INFISICAL_PROJECT_ID"),
+    } as const;
+
+    validateSecrets(config);
+    return config;
   }
 }
 
