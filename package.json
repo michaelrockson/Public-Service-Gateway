@@ -7,7 +7,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "ts-node-dev --respawn src/server.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/index.js"
   },
@@ -18,9 +18,11 @@
     "@types/node": "^26.0.0",
     "prettier": "^3.8.4",
     "ts-node-dev": "^2.0.0",
+    "tsx": "^4.23.0",
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@infisical/sdk": "^5.0.2",
     "axios": "^1.18.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
