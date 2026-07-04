@@ -40,9 +40,7 @@ export function validateInfisicalSecrets(secrets: Record<string, unknown>) {
     fetchedSecrets.push(key);
   }
   if (fetchedSecrets.length > 0) {
-    logProcess(
-      `${fetchedSecrets.length} secret(s) injected from Infisical: \n ${fetchedSecrets.join(" \n ").toUpperCase()}`,
-    );
+    logProcess(`${fetchedSecrets.length} secret(s) injected from Infisical}`);
   }
 
   if (missingSecrets.length > 0) {

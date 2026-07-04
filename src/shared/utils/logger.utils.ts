@@ -19,13 +19,22 @@ export function logBootstrapError(step: string, error: unknown): void {
 }
 
 // --- Inbound requests ---
+export function logInboundRaw(message: string): void {
+  logger.info(`[INBOUND] ${message}`);
+}
+export function createMorganStream() {
+  return {
+    write: (message: string) => logInboundRaw(message.trim()),
+  };
+}
+
 export function logInboundRequest(
   method: string,
   path: string,
-  params: Record<string, unknown>,
+  params: Record<string, any>,
 ): void {
   logger.info(
-    `[INBOUND] ${method} ${path} | params: ${JSON.stringify(params)}`,
+    `[INBOUND REQUEST] ${method} ${path} | params: ${JSON.stringify(params)}`,
   );
 }
 
@@ -47,16 +56,18 @@ export function logInboundError(
 
 // --- Outbound requests ---
 export function logOutboundRequest(method: string, url: string): void {
-  logger.info(`--> ${method} ${url}`);
+  logger.info(`[OUTBOUND REQUEST] ${method} ${url}`);
 }
 
 export function logOutboundResponse(
   method: string,
   url: string,
-  status: number,
-  durationMs: number,
+  status: number | string,
+  durationMs: number | string,
 ): void {
-  logger.info(`<-- ${status} ${method} ${url} | ${durationMs}ms`);
+  logger.info(
+    `[OUTBOUND RESPONSE] ${status} ${method.toUpperCase()} ${url} | ${durationMs}ms`,
+  );
 }
 
 export function logOutboundError(

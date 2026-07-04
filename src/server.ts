@@ -5,7 +5,11 @@ import { createGatewayRouter } from "./modules/routes.registry.js";
 import { injectSecretsFromInfisical } from "./shared/infisical.service.js";
 import { populateEnvProvider } from "./shared/env.config.js";
 import { bootServices } from "./shared/utils/config.utils.js";
-import { logBootstrapStep } from "./shared/utils/logger.utils.js";
+import {
+  createMorganStream,
+  logBootstrapStep,
+  logProcess,
+} from "./shared/utils/logger.utils.js";
 
 async function startServer() {
   const serverSecrets = await injectSecretsFromInfisical();
@@ -19,18 +23,14 @@ async function startServer() {
   const environment: string = serverSecrets.environment ?? "dev";
   const gatewayRouter = createGatewayRouter(controllers);
 
-  server.use(
-    morgan("combined", {
-      stream: { write: (message) => logger.info(message.trim()) },
-    }),
-  );
+  server.use(morgan("combined", { stream: createMorganStream() }));
 
   server.use(express.json());
   server.use("/api", gatewayRouter);
 
   server.listen(port, (): void => {
-    logger.info(`Server running on ${port}`);
-    logger.info(`Server environment: ${environment}`);
+    logProcess(`Server running on ${port}`);
+    logProcess(`Server environment: ${environment}`);
   });
 }
 
