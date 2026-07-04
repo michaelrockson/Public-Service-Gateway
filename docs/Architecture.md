@@ -1,4 +1,4 @@
-# Public Services API Gateway — Architecture Guide
+# API Gateway Architecture Guide
 
 A reference for any developer picking up this codebase. Covers the startup
 sequence, dependency flow, module structure and the conventions to follow
@@ -67,10 +67,11 @@ src/
     └── server.logger.ts        # Winston logger instance
 ```
 
+
 ## 4. Startup Sequence
 
 Everything flows through `startServer()` in `server.ts`. The sequence is
-strictly ordered — each step depends on the one before it completing
+strictly ordered each step depends on the one before it completing
 successfully.
 
 ```
@@ -86,7 +87,7 @@ startServer()
 │         singleton so any class can read config values synchronously,
 │         without touching process.env directly.
 │
-├── 3. setServices()
+├── 3. bootServices()
 │         Instantiates all services and controllers now that envProvider
 │         is populated. Services are created first, then injected into
 │         their controllers as constructor dependencies.
@@ -101,6 +102,7 @@ startServer()
           Server is live. Incoming requests are routed through the
           mounted router → controller → service.
 ```
+
 
 ## 5. Dependency Flow
 
@@ -134,7 +136,7 @@ This means:
 - Every dependency is explicit nothing is imported as a module-level
   singleton after `setServices()` runs.
 
----
+
 
 ## 6. Secrets & Configuration
 
@@ -142,7 +144,7 @@ This means:
 
 There are two distinct config concerns that must happen in order:
 
-**Step 1 — Bootstrap secrets (from local `.env`)**
+**Step 1  Bootstrap secrets (from local `.env`)**
 
 The local `.env` file contains only the five credentials needed to reach
 Infisical. These are loaded by `dotenv` via `config.utils.ts` and are
@@ -156,7 +158,7 @@ INFISICAL_ENVIRONMENT
 INFISICAL_PROJECT_ID
 ```
 
-**Step 2 — Runtime secrets (from Infisical)**
+**Step 2 Runtime secrets (from Infisical)**
 
 After authenticating with Infisical, all remaining application secrets
 (API keys, URLs, port, log level, etc.) are fetched remotely and
@@ -175,7 +177,7 @@ this.newsApiUrl = envProvider.newsApiUrl;
 this.newsApiUrl = process.env.NEWS_API_URL;
 ```
 
-### Critical rule — instantiation timing
+### Critical rule instantiation timing
 
 Services read from `envProvider` in their constructors. This means
 **services must never be instantiated at module load time** (i.e. no
