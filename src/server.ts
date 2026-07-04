@@ -5,6 +5,7 @@ import { createGatewayRouter } from "./modules/routes.registry.js";
 import { injectSecretsFromInfisical } from "./shared/infisical.service.js";
 import { populateEnvProvider } from "./shared/env.config.js";
 import { bootServices } from "./shared/utils/config.utils.js";
+import { logBootstrapStep } from "./shared/utils/logger.utils.js";
 
 async function startServer() {
   const serverSecrets = await injectSecretsFromInfisical();

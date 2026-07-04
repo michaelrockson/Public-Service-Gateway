@@ -4,6 +4,7 @@ import { WeatherService } from "../../modules/weather/weather.service.js";
 import { WeatherController } from "../../modules/weather/weather.controller.js";
 import { NewsService } from "../../modules/news/news.service.js";
 import { NewsController } from "../../modules/news/news.controller.js";
+import { logProcess } from "./logger.utils.js";
 
 export const envPath = path.join(process.cwd(), ".env");
 
@@ -11,19 +12,43 @@ dotenv.config({
   path: envPath,
 });
 
-export function validateSecrets(secrets: Record<string, unknown>) {
+export function validateEnvs(secrets: Record<string, unknown>) {
+  let missingEnvs: string[] = [];
+
+  for (const [key, value] of Object.entries(secrets)) {
+    if (value === undefined || value === null || value === "") {
+      missingEnvs.push(key);
+    }
+  }
+
+  if (missingEnvs.length > 0) {
+    throw new Error(
+      `${missingEnvs.length} missing environment variable(s): 
+      ${missingEnvs.join(", ")}`,
+    );
+  }
+}
+
+export function validateInfisicalSecrets(secrets: Record<string, unknown>) {
   let missingSecrets: string[] = [];
+  let fetchedSecrets: string[] = [];
 
   for (const [key, value] of Object.entries(secrets)) {
     if (value === undefined || value === null || value === "") {
       missingSecrets.push(key);
     }
+    fetchedSecrets.push(key);
+  }
+  if (fetchedSecrets.length > 0) {
+    logProcess(
+      `${fetchedSecrets.length} secret(s) injected from Infisical: \n ${fetchedSecrets.join(" \n ").toUpperCase()}`,
+    );
   }
 
   if (missingSecrets.length > 0) {
     throw new Error(
-      `${missingSecrets.length} missing environment variable(s): 
-      ${missingSecrets.join(", ")}`,
+      `${missingSecrets.length} missing environment variable(s): \n
+      ${missingSecrets.join("\n ").toUpperCase()}`,
     );
   }
 }
