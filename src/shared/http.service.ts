@@ -18,7 +18,6 @@ export class HttpService {
    * @param params
    */
   public async makeApiRequest(endpoint?: string, params?: {}) {
-    console.log(`${this.apiUrl}/${endpoint}`);
     return await axios.get(`${this.apiUrl}/${endpoint}`, {
       params: {
         ...params,

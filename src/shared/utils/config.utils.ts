@@ -1,9 +1,5 @@
 import dotenv from "dotenv";
 import path from "path";
-import { WeatherService } from "../../modules/weather/weather.service.js";
-import { WeatherController } from "../../modules/weather/weather.controller.js";
-import { NewsService } from "../../modules/news/news.service.js";
-import { NewsController } from "../../modules/news/news.controller.js";
 import { logProcess } from "./logger.utils.js";
 
 export const envPath = path.join(process.cwd(), ".env");
@@ -82,14 +78,4 @@ export function validateInfisicalCredentials(
   if (!clientId || !clientSecret) {
     throw new Error("Missing infisical credentials for authentication");
   }
-}
-
-export function bootServices() {
-  const weatherService = new WeatherService();
-  const weatherController = new WeatherController(weatherService);
-
-  const newsService = new NewsService();
-  const newsController = new NewsController(newsService);
-
-  return { weatherController, newsController };
 }

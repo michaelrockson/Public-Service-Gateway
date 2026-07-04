@@ -4,12 +4,8 @@ import logger from "./shared/server.logger.js";
 import { createGatewayRouter } from "./modules/routes.registry.js";
 import { injectSecretsFromInfisical } from "./shared/infisical.service.js";
 import { populateEnvProvider } from "./shared/env.config.js";
-import { bootServices } from "./shared/utils/config.utils.js";
-import {
-  createMorganStream,
-  logBootstrapStep,
-  logProcess,
-} from "./shared/utils/logger.utils.js";
+import { createMorganStream, logProcess } from "./shared/utils/logger.utils.js";
+import { bootServices } from "./shared/utils/server.utils.js";
 
 async function startServer() {
   const serverSecrets = await injectSecretsFromInfisical();
