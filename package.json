@@ -5,7 +5,7 @@
   "repository": "https://github.com/michaelrockson/Personal-Blogging-Platform-Flask-API.git",
   "author": "rocksoncodes <michaelrockszn@gmail.com>",
   "license": "MIT",
-  "types": "module",
+  "type": "module",
   "scripts": {
     "dev": "ts-node-dev --respawn src/server.ts",
     "build": "tsc",

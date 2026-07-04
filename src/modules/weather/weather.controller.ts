@@ -1,16 +1,29 @@
 import { Request, Response } from "express";
-import weatherService, { WeatherService } from "./weather.service";
-import { ControllerResponseHandler } from "../../shared/http.controller";
+import { WeatherService } from "./weather.service.js";
+import { ControllerResponseHandler } from "../../shared/http.controller.js";
 
+/**
+ * Handles incoming HTTP requests for weather endpoints, delegating
+ * data fetching to `WeatherService` and response formatting to
+ * `ControllerResponseHandler`.
+ */
 export class WeatherController {
   private readonly httpClient: WeatherService;
   private readonly responseHandler: ControllerResponseHandler;
 
-  constructor() {
+  /**
+   * @param weatherService - The initialized weather service instance,
+   *   provided by `bootServices()` in `server.ts`.
+   */
+  constructor(weatherService: WeatherService) {
     this.httpClient = weatherService;
     this.responseHandler = new ControllerResponseHandler();
   }
 
+  /**
+   * Handles `GET /weather/current`.
+   * Required query params: `lat`, `lon`.
+   */
   async handleCurrentWeatherRequest(req: Request, res: Response) {
     return this.responseHandler.handleRequest(
       req,
@@ -21,6 +34,10 @@ export class WeatherController {
     );
   }
 
+  /**
+   * Handles `GET /weather/forecast`.
+   * Required query params: `lat`, `lon`.
+   */
   async handleForecastWeatherRequest(req: Request, res: Response) {
     return this.responseHandler.handleRequest(
       req,
@@ -31,7 +48,3 @@ export class WeatherController {
     );
   }
 }
-
-let weatherController: WeatherController = new WeatherController();
-
-export default weatherController;

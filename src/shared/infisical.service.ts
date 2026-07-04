@@ -4,30 +4,38 @@ import {
   getEnvVar,
   validateInfisicalCredentials,
   validateSecrets,
-} from "./utils/config.utils";
-
-export const infisicalConfig = {
-  siteUrl: getEnvVar("INFISICAL_SITE_URL"),
-  clientId: getEnvVar("INFISICAL_CLIENT_ID"),
-  clientSecret: getEnvVar("INFISICAL_CLIENT_SECRET"),
-  environment: getEnvVar("INFISICAL_ENVIRONMENT"),
-  projectId: getEnvVar("INFISICAL_PROJECT_ID"),
-} as const;
-
-validateSecrets(infisicalConfig);
+} from "./utils/config.utils.js";
 
 export class InfisicalService {
   private readonly client: InfisicalSDK;
-  private readonly siteUrl: string = infisicalConfig.siteUrl;
-  private readonly clientId: string = infisicalConfig.clientId;
-  private readonly clientSecret: string = infisicalConfig.clientSecret;
-  private readonly environment: string = infisicalConfig.environment;
-  private readonly projectId: string = infisicalConfig.projectId;
+  private readonly clientId: string;
+  private readonly clientSecret: string;
+  private readonly environment: string;
+  private readonly projectId: string;
+  private readonly infisicalConfig;
 
   constructor() {
+    this.infisicalConfig = this.getInfisicalConfig();
     this.client = new InfisicalSDK({
-      siteUrl: this.siteUrl,
+      siteUrl: this.infisicalConfig.siteUrl,
     });
+    this.clientId = this.infisicalConfig.clientId;
+    this.clientSecret = this.infisicalConfig.clientSecret;
+    this.environment = this.infisicalConfig.environment;
+    this.projectId = this.infisicalConfig.projectId;
+  }
+
+  private getInfisicalConfig() {
+    const config = {
+      siteUrl: getEnvVar("INFISICAL_SITE_URL"),
+      clientId: getEnvVar("INFISICAL_CLIENT_ID"),
+      clientSecret: getEnvVar("INFISICAL_CLIENT_SECRET"),
+      environment: getEnvVar("INFISICAL_ENVIRONMENT"),
+      projectId: getEnvVar("INFISICAL_PROJECT_ID"),
+    } as const;
+
+    validateSecrets(config);
+    return config;
   }
 
   async authenticate_infisical_client() {
@@ -45,24 +53,21 @@ export class InfisicalService {
 
   async injectInfisicalSecrets() {
     try {
-      const { secrets } = await this.client.secrets().listSecrets({
+      await this.client.secrets().listSecrets({
         environment: this.environment,
         projectId: this.projectId,
+        attachToProcessEnv: true,
       });
-
-      for (const secret of secrets) {
-        process.env[secret.secretKey] = secret.secretValue;
-      }
     } catch (error) {
       throw new Error(`Error fetching Infisical Secrets: ${error}`);
     }
   }
 }
 
-let infisicalEnvs = new InfisicalService();
-
 export async function injectSecretsFromInfisical() {
   try {
+    let infisicalEnvs = new InfisicalService();
+
     await infisicalEnvs.authenticate_infisical_client();
     await infisicalEnvs.injectInfisicalSecrets();
 
@@ -80,6 +85,6 @@ export async function injectSecretsFromInfisical() {
 
     return config;
   } catch (error) {
-    throw new Error(`Error fetching secrets from infisical`);
+    throw new Error(`Error fetching secrets from infisical ${error}`);
   }
 }
