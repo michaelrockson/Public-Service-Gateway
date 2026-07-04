@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { config } from "../env.config";
+import { envProvider } from "./env.config.js";
 import {
   parseParams,
   validateParams,
   validateResponse,
-} from "./utils/controller.utils";
+} from "./utils/controller.utils.js";
 
 export class ControllerResponseHandler {
   constructor() {}
@@ -143,7 +143,7 @@ export class ControllerResponseHandler {
         context: string;
       }
     | undefined {
-    if (config.environment === "prod") {
+    if (envProvider.environment === "prod") {
       return undefined;
     }
 

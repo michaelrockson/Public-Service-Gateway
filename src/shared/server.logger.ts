@@ -1,7 +1,7 @@
 import winston from "winston";
-import { config } from "../env.config";
+import { envProvider } from "./env.config.js";
 
-const isProduction = config.isProduction;
+const isProduction = envProvider.environment;
 
 const transports: winston.transport[] = [
   new winston.transports.Console({
@@ -25,7 +25,7 @@ if (isProduction) {
 }
 
 const logger = winston.createLogger({
-  level: config.logLevel || "info",
+  level: envProvider.logLevel || "info",
   exitOnError: false,
   format: winston.format.combine(
     winston.format.timestamp({ format: "HH:mm:ss" }),

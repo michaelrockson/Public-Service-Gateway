@@ -1,16 +1,22 @@
-import { HttpService } from "../../shared/http.service";
-import { config } from "../../env.config";
-import { NewsSearchParams } from "./news.model";
+import { HttpService } from "../../shared/http.service.js";
+import { envProvider } from "../../shared/env.config.js";
+import { NewsSearchParams } from "./news.model.js";
 
+/**
+ * Handles all outbound requests to the NewsAPI.
+ *
+ * Reads `newsApiUrl` and `newsApiKey` from the env provider at
+ * construction time, instantiates only after `populateEnvProvider()`
+ * has been called in `server.ts`.
+ */
 export class NewsService {
   private readonly newsApiUrl: string;
   private readonly newsApiKey: string;
   private readonly httpService: HttpService;
 
   constructor() {
-
-    this.newsApiKey =  config.newsApiKey;
-    this.newsApiUrl = config.newsApiUrl;
+    this.newsApiKey = envProvider.newsApiKey;
+    this.newsApiUrl = envProvider.newsApiUrl;
     this.httpService = new HttpService(
       this.newsApiUrl,
       this.newsApiKey,
@@ -18,6 +24,13 @@ export class NewsService {
     );
   }
 
+  /**
+   * Fetches news articles matching a search query.
+   *
+   * @param newsParams - Query parameters including `q` (search term).
+   * @returns Matching articles from the NewsAPI `/everything` endpoint.
+   * @throws {Error} If the API request fails.
+   */
   async getNewsArticles(newsParams: NewsSearchParams) {
     try {
       const response = await this.httpService.makeApiRequest(
@@ -30,11 +43,18 @@ export class NewsService {
     }
   }
 
+  /**
+   * Fetches current top headlines, optionally filtered by country.
+   *
+   * @param newsParams - Query parameters including `country`.
+   * @returns Top headlines from the NewsAPI `/top-headlines` endpoint.
+   * @throws {Error} If the API request fails.
+   */
   async getTopHeadlines(newsParams: NewsSearchParams) {
     try {
       const response = await this.httpService.makeApiRequest(
-          "/top-headlines",
-          newsParams,
+        "/top-headlines",
+        newsParams,
       );
       return response.data;
     } catch (error) {
@@ -42,6 +62,3 @@ export class NewsService {
     }
   }
 }
-
-let newsService: NewsService = new NewsService();
-export default newsService;

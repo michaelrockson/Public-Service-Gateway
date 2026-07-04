@@ -1,17 +1,30 @@
 import { Request, Response } from "express";
-import newsService, { NewsService } from "./news.service";
-import { ControllerResponseHandler } from "../../shared/http.controller";
-import { NewsSearchParams } from "./news.model";
+import { NewsService } from "./news.service.js";
+import { ControllerResponseHandler } from "../../shared/http.controller.js";
+import { NewsSearchParams } from "./news.model.js";
 
+/**
+ * Handles incoming HTTP requests for news endpoints, delegating
+ * data fetching to `NewsService` and response formatting to
+ * `ControllerResponseHandler`.
+ */
 export class NewsController {
   private readonly httpClient: NewsService;
   private readonly responseHandler: ControllerResponseHandler;
 
-  constructor() {
+  /**
+   * @param newsService - The initialized news service instance,
+   *   provided by `setServices()` in `server.ts`.
+   */
+  constructor(newsService: NewsService) {
     this.httpClient = newsService;
     this.responseHandler = new ControllerResponseHandler();
   }
 
+  /**
+   * Handles `GET /news/topic`.
+   * Required query params: `q`.
+   */
   async handleGetNewsArticlesRequest(req: Request, res: Response) {
     return this.responseHandler.handleRequest(
       req,
@@ -22,18 +35,17 @@ export class NewsController {
     );
   }
 
+  /**
+   * Handles `GET /news/top-headlines`.
+   * Required query params: `country`.
+   */
   async handleGetTopHeadlines(req: Request, res: Response) {
     return this.responseHandler.handleRequest(
-        req,
-        res,
-        (params: NewsSearchParams) => this.httpClient.getTopHeadlines(params),
-        "Top Headlines",
-        ["country"],
-    )
+      req,
+      res,
+      (params: NewsSearchParams) => this.httpClient.getTopHeadlines(params),
+      "Top Headlines",
+      ["country"],
+    );
   }
-
 }
-
-let newsController = new NewsController();
-
-export default newsController;

@@ -1,8 +1,14 @@
 import dotenv from "dotenv";
 import path from "path";
+import { WeatherService } from "../../modules/weather/weather.service.js";
+import { WeatherController } from "../../modules/weather/weather.controller.js";
+import { NewsService } from "../../modules/news/news.service.js";
+import { NewsController } from "../../modules/news/news.controller.js";
+
+export const envPath = path.join(process.cwd(), ".env");
 
 dotenv.config({
-  path: path.join(__dirname, "../../../.env"),
+  path: envPath,
 });
 
 export function validateSecrets(secrets: Record<string, unknown>) {
@@ -45,4 +51,22 @@ export function getEnvNumber(key: string, fallback?: number): number {
     );
   }
   return parsed;
+}
+export function validateInfisicalCredentials(
+  clientId: string,
+  clientSecret: string,
+) {
+  if (!clientId || !clientSecret) {
+    throw new Error("Missing infisical credentials for authentication");
+  }
+}
+
+export function bootServices() {
+  const weatherService = new WeatherService();
+  const weatherController = new WeatherController(weatherService);
+
+  const newsService = new NewsService();
+  const newsController = new NewsController(newsService);
+
+  return { weatherController, newsController };
 }
