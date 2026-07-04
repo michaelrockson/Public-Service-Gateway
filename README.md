@@ -105,7 +105,7 @@ Fetches current weather data for a given location.
 ```json
 {
   "currentWeather": {
-    "...OpenWeatherMap response..."
+    "details" : "...OpenWeatherMap response..."
   }
 }
 ```
@@ -131,7 +131,7 @@ Fetches a 5-day weather forecast for a given location.
 ```json
 {
   "forecastWeather": {
-    "...OpenWeatherMap response..."
+    "details" : "...OpenWeatherMap response..."
   }
 }
 ```
@@ -158,7 +158,7 @@ Fetches current top headlines, optionally filtered by country.
 ```json
 {
   "Top Headlines": {
-    "...NewsAPI response..."
+    "details": "...NewsAPI response..."
   }
 }
 ```
@@ -183,7 +183,7 @@ Fetches news articles matching a search query.
 ```json
 {
   "Related Article(s)": {
-    "...NewsAPI response..."
+    "details": "...NewsAPI response..."
   }
 }
 ```
