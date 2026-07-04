@@ -2,9 +2,11 @@ import { InfisicalSDK } from "@infisical/sdk";
 import {
   getEnvNumber,
   getEnvVar,
+  validateEnvs,
   validateInfisicalCredentials,
-  validateSecrets,
+  validateInfisicalSecrets,
 } from "./utils/config.utils.js";
+import { logProcess, logProcessError } from "./utils/logger.utils.js";
 
 export class InfisicalService {
   private readonly client: InfisicalSDK;
@@ -29,24 +31,32 @@ export class InfisicalService {
     validateInfisicalCredentials(this.clientId, this.clientSecret);
 
     try {
-      await this.client.auth().universalAuth.login({
+      logProcess("Authenticating Infisical Client.....");
+
+      const infisicalClient = await this.client.auth().universalAuth.login({
         clientId: this.clientId,
         clientSecret: this.clientSecret,
       });
+
+      if (infisicalClient) {
+        logProcess("Infisical Client Authenticated!");
+      }
     } catch (error) {
-      throw new Error(`Error authenticating Infisical Client: ${error}`);
+      logProcessError(`Authenticating Infisical Client:`, error);
     }
   }
 
   async injectInfisicalSecrets() {
     try {
+      logProcess("Fetching Secrets from Infisical.....");
+
       await this.client.secrets().listSecrets({
         environment: this.environment,
         projectId: this.projectId,
         attachToProcessEnv: true,
       });
     } catch (error) {
-      throw new Error(`Error fetching Infisical Secrets: ${error}`);
+      logProcessError(`Fetching Infisical Secrets:`, error);
     }
   }
 
@@ -59,7 +69,7 @@ export class InfisicalService {
       projectId: getEnvVar("INFISICAL_PROJECT_ID"),
     } as const;
 
-    validateSecrets(config);
+    validateEnvs(config);
     return config;
   }
 }
@@ -81,7 +91,7 @@ export async function injectSecretsFromInfisical() {
       newsApiKey: getEnvVar("NEWS_API_KEY", ""),
     } as const;
 
-    validateSecrets(config);
+    validateInfisicalSecrets(config);
 
     return config;
   } catch (error) {
