@@ -205,12 +205,12 @@ src/
 │   │   ├── weather.service.ts       # Outbound calls to OpenWeatherMap
 │   │   ├── weather.controller.ts    # HTTP request handling for weather endpoints
 │   │   ├── weather.routes.ts        # Route definitions for /api/weather
-│   │   └── weather.model.ts         # Request parameter types
+│   │   └── weather.types.ts         # Request parameter types
 │   └── news/
 │       ├── news.service.ts          # Outbound calls to NewsAPI
 │       ├── news.controller.ts       # HTTP request handling for news endpoints
 │       ├── news.routes.ts           # Route definitions for /api/news
-│       └── news.model.ts            # Request parameter types
+│       └── news.types.ts            # Request parameter types
 └── shared/
     ├── infisical.service.ts         # Infisical auth and secret injection
     ├── env.config.ts                # envProvider synchronous config access

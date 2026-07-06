@@ -1,14 +1,7 @@
-import { CurrentWeatherParams } from "./weather.model.js";
+import { CurrentWeatherParams } from "./weather.types.js";
 import { HttpService } from "../../shared/http.service.js";
 import { envProvider } from "../../shared/env.config.js";
 
-/**
- * Handles all outbound requests to the OpenWeatherMap API.
- *
- * Reads `weatherApiUrl` and `weatherApiKey` from the env provider at
- * construction time, instantiates only after `populateEnvProvider()`
- * has been called in `server.ts`.
- */
 export class WeatherService {
   private readonly weatherApiUrl: string;
   private readonly weatherApiKey: string;
