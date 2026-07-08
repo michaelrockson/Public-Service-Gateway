@@ -39,7 +39,7 @@ Each integration follows the same modular service / controller / router pattern.
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/michaelrockson/Public-Service-API-Gateway.git
+git clone https://github.com/michaelrockson/Public-Service-Gateway.git
 cd Public-Service-API-Gateway
 ```
 
