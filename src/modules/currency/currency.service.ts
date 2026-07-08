@@ -21,7 +21,7 @@ export class CurrencyService {
   ): Promise<void> {
     try {
       const response = await this.httpService.makeApiRequest(
-        "currency",
+        "latest",
         currencyParams,
       );
     } catch (error) {

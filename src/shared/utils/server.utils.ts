@@ -17,7 +17,7 @@ export function bootServices() {
     const currencyService = new CurrencyService();
     const currencyController = new CurrencyController(currencyService);
 
-    if (weatherService || weatherController || newsService || newsController) {
+    if (currencyController) {
       logBootstrapStep("Module Services and Controllers were booted");
     }
 
