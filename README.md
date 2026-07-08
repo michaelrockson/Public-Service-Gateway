@@ -1,4 +1,4 @@
-# Public Services API Gateway
+# Public Service Gateway
 
 An API gateway for public services built on Express and TypeScript. The gateway aggregates several public APIs behind a single, uniform interface for downstream clients. Secrets and runtime configuration are managed via [Infisical](https://infisical.com/) no API keys are stored locally beyond the credentials needed to bootstrap the Infisical connection.
 
