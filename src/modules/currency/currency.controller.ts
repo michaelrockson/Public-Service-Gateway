@@ -40,4 +40,14 @@ export class CurrencyController {
       ["from", "to", "amount"],
     );
   }
+
+  async handleTimeFrameRequest(req: Request, res: Response) {
+    return this.responseHandler.handleRequest(
+      req,
+      res,
+      (params) => this.httpClient.getTimeframeRates(params),
+      "Timeframe Rates",
+      ["start_date", "end_date"],
+    );
+  }
 }

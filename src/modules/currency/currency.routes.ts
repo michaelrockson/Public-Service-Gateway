@@ -27,5 +27,12 @@ export function createCurrencyRouter(
     },
   );
 
+  currencyRouter.get(
+    "/timeframe",
+    async (req: Request, res: Response): Promise<void> => {
+      await currencyController.handleTimeFrameRequest(req, res);
+    },
+  );
+
   return currencyRouter;
 }
