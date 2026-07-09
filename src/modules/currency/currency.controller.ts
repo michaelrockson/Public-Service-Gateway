@@ -11,13 +11,13 @@ export class CurrencyController {
     this.responseHandler = new ControllerResponseHandler();
   }
 
-  async handleCurrencyRateRequest(req: Request, res: Response) {
+  async handleLiveRateRequest(req: Request, res: Response) {
     return this.responseHandler.handleRequest(
       req,
       res,
-      (params) => this.httpClient.getCurrencyRates(params),
+      (params) => this.httpClient.getLiveRates(params),
       "currencyRates",
-      ["currency"],
+      ["symbols"],
     );
   }
 }

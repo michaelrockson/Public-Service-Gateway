@@ -7,9 +7,9 @@ export function createCurrencyRouter(
   const currencyRouter = Router();
 
   currencyRouter.get(
-    "/latest",
+    "/live",
     async (req: Request, res: Response): Promise<void> => {
-      await currencyController.handleCurrencyRateRequest(req, res);
+      await currencyController.handleLiveRateRequest(req, res);
     },
   );
 

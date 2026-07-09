@@ -12,18 +12,17 @@ export class CurrencyService {
     this.httpService = new HttpService(
       this.currencyApiUrl,
       this.currencyApiKey,
-      "apikey",
+      "access_key",
     );
   }
 
-  async getCurrencyRates(
-    currencyParams: Record<string, string>,
-  ): Promise<void> {
+  async getLiveRates(currencyParams: Record<string, string>): Promise<void> {
     try {
       const response = await this.httpService.makeApiRequest(
-        "latest",
+        "live",
         currencyParams,
       );
+      return response.data;
     } catch (error) {
       this.httpService.handleApiErrors(error);
     }
