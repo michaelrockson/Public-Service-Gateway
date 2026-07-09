@@ -34,5 +34,12 @@ export function createCurrencyRouter(
     },
   );
 
+  currencyRouter.get(
+    "/change",
+    async (req: Request, res: Response): Promise<void> => {
+      await currencyController.handleChangeRateRequest(req, res);
+    },
+  );
+
   return currencyRouter;
 }

@@ -50,4 +50,14 @@ export class CurrencyController {
       ["start_date", "end_date"],
     );
   }
+
+  async handleChangeRateRequest(req: Request, res: Response) {
+    return this.responseHandler.handleRequest(
+      req,
+      res,
+      (params) => this.httpClient.getChangeRates(params),
+      "Changed Rates",
+      ["start_date", "end_date"],
+    );
+  }
 }

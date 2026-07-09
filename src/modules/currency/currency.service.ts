@@ -69,4 +69,16 @@ export class CurrencyService {
       this.httpService.handleApiErrors(error);
     }
   }
+
+  async getChangeRates(currencyParams: Record<string, string>): Promise<void> {
+    try {
+      const response = await this.httpService.makeApiRequest(
+        "change",
+        currencyParams,
+      );
+      return response.data;
+    } catch (error) {
+      this.httpService.handleApiErrors(error);
+    }
+  }
 }
