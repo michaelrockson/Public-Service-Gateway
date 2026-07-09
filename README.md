@@ -17,15 +17,15 @@ An API gateway for public services built on Express and TypeScript. The gateway 
 
 This gateway aggregates the following public APIs into unified endpoints:
 
-| API | Purpose | Status |
-|---|---|---|
-| [OpenWeatherMap](https://openweathermap.org/api) | Current weather and 5-day forecast | Implemented |
-| [NewsAPI](https://newsapi.org/) | News headlines and articles | Implemented |
-| [ExchangeRate-API](https://www.exchangerate-api.com/) | Currency exchange rates | Planned |
-| [Nager.Date](https://date.nager.at/) | Public holidays by country | Planned |
-| [TheSportsDB](https://www.thesportsdb.com/api.php) / [API-Football](https://www.api-football.com/) | Sports scores and fixtures | Planned |
-| [AviationStack](https://aviationstack.com/) | Flight and aviation data | Planned |
-| [Agromonitoring](https://agromonitoring.com/api) | Agricultural and soil data | Planned |
+| API                                                                                                | Purpose | Status      |
+|----------------------------------------------------------------------------------------------------|---|-------------|
+| [OpenWeatherMap](https://openweathermap.org/api)                                                   | Current weather and 5-day forecast | Implemented |
+| [NewsAPI](https://newsapi.org/)                                                                    | News headlines and articles | Implemented |
+| [ExchangeRates.Host](https://exchangerate.host/)                                                   | Currency exchange rates | Implemented |
+| [Nager.Date](https://date.nager.at/)                                                               | Public holidays by country | Planned     |
+| [TheSportsDB](https://www.thesportsdb.com/api.php) / [API-Football](https://www.api-football.com/) | Sports scores and fixtures | Planned     |
+| [AviationStack](https://aviationstack.com/)                                                        | Flight and aviation data | Planned     |
+| [Agromonitoring](https://agromonitoring.com/api)                                                   | Agricultural and soil data | Planned     |
 
 Each integration follows the same modular service / controller / router pattern. API keys and base URLs are stored in Infisical and injected at startup.
 
