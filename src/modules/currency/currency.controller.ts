@@ -60,4 +60,13 @@ export class CurrencyController {
       ["start_date", "end_date"],
     );
   }
+
+  async handleAllCurrenciesRequest(req: Request, res: Response) {
+    return this.responseHandler.handleRequest(
+      req,
+      res,
+      (params) => this.httpClient.getAllSupportedCurrencies(params),
+      "All Supported Currencies",
+    );
+  }
 }

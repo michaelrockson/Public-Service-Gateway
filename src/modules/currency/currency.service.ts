@@ -81,4 +81,18 @@ export class CurrencyService {
       this.httpService.handleApiErrors(error);
     }
   }
+
+  async getAllSupportedCurrencies(
+    currencyParams: Record<string, string>,
+  ): Promise<void> {
+    try {
+      const response = await this.httpService.makeApiRequest(
+        "list",
+        currencyParams,
+      );
+      return response.data;
+    } catch (error) {
+      this.httpService.handleApiErrors(error);
+    }
+  }
 }
