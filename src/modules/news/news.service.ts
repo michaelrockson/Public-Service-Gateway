@@ -1,14 +1,7 @@
 import { HttpService } from "../../shared/http.service.js";
 import { envProvider } from "../../shared/env.config.js";
-import { NewsSearchParams } from "./news.model.js";
+import { NewsSearchParams } from "./news.types.js";
 
-/**
- * Handles all outbound requests to the NewsAPI.
- *
- * Reads `newsApiUrl` and `newsApiKey` from the env provider at
- * construction time, instantiates only after `populateEnvProvider()`
- * has been called in `server.ts`.
- */
 export class NewsService {
   private readonly newsApiUrl: string;
   private readonly newsApiKey: string;

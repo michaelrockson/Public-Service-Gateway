@@ -7,7 +7,7 @@ import { populateEnvProvider } from "./shared/env.config.js";
 import { createMorganStream, logProcess } from "./shared/utils/logger.utils.js";
 import { bootServices } from "./shared/utils/server.utils.js";
 
-async function startServer() {
+async function startServer(): Promise<void> {
   const serverSecrets = await injectSecretsFromInfisical();
   populateEnvProvider(serverSecrets);
 
@@ -20,7 +20,6 @@ async function startServer() {
   const gatewayRouter = createGatewayRouter(controllers);
 
   server.use(morgan("combined", { stream: createMorganStream() }));
-
   server.use(express.json());
   server.use("/api", gatewayRouter);
 

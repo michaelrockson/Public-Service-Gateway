@@ -53,12 +53,12 @@ src/
 │   │   ├── weather.service.ts
 │   │   ├── weather.controller.ts
 │   │   ├── weather.routes.ts
-│   │   └── weather.model.ts
+│   │   └── weather.types.ts
 │   └── news/
 │       ├── news.service.ts
 │       ├── news.controller.ts
 │       ├── news.routes.ts
-│       └── news.model.ts
+│       └── news.types.ts
 └── shared/                     # Cross-cutting infrastructure
     ├── infisical.service.ts    # Infisical auth + secret injection
     ├── env.config.ts           # envProvider — synchronous config access

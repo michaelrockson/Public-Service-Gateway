@@ -89,6 +89,8 @@ export async function injectSecretsFromInfisical() {
       weatherApiKey: getEnvVar("WEATHER_API_KEY", ""),
       newsApiUrl: getEnvVar("NEWS_API_URL", ""),
       newsApiKey: getEnvVar("NEWS_API_KEY", ""),
+      currencyApiUrl: getEnvVar("CURRENCY_API_URL", ""),
+      currencyApiKey: getEnvVar("CURRENCY_API_KEY", ""),
     } as const;
 
     validateInfisicalSecrets(config);

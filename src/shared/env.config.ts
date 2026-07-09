@@ -6,6 +6,8 @@ interface AppConfig {
   weatherApiKey: string;
   newsApiUrl: string;
   newsApiKey: string;
+  currencyApiUrl: string;
+  currencyApiKey: string;
 }
 
 export const envProvider = {} as AppConfig;

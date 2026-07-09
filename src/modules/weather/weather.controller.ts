@@ -2,11 +2,6 @@ import { Request, Response } from "express";
 import { WeatherService } from "./weather.service.js";
 import { ControllerResponseHandler } from "../../shared/http.controller.js";
 
-/**
- * Handles incoming HTTP requests for weather endpoints, delegating
- * data fetching to `WeatherService` and response formatting to
- * `ControllerResponseHandler`.
- */
 export class WeatherController {
   private readonly httpClient: WeatherService;
   private readonly responseHandler: ControllerResponseHandler;

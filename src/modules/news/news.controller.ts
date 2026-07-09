@@ -1,13 +1,8 @@
 import { Request, Response } from "express";
 import { NewsService } from "./news.service.js";
 import { ControllerResponseHandler } from "../../shared/http.controller.js";
-import { NewsSearchParams } from "./news.model.js";
+import { NewsSearchParams } from "./news.types.js";
 
-/**
- * Handles incoming HTTP requests for news endpoints, delegating
- * data fetching to `NewsService` and response formatting to
- * `ControllerResponseHandler`.
- */
 export class NewsController {
   private readonly httpClient: NewsService;
   private readonly responseHandler: ControllerResponseHandler;
