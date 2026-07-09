@@ -16,8 +16,18 @@ export class CurrencyController {
       req,
       res,
       (params) => this.httpClient.getLiveRates(params),
-      "currencyRates",
+      "Live Currency Rates",
       ["symbols"],
+    );
+  }
+
+  async handleHistoricalRateRequest(req: Request, res: Response) {
+    return this.responseHandler.handleRequest(
+      req,
+      res,
+      (params) => this.httpClient.getLiveRates(params),
+      "Historical Rates",
+      ["date"],
     );
   }
 }

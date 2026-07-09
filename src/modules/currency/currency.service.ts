@@ -27,4 +27,18 @@ export class CurrencyService {
       this.httpService.handleApiErrors(error);
     }
   }
+
+  async getHistoricalRates(
+    currencyParams: Record<string, string>,
+  ): Promise<void> {
+    try {
+      const response = await this.httpService.makeApiRequest(
+        "historical",
+        currencyParams,
+      );
+      return response.data;
+    } catch (error) {
+      this.httpService.handleApiErrors(error);
+    }
+  }
 }

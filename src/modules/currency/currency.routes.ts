@@ -13,5 +13,12 @@ export function createCurrencyRouter(
     },
   );
 
+  currencyRouter.get(
+    "/historical",
+    async (req: Request, res: Response): Promise<void> => {
+      await currencyController.handleHistoricalRateRequest(req, res);
+    },
+  );
+
   return currencyRouter;
 }
