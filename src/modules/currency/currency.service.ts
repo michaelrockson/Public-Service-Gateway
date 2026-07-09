@@ -41,4 +41,18 @@ export class CurrencyService {
       this.httpService.handleApiErrors(error);
     }
   }
+
+  async getConversionRates(
+    currencyParams: Record<string, string>,
+  ): Promise<void> {
+    try {
+      const response = await this.httpService.makeApiRequest(
+        "convert",
+        currencyParams,
+      );
+      return response.data;
+    } catch (error) {
+      this.httpService.handleApiErrors(error);
+    }
+  }
 }

@@ -25,9 +25,19 @@ export class CurrencyController {
     return this.responseHandler.handleRequest(
       req,
       res,
-      (params) => this.httpClient.getLiveRates(params),
+      (params) => this.httpClient.getHistoricalRates(params),
       "Historical Rates",
       ["date"],
+    );
+  }
+
+  async handleConversionRateRequest(req: Request, res: Response) {
+    return this.responseHandler.handleRequest(
+      req,
+      res,
+      (params) => this.httpClient.getConversionRates(params),
+      "Conversion Rates",
+      ["from", "to", "amount"],
     );
   }
 }

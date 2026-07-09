@@ -20,5 +20,12 @@ export function createCurrencyRouter(
     },
   );
 
+  currencyRouter.get(
+    "/convert",
+    async (req: Request, res: Response): Promise<void> => {
+      await currencyController.handleConversionRateRequest(req, res);
+    },
+  );
+
   return currencyRouter;
 }
