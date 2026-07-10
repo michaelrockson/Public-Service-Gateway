@@ -17,13 +17,6 @@ export class WeatherService {
     );
   }
 
-  /**
-   * Fetches the current weather for a given location.
-   *
-   * @param weatherParams - Query parameters including `lat` and `lon`.
-   * @returns The current weather data from OpenWeatherMap.
-   * @throws {Error} If the API request fails.
-   */
   async getCurrentWeather(weatherParams: CurrentWeatherParams) {
     try {
       const response = await this.httpService.makeApiRequest(
@@ -36,13 +29,6 @@ export class WeatherService {
     }
   }
 
-  /**
-   * Fetches a multi-day weather forecast for a given location.
-   *
-   * @param weatherParams - Query parameters including `lat` and `lon`.
-   * @returns The forecast data from OpenWeatherMap.
-   * @throws {Error} If the API request fails.
-   */
   async getWeatherForecast(weatherParams: CurrentWeatherParams) {
     try {
       const response = await this.httpService.makeApiRequest(
