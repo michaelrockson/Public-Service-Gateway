@@ -86,13 +86,10 @@ yarn start
 
 > **Important:** Always run the server from the project root, not from `src/`. The dotenv bootstrap resolves `.env` relative to `process.cwd()`. Running from the wrong directory will cause a `Missing required environment variable: INFISICAL_SITE_URL` error at startup.
 
----
-
 ## API & Testing
 
 All endpoints are documented in **[docs/Routes.md](docs/Routes.md)**, including full parameter tables and ready-to-use Postman examples for every module.
 
----
 
 ## Project Structure
 
