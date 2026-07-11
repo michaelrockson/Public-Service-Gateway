@@ -46,7 +46,8 @@ export function validateParams(params: Record<string, unknown>, res: Response) {
  * @param res
  */
 export function validateResponse(apiResponse: unknown, res: Response) {
-  if (!apiResponse) {
-    responseHandler.notFound(res, "current weather is unavailable");
+  if (apiResponse === undefined || apiResponse === null) {
+    responseHandler.notFound(res, "Requested data is unavailable");
+    throw new Error("Requested data is unavailable");
   }
 }

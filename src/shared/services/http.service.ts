@@ -16,9 +16,22 @@ export class HttpService {
    *
    * @param endpoint - API path segment, example: "weather" or "forecast".
    * @param params
+   * @param additionalUris - Additional URI segments to append to the endpoint, example: "v2", "details".
    */
-  public async makeApiRequest(endpoint?: string, params?: {}) {
-    return await axios.get(`${this.apiUrl}/${endpoint}`, {
+  public async makeApiRequest(
+    endpoint?: string,
+    params?: {},
+    additionalUris?: string[],
+  ) {
+    let fullEndpoint = endpoint ?? "";
+
+    if (additionalUris && additionalUris.length > 0) {
+      for (const uri of additionalUris) {
+        fullEndpoint += `/${uri}`;
+      }
+    }
+
+    return await axios.get(`${this.apiUrl}/${fullEndpoint}`, {
       params: {
         ...params,
         [this.apiKeyName]: this.apiKey,

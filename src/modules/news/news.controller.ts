@@ -7,19 +7,11 @@ export class NewsController {
   private readonly httpClient: NewsService;
   private readonly responseHandler: ControllerResponseHandler;
 
-  /**
-   * @param newsService - The initialized news service instance,
-   *   provided by `setServices()` in `server.ts`.
-   */
   constructor(newsService: NewsService) {
     this.httpClient = newsService;
     this.responseHandler = new ControllerResponseHandler();
   }
 
-  /**
-   * Handles `GET /news/topic`.
-   * Required query params: `q`.
-   */
   async handleGetNewsArticlesRequest(req: Request, res: Response) {
     return this.responseHandler.handleRequest(
       req,
@@ -30,10 +22,6 @@ export class NewsController {
     );
   }
 
-  /**
-   * Handles `GET /news/top-headlines`.
-   * Required query params: `country`.
-   */
   async handleGetTopHeadlines(req: Request, res: Response) {
     return this.responseHandler.handleRequest(
       req,
