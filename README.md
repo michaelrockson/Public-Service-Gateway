@@ -194,6 +194,22 @@ Fetches news articles matching a search query.
 
 ---
 
+## Testing with Postman
+
+Since the gateway aggregates multiple APIs under unified routes, testing with Postman is straightforward. You only need to target the gateway's local port (default `3000`) instead of managing individual API keys in Postman.
+
+1. **Set Base URL:** Configure your Postman collection variable or environment with `baseUrl = http://localhost:3000` (or your configured port).
+2. **Weather API:** 
+   - `GET {{baseUrl}}/api/weather/current?lat=51.5074&lon=-0.1278`
+   - `GET {{baseUrl}}/api/weather/forecast?lat=51.5074&lon=-0.1278`
+3. **News API:**
+   - `GET {{baseUrl}}/api/news/top-headlines?country=us`
+   - `GET {{baseUrl}}/api/news/topic?q=technology`
+
+*Note: No `Authorization` headers or API keys need to be sent in the Postman requests. The gateway handles the upstream authentication automatically using the Infisical secrets.*
+
+---
+
 ## Project Structure
 
 ```
