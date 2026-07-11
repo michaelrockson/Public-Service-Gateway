@@ -5,6 +5,8 @@ import { NewsController } from "../../modules/news/news.controller.js";
 import { logBootstrapError, logBootstrapStep } from "./logger.utils.js";
 import { CurrencyService } from "../../modules/currency/currency.service.js";
 import { CurrencyController } from "../../modules/currency/currency.controller.js";
+import { HolidayService } from "../../modules/holidays/holiday.service.js";
+import { HolidayController } from "../../modules/holidays/holiday.controller.js";
 
 export function bootServices() {
   try {
@@ -17,11 +19,19 @@ export function bootServices() {
     const currencyService = new CurrencyService();
     const currencyController = new CurrencyController(currencyService);
 
+    const holidayService = new HolidayService();
+    const holidayController = new HolidayController(holidayService);
+
     if (currencyController) {
       logBootstrapStep("Module Services and Controllers were booted");
     }
 
-    return { weatherController, newsController, currencyController };
+    return {
+      weatherController,
+      newsController,
+      currencyController,
+      holidayController,
+    };
   } catch (error) {
     logBootstrapError("Booting module services & controllers", error);
     throw new Error();

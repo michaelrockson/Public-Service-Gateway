@@ -105,6 +105,8 @@ export class HolidayService {
         "",
         [`${holidayParams.countryCode}`],
       );
+      if (response.status === 200) return true;
+      if (response.status === 204) return false;
       return response.data;
     } catch (error) {
       this.httpService.handleApiErrors(error);

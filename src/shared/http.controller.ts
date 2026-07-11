@@ -32,17 +32,21 @@ export class ControllerResponseHandler {
       if (requiredParams?.length) {
         requestParams = parseParams(req, requiredParams);
         validateParams(requestParams, res);
+        if (res.headersSent) return;
       }
 
       const serviceResponse = await fetchFunction(requestParams);
 
       validateResponse(serviceResponse, res);
+      if (res.headersSent) return;
 
       return this.successResponse(res, "Data fetched successfully", {
         [responseKey]: serviceResponse,
       });
     } catch (error) {
-      this.internalServerError(res, "Failed to process request", error);
+      if (!res.headersSent) {
+        this.internalServerError(res, "Failed to process request", error);
+      }
     }
   }
 
