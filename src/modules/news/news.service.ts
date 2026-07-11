@@ -20,7 +20,7 @@ export class NewsService {
   async getNewsArticles(newsParams: NewsSearchParams) {
     try {
       const response = await this.httpService.makeApiRequest(
-        "/everything",
+        "everything",
         newsParams,
       );
       return response.data;
@@ -32,7 +32,7 @@ export class NewsService {
   async getTopHeadlines(newsParams: NewsSearchParams) {
     try {
       const response = await this.httpService.makeApiRequest(
-        "/top-headlines",
+        "top-headlines",
         newsParams,
       );
       return response.data;

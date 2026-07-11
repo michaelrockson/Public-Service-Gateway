@@ -21,7 +21,7 @@ async function startServer(): Promise<void> {
 
   server.use(morgan("combined", { stream: createMorganStream() }));
   server.use(express.json());
-  server.use("/api", gatewayRouter);
+  server.use("/api/v1", gatewayRouter);
 
   server.listen(port, (): void => {
     logProcess(`Server running on ${port}`);
