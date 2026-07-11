@@ -38,8 +38,7 @@ export class HolidayController {
     return this.responseHandler.handleRequest(
       req,
       res,
-      (params: PublicHolidaysParams) =>
-        this.httpClient.getNextPublicHolidaysWorldwide(params),
+      () => this.httpClient.getNextPublicHolidaysWorldwide(),
       "Next Public Holidays Worldwide",
     );
   }
@@ -48,8 +47,7 @@ export class HolidayController {
     return this.responseHandler.handleRequest(
       req,
       res,
-      (params: PublicHolidaysParams) =>
-        this.httpClient.getAvailableCountries(params),
+      () => this.httpClient.getAvailableCountries(),
       "Available Countries",
     );
   }

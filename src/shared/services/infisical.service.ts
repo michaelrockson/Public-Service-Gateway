@@ -5,8 +5,8 @@ import {
   validateEnvs,
   validateInfisicalCredentials,
   validateInfisicalSecrets,
-} from "./utils/config.utils.js";
-import { logProcess, logProcessError } from "./utils/logger.utils.js";
+} from "../utils/config.utils.js";
+import { logProcess, logProcessError } from "../utils/logger.utils.js";
 
 export class InfisicalService {
   private readonly client: InfisicalSDK;

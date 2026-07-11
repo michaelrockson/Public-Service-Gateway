@@ -2,7 +2,7 @@ import express, { type Express } from "express";
 import morgan from "morgan";
 import logger from "./shared/server.logger.js";
 import { createGatewayRouter } from "./modules/routes.registry.js";
-import { injectSecretsFromInfisical } from "./shared/infisical.service.js";
+import { injectSecretsFromInfisical } from "./shared/services/infisical.service.js";
 import { populateEnvProvider } from "./shared/env.config.js";
 import { createMorganStream, logProcess } from "./shared/utils/logger.utils.js";
 import { bootServices } from "./shared/utils/server.utils.js";
