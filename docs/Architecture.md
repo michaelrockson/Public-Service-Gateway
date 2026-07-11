@@ -60,11 +60,13 @@ src/
 │       ├── news.routes.ts
 │       └── news.types.ts
 └── shared/                     # Cross-cutting infrastructure
-    ├── infisical.service.ts    # Infisical auth + secret injection
     ├── env.config.ts           # envProvider — synchronous config access
-    ├── http.service.ts         # Shared Axios wrapper
     ├── http.controller.ts      # Shared request/response handler
-    └── server.logger.ts        # Winston logger instance
+    ├── server.logger.ts        # Winston logger instance
+    └── services/
+        ├── base.service.ts     # Shared base class for API services
+        ├── http.service.ts     # Shared Axios wrapper
+        └── infisical.service.ts# Infisical auth + secret injection
 ```
 
 
@@ -203,14 +205,12 @@ module.model.ts         — TypeScript interfaces for request/response shapes
 ### Service
 
 Owns all communication with the external API. Constructed with config
-read from `envProvider`. Has no knowledge of Express.
+read from `envProvider`. Inherits from `BaseService`. Has no knowledge of Express.
 
 ```typescript
-export class NewsService {
+export class NewsService extends BaseService {
   constructor() {
-    this.newsApiUrl = envProvider.newsApiUrl; // safe —> envProvider is ready
-    this.newsApiKey = envProvider.newsApiKey;
-    this.httpService = new HttpService(this.newsApiUrl, this.newsApiKey, "apiKey");
+    super(envProvider.newsApiUrl, envProvider.newsApiKey, "apiKey");
   }
 }
 ```
@@ -245,7 +245,7 @@ export function createNewsRouter(newsController: NewsController): Router {
 
 ## 8. Shared Layer
 
-### `infisical.service.ts`
+### `services/infisical.service.ts`
 
 Handles the two-phase Infisical bootstrap:
 1. `InfisicalService` — authenticates and fetches secrets.
@@ -258,7 +258,11 @@ Exports `envProvider` (a plain object) and `populateEnvProvider()`.
 `populateEnvProvider()` is called once in `startServer()`. After that,
 `envProvider` is safe to read synchronously from any constructor.
 
-### `http.service.ts`
+### `services/base.service.ts`
+
+An abstract base class that sets up the underlying `HttpService`. All feature services inherit from this class and use its `executeRequest()` method to make API calls, reducing boilerplate.
+
+### `services/http.service.ts`
 
 A thin Axios wrapper (`HttpService`) that accepts a base URL, API key,
 and key param name at construction. Exposes `makeApiRequest()` and
@@ -289,13 +293,11 @@ src/modules/currency/
     currency.routes.ts
 ```
 
-**2. Implement the service** read from `envProvider`, use `HttpService`:
+**2. Implement the service** read from `envProvider`, inherit `BaseService`:
 ```typescript
-export class CurrencyService {
+export class CurrencyService extends BaseService {
   constructor() {
-    this.currencyApiUrl = envProvider.currencyApiUrl;
-    this.currencyApiKey = envProvider.currencyApiKey;
-    this.httpService = new HttpService(this.currencyApiUrl, this.currencyApiKey, "apikey");
+    super(envProvider.currencyApiUrl, envProvider.currencyApiKey, "apikey");
   }
 }
 ```

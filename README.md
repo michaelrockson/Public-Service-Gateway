@@ -212,11 +212,13 @@ src/
 │       ├── news.routes.ts           # Route definitions for /api/news
 │       └── news.types.ts            # Request parameter types
 └── shared/
-    ├── infisical.service.ts         # Infisical auth and secret injection
     ├── env.config.ts                # envProvider synchronous config access
-    ├── http.service.ts              # Shared Axios wrapper used by all services
     ├── http.controller.ts           # Shared request/response handler
     ├── server.logger.ts             # Winston logger instance
+    ├── services/
+    │   ├── base.service.ts          # Shared base class for all API services
+    │   ├── http.service.ts          # Shared Axios wrapper used by all services
+    │   └── infisical.service.ts     # Infisical auth and secret injection
     └── utils/
         └── config.utils.ts          # getEnvVar, validateSecrets, bootServices
 ```
