@@ -37,12 +37,18 @@ export class SportsService extends BaseService {
   async getSearchedPlayers(
     sportsParams: SearchPlayersParams,
   ): Promise<PlayersResponse | undefined> {
-    return this.executeRequest("searchplayers.php", sportsParams);
+    return this.executeRequest(
+      `${envProvider.sportsApiKey}/searchplayers.php`,
+      sportsParams,
+    );
   }
 
   async getSearchedVenues(
     sportsParams: SearchVenuesParams,
   ): Promise<VenuesResponse | undefined> {
-    return this.executeRequest("searchvenues.php", sportsParams);
+    return this.executeRequest(
+      `${envProvider.sportsApiKey}/searchvenues.php`,
+      sportsParams,
+    );
   }
 }
