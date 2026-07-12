@@ -19,32 +19,30 @@ export class SportsService extends BaseService {
   async getSearchedTeams(
     sportsParams: SearchTeamsParams,
   ): Promise<TeamsResponse | undefined> {
-    return this.executeRequest("searchteams.php", sportsParams.t, [
-      envProvider.sportsApiKey,
-    ]);
+    return this.executeRequest(
+      `${envProvider.sportsApiKey}/searchteams.php`,
+      sportsParams,
+    );
   }
 
   async getSearchedEvents(
     sportsParams: SearchEventsParams,
   ): Promise<EventsResponse | undefined> {
-    return this.executeRequest("searchevents.php", sportsParams, [
-      envProvider.sportsApiKey,
-    ]);
+    return this.executeRequest(
+      `${envProvider.sportsApiKey}/searchevents.php`,
+      sportsParams,
+    );
   }
 
   async getSearchedPlayers(
     sportsParams: SearchPlayersParams,
   ): Promise<PlayersResponse | undefined> {
-    return this.executeRequest("searchplayers.php", sportsParams, [
-      envProvider.sportsApiKey,
-    ]);
+    return this.executeRequest("searchplayers.php", sportsParams);
   }
 
   async getSearchedVenues(
     sportsParams: SearchVenuesParams,
   ): Promise<VenuesResponse | undefined> {
-    return this.executeRequest("searchvenues.php", sportsParams, [
-      envProvider.sportsApiKey,
-    ]);
+    return this.executeRequest("searchvenues.php", sportsParams);
   }
 }

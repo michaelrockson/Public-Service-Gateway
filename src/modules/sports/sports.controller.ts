@@ -23,7 +23,7 @@ export class SportsController {
       res,
       (params: SearchTeamsParams) => this.httpClient.getSearchedTeams(params),
       "Sports Teams",
-      ["teams"],
+      ["t"],
     );
   }
 
