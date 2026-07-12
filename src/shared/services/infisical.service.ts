@@ -92,6 +92,8 @@ export async function injectSecretsFromInfisical() {
       currencyApiUrl: getEnvVar("CURRENCY_API_URL", ""),
       currencyApiKey: getEnvVar("CURRENCY_API_KEY", ""),
       holidayApiUrl: getEnvVar("HOLIDAY_API_URL", ""),
+      sportsApiUrl: getEnvVar("SPORTS_API_URL", ""),
+      sportsApiKey: getEnvVar("SPORTS_API_KEY", ""),
     } as const;
 
     validateInfisicalSecrets(config);

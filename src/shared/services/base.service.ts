@@ -4,7 +4,7 @@ import { AxiosResponse } from "axios";
 export abstract class BaseService {
   protected readonly httpService: HttpService;
 
-  constructor(
+  protected constructor(
     apiUrl: string,
     apiKey: string = "",
     apiKeyQueryParamName: string = "",

@@ -9,6 +9,8 @@ interface AppConfig {
   currencyApiUrl: string;
   currencyApiKey: string;
   holidayApiUrl: string;
+  sportsApiUrl: string;
+  sportsApiKey: string;
 }
 
 export const envProvider = {} as AppConfig;

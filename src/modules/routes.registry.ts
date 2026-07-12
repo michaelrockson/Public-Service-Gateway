@@ -7,12 +7,15 @@ import { createCurrencyRouter } from "./currency/currency.routes.js";
 import { CurrencyController } from "./currency/currency.controller.js";
 import { HolidayController } from "./holidays/holiday.controller.js";
 import { createHolidayRouter } from "./holidays/holiday.routes.js";
+import { createSportsRouter } from "./sports/sports.routes.js";
+import { SportsController } from "./sports/sports.controller.js";
 
 interface ApiControllers {
   weatherController: WeatherController;
   newsController: NewsController;
   currencyController: CurrencyController;
   holidayController: HolidayController;
+  sportsController: SportsController;
 }
 
 export function createGatewayRouter(controllers: ApiControllers): Router {
@@ -25,6 +28,7 @@ export function createGatewayRouter(controllers: ApiControllers): Router {
     createCurrencyRouter(controllers.currencyController),
   );
   apiRouter.use("/holiday", createHolidayRouter(controllers.holidayController));
+  apiRouter.use("/sports", createSportsRouter(controllers.sportsController));
 
   return apiRouter;
 }

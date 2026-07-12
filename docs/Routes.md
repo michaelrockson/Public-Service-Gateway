@@ -92,7 +92,7 @@ GET {{baseUrl}}/api/v1/weather/forecast?lat=51.5074&lon=-0.1278
 - `400 Bad Request` `lat` or `lon` missing
 - `500 Internal Server Error` upstream API request failed
 
----
+--
 
 ## 2. News `/api/v1/news`
 
@@ -103,7 +103,6 @@ GET {{baseUrl}}/api/v1/weather/forecast?lat=51.5074&lon=-0.1278
 | GET | `/api/v1/news/top-headlines` | `country` |
 | GET | `/api/v1/news/topic` | `q` |
 
----
 
 ### GET /api/v1/news/top-headlines
 
@@ -133,7 +132,6 @@ GET {{baseUrl}}/api/v1/news/top-headlines?country=us
 - `400 Bad Request` `country` missing
 - `500 Internal Server Error` upstream API request failed
 
----
 
 ### GET /api/v1/news/topic
 
@@ -386,7 +384,6 @@ Returns all long weekends (public holidays adjacent to weekends) for a given cou
 GET {{baseUrl}}/api/v1/holiday/LongWeekend?year=2026&countryCode=US
 ```
 
----
 
 ### GET /api/v1/holiday/IsTodayPublicHoliday
 
