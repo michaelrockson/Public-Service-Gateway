@@ -33,7 +33,7 @@ export class SportsController {
       res,
       (params: SearchEventsParams) => this.httpClient.getSearchedEvents(params),
       "Sports Events",
-      ["events", "seasons"],
+      ["e", "s"],
     );
   }
 
@@ -44,7 +44,7 @@ export class SportsController {
       (params: SearchPlayersParams) =>
         this.httpClient.getSearchedPlayers(params),
       "Team Players",
-      ["player(s)"],
+      ["p"],
     );
   }
 
@@ -54,7 +54,7 @@ export class SportsController {
       res,
       (params: SearchVenuesParams) => this.httpClient.getSearchedVenues(params),
       "Sports Venues",
-      ["Venue(s)"],
+      ["v"],
     );
   }
 }
