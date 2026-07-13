@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { SportsService } from "./sports.service.js";
-import responseHandler, { ControllerResponseHandler } from "../../shared/http.controller.js";
+import responseHandler, {
+  ControllerResponseHandler,
+} from "../../shared/http.controller.js";
 import {
   LookupByIdParams,
   LookupTableParams,

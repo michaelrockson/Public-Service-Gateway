@@ -1,6 +1,16 @@
 import dotenv from "dotenv";
 import path from "path";
-import { logProcess } from "./logger.utils.js";
+import { logBootstrapStep, logProcess } from "./logger.utils.js";
+import { WeatherController } from "../../modules/weather/weather.controller.js";
+import { NewsController } from "../../modules/news/news.controller.js";
+import { CurrencyController } from "../../modules/currency/currency.controller.js";
+import { HolidayController } from "../../modules/holidays/holiday.controller.js";
+import { SportsController } from "../../modules/sports/sports.controller.js";
+import { WeatherService } from "../../modules/weather/weather.service.js";
+import { NewsService } from "../../modules/news/news.service.js";
+import { CurrencyService } from "../../modules/currency/currency.service.js";
+import { HolidayService } from "../../modules/holidays/holiday.service.js";
+import { SportsService } from "../../modules/sports/sports.service.js";
 
 export const envPath = path.join(process.cwd(), ".env");
 
@@ -77,5 +87,47 @@ export function validateInfisicalCredentials(
 ) {
   if (!clientId || !clientSecret) {
     throw new Error("Missing infisical credentials for authentication");
+  }
+}
+
+export type GatewayControllers = {
+  "Weather Controller": WeatherController;
+  "News Controller": NewsController;
+  "Currency Controller": CurrencyController;
+  "Holiday Controller": HolidayController;
+  "Sports Controller": SportsController;
+};
+
+export type GatewayServices = {
+  "Weather Service": WeatherService;
+  "News Service": NewsService;
+  "Currency Service": CurrencyService;
+  "Holiday Service": HolidayService;
+  "Sports Service": SportsService;
+};
+
+export function validateGatewayResources(
+  gatewayControllers: GatewayControllers,
+  gatewayServices: GatewayServices,
+) {
+  let isGatewayServicesBooted: boolean | undefined = undefined;
+  let isGatewayControllersBooted: boolean | undefined = undefined;
+
+  for (const [key, gatewayService] of Object.entries(gatewayServices)) {
+    if (!gatewayService) {
+      throw new Error(`${key} failed to boot, check module service`);
+    }
+    isGatewayServicesBooted = true;
+  }
+
+  for (const [key, gatewayController] of Object.entries(gatewayControllers)) {
+    if (!gatewayController) {
+      throw new Error(`${key} failed to boot, check module controller`);
+    }
+    isGatewayControllersBooted = true;
+  }
+
+  if (isGatewayServicesBooted && isGatewayControllersBooted) {
+    logBootstrapStep("Gateway Services and Controllers booted successfully");
   }
 }

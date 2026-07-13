@@ -2,13 +2,18 @@ import { WeatherService } from "../../modules/weather/weather.service.js";
 import { WeatherController } from "../../modules/weather/weather.controller.js";
 import { NewsService } from "../../modules/news/news.service.js";
 import { NewsController } from "../../modules/news/news.controller.js";
-import { logBootstrapError, logBootstrapStep } from "./logger.utils.js";
+import { logBootstrapError } from "./logger.utils.js";
 import { CurrencyService } from "../../modules/currency/currency.service.js";
 import { CurrencyController } from "../../modules/currency/currency.controller.js";
 import { HolidayService } from "../../modules/holidays/holiday.service.js";
 import { HolidayController } from "../../modules/holidays/holiday.controller.js";
 import { SportsService } from "../../modules/sports/sports.service.js";
 import { SportsController } from "../../modules/sports/sports.controller.js";
+import {
+  GatewayControllers,
+  GatewayServices,
+  validateGatewayResources,
+} from "./config.utils.js";
 
 export function bootServices() {
   try {
@@ -27,9 +32,23 @@ export function bootServices() {
     const sportsService = new SportsService();
     const sportsController = new SportsController(sportsService);
 
-    if (currencyController) {
-      logBootstrapStep("Module Services and Controllers were booted");
-    }
+    const bootedServices: GatewayServices = {
+      "Weather Service": weatherService,
+      "News Service": newsService,
+      "Currency Service": currencyService,
+      "Holiday Service": holidayService,
+      "Sports Service": sportsService,
+    };
+
+    const bootedControllers: GatewayControllers = {
+      "Weather Controller": weatherController,
+      "News Controller": newsController,
+      "Currency Controller": currencyController,
+      "Holiday Controller": holidayController,
+      "Sports Controller": sportsController,
+    };
+
+    validateGatewayResources(bootedControllers, bootedServices);
 
     return {
       weatherController,
