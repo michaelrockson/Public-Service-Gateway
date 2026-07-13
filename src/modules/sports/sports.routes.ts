@@ -32,5 +32,19 @@ export function createSportsRouter(sportsController: SportsController): Router {
     },
   );
 
+  sportsRouter.get(
+    "/lookUpLeague",
+    async (req: Request, res: Response): Promise<void> => {
+      await sportsController.handleLookupLeagueRequest(req, res);
+    },
+  );
+
+  sportsRouter.get(
+    "/lookUpTable",
+    async (req: Request, res: Response): Promise<void> => {
+      await sportsController.handleLookupTableRequest(req, res);
+    },
+  );
+
   return sportsRouter;
 }

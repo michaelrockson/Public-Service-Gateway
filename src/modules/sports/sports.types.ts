@@ -89,7 +89,6 @@ export interface TableResponse {
   table: TableEntry[] | null;
 }
 
-
 export interface SearchTeamsParams {
   t: string;
 }
@@ -110,14 +109,4 @@ export interface LookupByIdParams {
 export interface LookupTableParams {
   l: string;
   s?: string;
-}
-export interface EventsByDayParams {
-  d: string;
-  s?: string;
-  l?: string;
-}
-export interface TeamsByLeagueParams {
-  l?: string;
-  s?: string;
-  c?: string;
 }

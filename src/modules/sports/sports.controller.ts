@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { SportsService } from "./sports.service.js";
 import { ControllerResponseHandler } from "../../shared/http.controller.js";
 import {
+  LookupByIdParams,
+  LookupTableParams,
   SearchEventsParams,
   SearchPlayersParams,
   SearchTeamsParams,
@@ -55,6 +57,26 @@ export class SportsController {
       (params: SearchVenuesParams) => this.httpClient.getSearchedVenues(params),
       "Sports Venues",
       ["v"],
+    );
+  }
+
+  async handleLookupLeagueRequest(req: Request, res: Response) {
+    return this.responseHandler.handleRequest(
+      req,
+      res,
+      (params: LookupByIdParams) => this.httpClient.getLookupLeague(params),
+      "Sports League(s)",
+      ["id"],
+    );
+  }
+
+  async handleLookupTableRequest(req: Request, res: Response) {
+    return this.responseHandler.handleRequest(
+      req,
+      res,
+      (params: LookupTableParams) => this.httpClient.getLookupTable(params),
+      "Sports Table(s)",
+      ["l"],
     );
   }
 }

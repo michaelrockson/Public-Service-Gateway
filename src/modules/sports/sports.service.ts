@@ -2,11 +2,15 @@ import { BaseService } from "../../shared/services/base.service.js";
 import { envProvider } from "../../shared/env.config.js";
 import {
   EventsResponse,
+  LeaguesResponse,
+  LookupByIdParams,
+  LookupTableParams,
   PlayersResponse,
   SearchEventsParams,
   SearchPlayersParams,
   SearchTeamsParams,
   SearchVenuesParams,
+  TableResponse,
   TeamsResponse,
   VenuesResponse,
 } from "./sports.types.js";
@@ -48,6 +52,24 @@ export class SportsService extends BaseService {
   ): Promise<VenuesResponse | undefined> {
     return this.executeRequest(
       `${envProvider.sportsApiKey}/searchvenues.php`,
+      sportsParams,
+    );
+  }
+
+  async getLookupLeague(
+    sportsParams: LookupByIdParams,
+  ): Promise<LeaguesResponse | undefined> {
+    return this.executeRequest(
+      `${envProvider.sportsApiKey}/lookupleague.php`,
+      sportsParams,
+    );
+  }
+
+  async getLookupTable(
+    sportsParams: LookupTableParams,
+  ): Promise<TableResponse | undefined> {
+    return this.executeRequest(
+      `${envProvider.sportsApiKey}/lookuptable.php`,
       sportsParams,
     );
   }
