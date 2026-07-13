@@ -1,16 +1,7 @@
 import dotenv from "dotenv";
 import path from "path";
-import { logBootstrapStep, logProcess } from "./logger.utils.js";
-import { WeatherController } from "../../modules/weather/weather.controller.js";
-import { NewsController } from "../../modules/news/news.controller.js";
-import { CurrencyController } from "../../modules/currency/currency.controller.js";
-import { HolidayController } from "../../modules/holidays/holiday.controller.js";
-import { SportsController } from "../../modules/sports/sports.controller.js";
-import { WeatherService } from "../../modules/weather/weather.service.js";
-import { NewsService } from "../../modules/news/news.service.js";
-import { CurrencyService } from "../../modules/currency/currency.service.js";
-import { HolidayService } from "../../modules/holidays/holiday.service.js";
-import { SportsService } from "../../modules/sports/sports.service.js";
+import { logBootstrapStep, logProcess } from "../logger.utils.js";
+import { GatewayControllers, GatewayServices } from "./config.types.js";
 
 export const envPath = path.join(process.cwd(), ".env");
 
@@ -18,6 +9,12 @@ dotenv.config({
   path: envPath,
 });
 
+/**
+ * Validates that all provided environment variables are set.
+ *
+ * @param secrets - A map of environment variable names to their resolved values.
+ * @throws {Error} If one or more values are `undefined`, `null`, or an empty string.
+ */
 export function validateEnvs(secrets: Record<string, unknown>) {
   let missingEnvs: string[] = [];
 
@@ -35,6 +32,13 @@ export function validateEnvs(secrets: Record<string, unknown>) {
   }
 }
 
+/**
+ * Validates secrets fetched from Infisical, logging how many were successfully
+ * injected and throwing if any required secrets are missing.
+ *
+ * @param secrets - A map of secret names to their fetched values.
+ * @throws {Error} If one or more values are `undefined`, `null`, or an empty string.
+ */
 export function validateInfisicalSecrets(secrets: Record<string, unknown>) {
   let missingSecrets: string[] = [];
   let fetchedSecrets: string[] = [];
@@ -57,6 +61,14 @@ export function validateInfisicalSecrets(secrets: Record<string, unknown>) {
   }
 }
 
+/**
+ * Retrieves a string environment variable, optionally falling back to a default value.
+ *
+ * @param key - The name of the environment variable to read.
+ * @param fallback - A default value to use if the environment variable is not set.
+ * @returns The environment variable's value, or the fallback if provided.
+ * @throws {Error} If the environment variable is not set and no fallback is provided.
+ */
 export function getEnvVar(key: string, fallback?: string): string {
   const value: string | undefined = process.env[key] ?? fallback;
   if (value === undefined) {
@@ -65,6 +77,15 @@ export function getEnvVar(key: string, fallback?: string): string {
   return value;
 }
 
+/**
+ * Retrieves a numeric environment variable, optionally falling back to a default value.
+ *
+ * @param key - The name of the environment variable to read.
+ * @param fallback - A default numeric value to use if the environment variable is not set.
+ * @returns The parsed numeric value, or the fallback if provided.
+ * @throws {Error} If the environment variable is not set and no fallback is provided,
+ * or if the value cannot be parsed as a number.
+ */
 export function getEnvNumber(key: string, fallback?: number): number {
   const raw: string | undefined = process.env[key];
   if (raw === undefined) {
@@ -81,6 +102,14 @@ export function getEnvNumber(key: string, fallback?: number): number {
   }
   return parsed;
 }
+
+/**
+ * Validates that Infisical authentication credentials are present.
+ *
+ * @param clientId - The Infisical client ID.
+ * @param clientSecret - The Infisical client secret.
+ * @throws {Error} If either the client ID or client secret is missing.
+ */
 export function validateInfisicalCredentials(
   clientId: string,
   clientSecret: string,
@@ -90,26 +119,18 @@ export function validateInfisicalCredentials(
   }
 }
 
-export type GatewayControllers = {
-  "Weather Controller": WeatherController;
-  "News Controller": NewsController;
-  "Currency Controller": CurrencyController;
-  "Holiday Controller": HolidayController;
-  "Sports Controller": SportsController;
-};
-
-export type GatewayServices = {
-  "Weather Service": WeatherService;
-  "News Service": NewsService;
-  "Currency Service": CurrencyService;
-  "Holiday Service": HolidayService;
-  "Sports Service": SportsService;
-};
-
+/**
+ * Validates that all gateway services and controllers booted successfully,
+ * logging a success message if so.
+ *
+ * @param gatewayControllers - A map of controller names to their booted instances.
+ * @param gatewayServices - A map of service names to their booted instances.
+ * @throws {Error} If any service or controller entry is falsy (failed to boot).
+ */
 export function validateGatewayResources(
   gatewayControllers: GatewayControllers,
   gatewayServices: GatewayServices,
-) {
+): void {
   let isGatewayServicesBooted: boolean | undefined = undefined;
   let isGatewayControllersBooted: boolean | undefined = undefined;
 
