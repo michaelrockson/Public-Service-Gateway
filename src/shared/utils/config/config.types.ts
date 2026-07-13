@@ -24,3 +24,19 @@ export type GatewayServices = {
   "Holiday Service": HolidayService;
   "Sports Service": SportsService;
 };
+
+export type ModuleResourcesProvider = {
+  name: string;
+  service:
+    | WeatherService
+    | NewsService
+    | HolidayService
+    | SportsService
+    | CurrencyService;
+  controller:
+    | WeatherController
+    | NewsController
+    | HolidayController
+    | SportsController
+    | CurrencyController;
+};

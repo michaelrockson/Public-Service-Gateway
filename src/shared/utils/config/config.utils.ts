@@ -128,22 +128,26 @@ export function validateInfisicalCredentials(
  * @throws {Error} If any service or controller entry is falsy (failed to boot).
  */
 export function validateGatewayResources(
-  gatewayControllers: GatewayControllers,
-  gatewayServices: GatewayServices,
+  gatewayControllers: any,
+  gatewayServices: any,
 ): void {
   let isGatewayServicesBooted: boolean | undefined = undefined;
   let isGatewayControllersBooted: boolean | undefined = undefined;
 
   for (const [key, gatewayService] of Object.entries(gatewayServices)) {
     if (!gatewayService) {
-      throw new Error(`${key} failed to boot, check module service`);
+      throw new Error(
+        `${key} service is not registered, check module resource registry`,
+      );
     }
     isGatewayServicesBooted = true;
   }
 
   for (const [key, gatewayController] of Object.entries(gatewayControllers)) {
     if (!gatewayController) {
-      throw new Error(`${key} failed to boot, check module controller`);
+      throw new Error(
+        `${key} controller is not registered, check module resource registry`,
+      );
     }
     isGatewayControllersBooted = true;
   }
@@ -151,4 +155,16 @@ export function validateGatewayResources(
   if (isGatewayServicesBooted && isGatewayControllersBooted) {
     logBootstrapStep("Gateway Services and Controllers booted successfully");
   }
+}
+
+export function unpackResourceControllers(gatewayControllerRegistry: {}) {
+  const resourceControllers = {};
+
+  for (const [key, controller] of Object.entries(gatewayControllerRegistry)) {
+    if (controller) {
+      resourceControllers[key] = controller;
+    }
+  }
+
+  return resourceControllers;
 }
