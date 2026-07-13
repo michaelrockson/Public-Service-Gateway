@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { CurrencyService } from "./currency.service.js";
-import { ControllerResponseHandler } from "../../shared/http.controller.js";
+import responseHandler, {
+  ControllerResponseHandler,
+} from "../../shared/http.controller.js";
 
 export class CurrencyController {
   private readonly httpClient: CurrencyService;
@@ -8,7 +10,7 @@ export class CurrencyController {
 
   constructor(currencyService: CurrencyService) {
     this.httpClient = currencyService;
-    this.responseHandler = new ControllerResponseHandler();
+    this.responseHandler = responseHandler;
   }
 
   async handleLiveRateRequest(req: Request, res: Response) {

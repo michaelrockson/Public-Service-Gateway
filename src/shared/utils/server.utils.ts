@@ -1,37 +1,12 @@
-import { WeatherService } from "../../modules/weather/weather.service.js";
-import { WeatherController } from "../../modules/weather/weather.controller.js";
-import { NewsService } from "../../modules/news/news.service.js";
-import { NewsController } from "../../modules/news/news.controller.js";
-import { logBootstrapError, logBootstrapStep } from "./logger.utils.js";
-import { CurrencyService } from "../../modules/currency/currency.service.js";
-import { CurrencyController } from "../../modules/currency/currency.controller.js";
-import { HolidayService } from "../../modules/holidays/holiday.service.js";
-import { HolidayController } from "../../modules/holidays/holiday.controller.js";
+import { logBootstrapError } from "./logger.utils.js";
+import { unpackResourceControllers } from "./config/config.utils.js";
+import { GatewayControllers } from "./config/config.types.js";
+import { registerGatewayResources } from "../../modules/resource.registry.js";
 
-export function bootServices() {
+export function bootGatewayResources(): GatewayControllers {
   try {
-    const weatherService = new WeatherService();
-    const weatherController = new WeatherController(weatherService);
-
-    const newsService = new NewsService();
-    const newsController = new NewsController(newsService);
-
-    const currencyService = new CurrencyService();
-    const currencyController = new CurrencyController(currencyService);
-
-    const holidayService = new HolidayService();
-    const holidayController = new HolidayController(holidayService);
-
-    if (currencyController) {
-      logBootstrapStep("Module Services and Controllers were booted");
-    }
-
-    return {
-      weatherController,
-      newsController,
-      currencyController,
-      holidayController,
-    };
+    const registeredResources = registerGatewayResources();
+    return unpackResourceControllers(registeredResources);
   } catch (error) {
     logBootstrapError("Booting module services & controllers", error);
     throw new Error();

@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { NewsService } from "./news.service.js";
-import { ControllerResponseHandler } from "../../shared/http.controller.js";
+import responseHandler, {
+  ControllerResponseHandler,
+} from "../../shared/http.controller.js";
 import { NewsSearchParams } from "./news.types.js";
 
 export class NewsController {
@@ -9,7 +11,7 @@ export class NewsController {
 
   constructor(newsService: NewsService) {
     this.httpClient = newsService;
-    this.responseHandler = new ControllerResponseHandler();
+    this.responseHandler = responseHandler;
   }
 
   async handleGetNewsArticlesRequest(req: Request, res: Response) {

@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { HolidayService } from "./holiday.service.js";
-import { ControllerResponseHandler } from "../../shared/http.controller.js";
+import responseHandler, {
+  ControllerResponseHandler,
+} from "../../shared/http.controller.js";
 import { PublicHolidaysParams } from "./holiday.types.js";
 
 export class HolidayController {
@@ -9,7 +11,7 @@ export class HolidayController {
 
   constructor(holidayService: HolidayService) {
     this.httpClient = holidayService;
-    this.responseHandler = new ControllerResponseHandler();
+    this.responseHandler = responseHandler;
   }
 
   async handlePublicHolidaysRequest(req: Request, res: Response) {

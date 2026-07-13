@@ -51,7 +51,7 @@ export class HolidayService extends BaseService {
 
   async IsTodayPublicHoliday(
     holidayParams: PublicHolidaysParams,
-  ): Promise<HolidayResponse | undefined | boolean> {
+  ): Promise<unknown> {
     const response = await this.executeRawRequest("IsTodayPublicHoliday", "", [
       `${holidayParams.countryCode}`,
     ]);

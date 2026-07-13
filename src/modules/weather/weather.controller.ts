@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { WeatherService } from "./weather.service.js";
-import { ControllerResponseHandler } from "../../shared/http.controller.js";
+import responseHandler, {
+  ControllerResponseHandler,
+} from "../../shared/http.controller.js";
 
 export class WeatherController {
   private readonly httpClient: WeatherService;
@@ -8,7 +10,7 @@ export class WeatherController {
 
   constructor(weatherService: WeatherService) {
     this.httpClient = weatherService;
-    this.responseHandler = new ControllerResponseHandler();
+    this.responseHandler = responseHandler;
   }
 
   async handleCurrentWeatherRequest(req: Request, res: Response) {

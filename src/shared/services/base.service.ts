@@ -4,7 +4,7 @@ import { AxiosResponse } from "axios";
 export abstract class BaseService {
   protected readonly httpService: HttpService;
 
-  constructor(
+  protected constructor(
     apiUrl: string,
     apiKey: string = "",
     apiKeyQueryParamName: string = "",
@@ -38,7 +38,7 @@ export abstract class BaseService {
    * and generic error reporting. Returns the full Axios response object.
    * Useful when the status code is needed.
    */
-  protected async executeRawRequest<T = any>(
+  protected async executeRawRequest<T = unknown>(
     endpoint?: string,
     queryParams?: any,
     pathParams?: string[],
