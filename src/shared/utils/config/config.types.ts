@@ -10,33 +10,24 @@ import { HolidayService } from "../../../modules/holidays/holiday.service.js";
 import { SportsService } from "../../../modules/sports/sports.service.js";
 
 export type GatewayControllers = {
-  "Weather Controller": WeatherController;
-  "News Controller": NewsController;
-  "Currency Controller": CurrencyController;
-  "Holiday Controller": HolidayController;
-  "Sports Controller": SportsController;
+  weatherController: WeatherController;
+  newsController: NewsController;
+  currencyController: CurrencyController;
+  holidayController: HolidayController;
+  sportsController: SportsController;
 };
 
 export type GatewayServices = {
-  "Weather Service": WeatherService;
-  "News Service": NewsService;
-  "Currency Service": CurrencyService;
-  "Holiday Service": HolidayService;
-  "Sports Service": SportsService;
+  weatherService: WeatherService;
+  newsService: NewsService;
+  currencyService: CurrencyService;
+  holidayService: HolidayService;
+  sportsService: SportsService;
 };
 
-export type ModuleResourcesProvider = {
-  name: string;
-  service:
-    | WeatherService
-    | NewsService
-    | HolidayService
-    | SportsService
-    | CurrencyService;
-  controller:
-    | WeatherController
-    | NewsController
-    | HolidayController
-    | SportsController
-    | CurrencyController;
-};
+export type ModuleResourcesProvider =
+  | { name: "weather"; service: WeatherService; controller: WeatherController }
+  | { name: "news"; service: NewsService; controller: NewsController }
+  | { name: "currency"; service: CurrencyService; controller: CurrencyController }
+  | { name: "holiday"; service: HolidayService; controller: HolidayController }
+  | { name: "sports"; service: SportsService; controller: SportsController };

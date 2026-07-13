@@ -128,8 +128,8 @@ export function validateInfisicalCredentials(
  * @throws {Error} If any service or controller entry is falsy (failed to boot).
  */
 export function validateGatewayResources(
-  gatewayControllers: any,
-  gatewayServices: any,
+  gatewayControllers: GatewayControllers,
+  gatewayServices: GatewayServices,
 ): void {
   let isGatewayServicesBooted: boolean | undefined = undefined;
   let isGatewayControllersBooted: boolean | undefined = undefined;
@@ -157,12 +157,16 @@ export function validateGatewayResources(
   }
 }
 
-export function unpackResourceControllers(gatewayControllerRegistry: {}) {
-  const resourceControllers = {};
+export function unpackResourceControllers(
+  gatewayControllerRegistry: GatewayControllers,
+): GatewayControllers {
+  const resourceControllers = {} as GatewayControllers;
 
-  for (const [key, controller] of Object.entries(gatewayControllerRegistry)) {
-    if (controller) {
-      resourceControllers[key] = controller;
+  for (const key of Object.keys(gatewayControllerRegistry) as Array<
+    keyof GatewayControllers
+  >) {
+    if (gatewayControllerRegistry[key]) {
+      Object.assign(resourceControllers, { [key]: gatewayControllerRegistry[key] });
     }
   }
 

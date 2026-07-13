@@ -2,7 +2,7 @@ import { WeatherService } from "./weather.service.js";
 import { WeatherController } from "./weather.controller.js";
 import { ModuleResourcesProvider } from "../../shared/utils/config/config.types.js";
 
-export function provideWeatherResources(): ModuleResourcesProvider {
+export function provideWeatherResources(): Extract<ModuleResourcesProvider, { name: "weather" }> {
   const weatherService = new WeatherService();
   const weatherController = new WeatherController(weatherService);
 
