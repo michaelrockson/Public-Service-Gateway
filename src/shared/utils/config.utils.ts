@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import path from "path";
-import { logBootstrapStep, logProcess, consoleLogger } from "../logger.utils.js";
-import { GatewayControllers, GatewayServices } from "./config.types.js";
+import { logBootstrapStep, logProcess, consoleLogger } from "./logger.utils.js";
+import { GatewayControllers, GatewayServices } from "../config/config.types.js";
 
 export const envPath = path.join(process.cwd(), ".env");
 
@@ -50,7 +50,10 @@ export function validateInfisicalSecrets(secrets: Record<string, unknown>) {
     fetchedSecrets.push(key);
   }
   if (fetchedSecrets.length > 0) {
-    logProcess(consoleLogger, `${fetchedSecrets.length} secret(s) injected from Infisical}`);
+    logProcess(
+      consoleLogger,
+      `${fetchedSecrets.length} secret(s) injected from Infisical}`,
+    );
   }
 
   if (missingSecrets.length > 0) {
@@ -155,7 +158,10 @@ export function validateGatewayResources(
   }
 
   if (isGatewayServicesBooted && isGatewayControllersBooted) {
-    logBootstrapStep(logger, "Gateway Services and Controllers booted successfully");
+    logBootstrapStep(
+      logger,
+      "Gateway Services and Controllers booted successfully",
+    );
   }
 }
 
@@ -168,7 +174,9 @@ export function unpackResourceControllers(
     keyof GatewayControllers
   >) {
     if (gatewayControllerRegistry[key]) {
-      Object.assign(resourceControllers, { [key]: gatewayControllerRegistry[key] });
+      Object.assign(resourceControllers, {
+        [key]: gatewayControllerRegistry[key],
+      });
     }
   }
 

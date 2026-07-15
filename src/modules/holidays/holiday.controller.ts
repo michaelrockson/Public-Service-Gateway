@@ -7,7 +7,10 @@ export class HolidayController {
   private readonly httpClient: HolidayService;
   private readonly responseHandler: IResponseHandler;
 
-  constructor(holidayService: HolidayService, responseHandler: IResponseHandler) {
+  constructor(
+    holidayService: HolidayService,
+    responseHandler: IResponseHandler,
+  ) {
     this.httpClient = holidayService;
     this.responseHandler = responseHandler;
   }

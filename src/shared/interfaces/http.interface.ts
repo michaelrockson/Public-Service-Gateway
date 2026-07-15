@@ -1,9 +1,9 @@
 export interface IHttpClient {
-  makeApiRequest<T = any>(
+  makeApiRequest<T = unknown>(
     endpoint?: string,
     params?: Record<string, unknown>,
-    additionalUris?: string[]
+    additionalUris?: string[],
   ): Promise<{ data: T; status?: number }>;
-  
+
   handleApiErrors(error: unknown): never;
 }

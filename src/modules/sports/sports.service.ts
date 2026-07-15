@@ -26,19 +26,13 @@ export class SportsService extends BaseService {
   async getSearchedTeams(
     sportsParams: SearchTeamsParams,
   ): Promise<TeamsResponse | undefined> {
-    return this.executeRequest(
-      `${this.apiKey}/searchteams.php`,
-      sportsParams,
-    );
+    return this.executeRequest(`${this.apiKey}/searchteams.php`, sportsParams);
   }
 
   async getSearchedEvents(
     sportsParams: SearchEventsParams,
   ): Promise<EventsResponse | undefined> {
-    return this.executeRequest(
-      `${this.apiKey}/searchevents.php`,
-      sportsParams,
-    );
+    return this.executeRequest(`${this.apiKey}/searchevents.php`, sportsParams);
   }
 
   async getSearchedPlayers(
@@ -53,27 +47,18 @@ export class SportsService extends BaseService {
   async getSearchedVenues(
     sportsParams: SearchVenuesParams,
   ): Promise<VenuesResponse | undefined> {
-    return this.executeRequest(
-      `${this.apiKey}/searchvenues.php`,
-      sportsParams,
-    );
+    return this.executeRequest(`${this.apiKey}/searchvenues.php`, sportsParams);
   }
 
   async getLookupLeague(
     sportsParams: LookupByIdParams,
   ): Promise<LeaguesResponse | undefined> {
-    return this.executeRequest(
-      `${this.apiKey}/lookupleague.php`,
-      sportsParams,
-    );
+    return this.executeRequest(`${this.apiKey}/lookupleague.php`, sportsParams);
   }
 
   async getLookupTable(
     sportsParams: LookupTableParams,
   ): Promise<TableResponse | undefined> {
-    return this.executeRequest(
-      `${this.apiKey}/lookuptable.php`,
-      sportsParams,
-    );
+    return this.executeRequest(`${this.apiKey}/lookuptable.php`, sportsParams);
   }
 }

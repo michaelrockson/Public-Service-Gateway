@@ -1,6 +1,6 @@
 import winston from "winston";
-import { ILogger } from "./interfaces/logger.interface.js";
-import { IConfig } from "./interfaces/config.interface.js";
+import { ILogger } from "../interfaces/logger.interface.js";
+import { IConfig } from "../interfaces/config.interface.js";
 
 export class WinstonLogger implements ILogger {
   private logger: winston.Logger;

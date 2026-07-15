@@ -1,4 +1,4 @@
-import { IConfig } from "./interfaces/config.interface.js";
+import { IConfig } from "../interfaces/config.interface.js";
 
 export class ConfigService implements IConfig {
   public readonly environment: string;

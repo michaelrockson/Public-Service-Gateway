@@ -41,7 +41,7 @@ export class AxiosHttpClient implements IHttpClient {
 
     return {
       data: response.data,
-      status: response.status
+      status: response.status,
     };
   }
 
@@ -55,7 +55,9 @@ export class AxiosHttpClient implements IHttpClient {
       if (error.response) {
         const method = error.config?.method?.toUpperCase();
         const url = error.config?.url;
-        const params = this.safetyCheckParams(error.config?.params as Record<string, unknown>);
+        const params = this.safetyCheckParams(
+          error.config?.params as Record<string, unknown>,
+        );
 
         throw new Error(
           [

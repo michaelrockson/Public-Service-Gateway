@@ -6,7 +6,10 @@ export class CurrencyController {
   private readonly httpClient: CurrencyService;
   private readonly responseHandler: IResponseHandler;
 
-  constructor(currencyService: CurrencyService, responseHandler: IResponseHandler) {
+  constructor(
+    currencyService: CurrencyService,
+    responseHandler: IResponseHandler,
+  ) {
     this.httpClient = currencyService;
     this.responseHandler = responseHandler;
   }

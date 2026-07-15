@@ -1,5 +1,5 @@
-import { Request } from "express";
-import { BadRequestError, NotFoundError } from "../errors/api.errors.js";
+import { Request, Response } from "express";
+import { BadRequestError, NotFoundError } from "../http/api.errors.js";
 
 /**
  * Parses parameters from the request query string.
@@ -31,7 +31,9 @@ export function validateParams(params: Record<string, unknown>) {
   }
 
   if (missingParams.length > 0) {
-    throw new BadRequestError(`Missing required query parameter(s): ${missingParams.join(", ")}`);
+    throw new BadRequestError(
+      `Missing required query parameter(s): ${missingParams.join(", ")}`,
+    );
   }
 }
 

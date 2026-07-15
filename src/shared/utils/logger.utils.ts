@@ -4,7 +4,11 @@ export function logProcess(logger: ILogger, step: string): void {
   logger.info(`[PROCESS] ${step}`);
 }
 
-export function logProcessError(logger: ILogger, step: string, error: unknown): void {
+export function logProcessError(
+  logger: ILogger,
+  step: string,
+  error: unknown,
+): void {
   logger.error(`[PROCESS] Failed at: ${step} | ${error}`);
 }
 
@@ -12,7 +16,11 @@ export function logBootstrapStep(logger: ILogger, step: string): void {
   logger.info(`[BOOTSTRAP] ${step}`);
 }
 
-export function logBootstrapError(logger: ILogger, step: string, error: unknown): void {
+export function logBootstrapError(
+  logger: ILogger,
+  step: string,
+  error: unknown,
+): void {
   logger.error(`[BOOTSTRAP] Failed at: ${step} | ${error}`);
 }
 

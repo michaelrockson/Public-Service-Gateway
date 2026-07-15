@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
-import { IResponseHandler } from "./interfaces/response-handler.interface.js";
-import { IConfig } from "./interfaces/config.interface.js";
-import { BadRequestError, NotFoundError } from "./errors/api.errors.js";
+
+import { IResponseHandler } from "../interfaces/response-handler.interface.js";
+import { IConfig } from "../interfaces/config.interface.js";
+import { BadRequestError, NotFoundError } from "./api.errors.js";
 import {
   parseParams,
   validateParams,
   validateResponse,
-} from "./utils/controller.utils.js";
+} from "../utils/controller.utils.js";
 
 export class ControllerResponseHandler implements IResponseHandler {
   constructor(private readonly config: IConfig) {}
