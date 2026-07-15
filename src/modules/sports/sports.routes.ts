@@ -1,7 +1,9 @@
 import { Request, Response, Router } from "express";
 import { SportsController } from "./sports.controller.js";
 
-export function createSportsRouter(sportsController: SportsController): Router {
+export function provideSportsRouter(
+  sportsController: SportsController,
+): Router {
   const sportsRouter = Router();
 
   sportsRouter.get(

@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { CurrencyController } from "./currency.controller.js";
 
-export function createCurrencyRouter(
+export function provideCurrencyRouter(
   currencyController: CurrencyController,
 ): Router {
   const currencyRouter = Router();
