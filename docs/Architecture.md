@@ -102,7 +102,7 @@ src/
 │
 └── shared/                          # Cross-cutting infrastructure
     ├── config/
-    │   ├── gateway.types.ts          # SharedDependencies, GatewayControllers, GatewayServices, ModuleResourcesProvider
+    │   ├── bootstrap.types.ts          # SharedDependencies, GatewayControllers, GatewayServices, ModuleResourcesProvider
     │   └── config.service.ts            # ConfigService class (implements IConfig)
     │
     ├── http/
@@ -121,7 +121,7 @@ src/
     ├── services/
     │   ├── base.service.ts          # Abstract base: executeRequest / executeRawRequest (accepts IHttpClient)
     │   ├── axios.client.ts          # AxiosHttpClient (implements IHttpClient)
-    │   └── infisical.config.ts     # InfisicalService class + injectSecretsFromInfisical()
+    │   └── bootstrap.infisical.ts     # InfisicalService class + injectSecretsFromInfisical()
     │
     └── utils/
         ├── config.utils.ts          # validateEnvs / validateInfisicalSecrets / getEnvVar / getEnvNumber /
@@ -402,7 +402,7 @@ Each feature module follows a five-file structure:
 
 ```
 module.provider.ts    — Factory: creates AxiosHttpClient → service → controller, returns typed pair
-module.config.service.ts     — Outbound HTTP calls to the third-party API (extends BaseService)
+bootstrap.module.ts     — Outbound HTTP calls to the third-party API (extends BaseService)
 module.controller.ts  — Receives HTTP requests, delegates to service via IResponseHandler
 module.routes.ts      — Defines routes, exported as a factory function
 module.types.ts       — TypeScript interfaces for request params and API response shapes
@@ -490,12 +490,12 @@ A class implementing `IConfig`. Constructed once in `server.ts` from the
 construction its properties are `readonly`, making it a stable, immutable
 config snapshot for the lifetime of the process.
 
-### `config/gateway.types.ts`
+### `config/bootstrap.types.ts`
 
 Defines the four shared types: `SharedDependencies`, `GatewayControllers`,
 `GatewayServices`, and `ModuleResourcesProvider`. See [Section 12](#12-type-system).
 
-### `services/infisical.config.ts`
+### `services/bootstrap.infisical.ts`
 
 Two exports:
 - `InfisicalService` class — authenticates with the Infisical SDK (universal
@@ -681,7 +681,7 @@ export interface IResponseHandler {
 
 ## 12. Type System
 
-All shared gateway types live in `shared/config/gateway.types.ts`.
+All shared gateway types live in `shared/config/bootstrap.types.ts`.
 
 ### `SharedDependencies`
 
@@ -823,7 +823,7 @@ interface IConfig {
 // config.service.ts — add matching readonly properties + constructor assignments
 ```
 
-**3. Map the new vars in `infisical.config.ts`:**
+**3. Map the new vars in `bootstrap.infisical.ts`:**
 ```typescript
 const config = {
   // ...existing...
@@ -891,7 +891,7 @@ export function provideMapsResources(
 }
 ```
 
-**8. Update `gateway.types.ts`** — add the new variant to all three types:
+**8. Update `bootstrap.types.ts`** — add the new variant to all three types:
 ```typescript
 // ModuleResourcesProvider — new union member:
 | { name: "maps"; service: MapsService; controller: MapsController }

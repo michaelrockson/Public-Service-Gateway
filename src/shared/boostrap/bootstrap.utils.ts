@@ -4,7 +4,7 @@ import {
   logBootstrapStep,
   logProcess,
 } from "../logger/logger.utils.js";
-import { GatewayControllers, SharedDependencies } from "./gateway.types.js";
+import { GatewayControllers, SharedDependencies } from "./bootstrap.types.js";
 import { registerGatewayControllers } from "../../modules/controllers.registry.js";
 
 /**

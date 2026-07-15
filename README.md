@@ -125,7 +125,7 @@ src/
     ├── services/
     │   ├── base.service.ts          # Abstract base class for all API services
     │   ├── axios.client.ts          # Shared Axios wrapper (executeRequest / executeRawRequest)
-    │   └── infisical.config.ts     # Infisical auth and secret injection
+    │   └── bootstrap.infisical.ts     # Infisical auth and secret injection
     └── utils/
         ├── config.utils.ts          # getEnvVar, validateSecrets
         ├── request.utils.ts      # Shared controller helper utilities

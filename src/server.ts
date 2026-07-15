@@ -1,24 +1,24 @@
 import express, { type Express } from "express";
 import morgan from "morgan";
 import { createGatewayRouter } from "./modules/routes.registry.js";
-import { injectSecretsFromInfisical } from "./shared/boostrap/infisical.config.js";
+import { injectSecretsFromInfisical } from "./shared/boostrap/bootstrap.infisical.js";
 import {
   consoleLogger,
   createMorganStream,
   logProcess,
 } from "./shared/logger/logger.utils.js";
 import { bootGatewayControllers } from "./shared/boostrap/bootstrap.utils.js";
-import { ServerConfigService } from "./shared/boostrap/server.config.service.js";
-import { ModuleConfigService } from "./shared/boostrap/module.config.service.js";
+import { BootstrapSystem } from "./shared/boostrap/bootstrap.system.js";
+import { BootstrapModule } from "./shared/boostrap/bootstrap.module.js";
 import { WinstonLogger } from "./shared/logger/winston.logger.js";
 import { ControllerResponseHandler } from "./shared/http/response.handler.js";
-import { SharedDependencies } from "./shared/boostrap/gateway.types.js";
+import { SharedDependencies } from "./shared/boostrap/bootstrap.types.js";
 
 async function startServer(): Promise<void> {
   const serverSecrets = await injectSecretsFromInfisical();
 
-  const systemConfig = new ServerConfigService(serverSecrets.systemConfig);
-  const moduleConfig = new ModuleConfigService(serverSecrets.moduleConfig);
+  const systemConfig = new BootstrapSystem(serverSecrets.systemConfig);
+  const moduleConfig = new BootstrapModule(serverSecrets.moduleConfig);
   const logger = new WinstonLogger(systemConfig);
   const responseHandler = new ControllerResponseHandler(
     systemConfig.environment,

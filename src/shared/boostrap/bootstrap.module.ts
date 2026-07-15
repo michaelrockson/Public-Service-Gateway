@@ -1,6 +1,6 @@
 import { IModuleConfig } from "../interfaces/config/config.interface.js";
 
-export class ModuleConfigService implements IModuleConfig {
+export class BootstrapModule implements IModuleConfig {
   public readonly weatherApiUrl: string;
   public readonly weatherApiKey: string;
   public readonly newsApiUrl: string;

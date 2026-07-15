@@ -1,7 +1,7 @@
 import {
   GatewayControllers,
   SharedDependencies,
-} from "../shared/boostrap/gateway.types.js";
+} from "../shared/boostrap/bootstrap.types.js";
 import { validateGatewayControllers } from "../shared/boostrap/bootstrap.utils.js";
 import { provideWeatherController } from "./weather/weather.provider.js";
 import { provideNewsController } from "./news/news.provider.js";

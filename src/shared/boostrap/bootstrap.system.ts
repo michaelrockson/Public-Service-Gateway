@@ -1,6 +1,6 @@
 import { ISystemConfig } from "../interfaces/config/config.interface.js";
 
-export class ServerConfigService implements ISystemConfig {
+export class BootstrapSystem implements ISystemConfig {
   public readonly environment: string;
   public readonly port: number;
   public readonly logLevel: string;
