@@ -1,14 +1,16 @@
 import { NewsService } from "./news.service.js";
 import { NewsController } from "./news.controller.js";
-import { ModuleResourcesProvider } from "../../shared/utils/config/config.types.js";
+import { ModuleResourcesProvider, SharedDependencies } from "../../shared/utils/config/config.types.js";
+import { AxiosHttpClient } from "../../shared/services/http.service.js";
 
-export function provideNewsResources(): Extract<ModuleResourcesProvider, { name: "news" }> {
-  const newsService = new NewsService();
-  const newsController = new NewsController(newsService);
+export function provideNewsResources(deps: SharedDependencies): Extract<ModuleResourcesProvider, { name: "news" }> {
+  const newsHttpClient = new AxiosHttpClient(deps.config.newsApiUrl, deps.config.newsApiKey, "apiKey");
+  const newsService = new NewsService(newsHttpClient);
+  const newsController = new NewsController(newsService, deps.responseHandler);
 
   return {
     name: "news",
     service: newsService,
-    controller: newsController
+    controller: newsController,
   };
 }

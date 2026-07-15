@@ -6,7 +6,7 @@ import {
   validateInfisicalCredentials,
   validateInfisicalSecrets,
 } from "../utils/config/config.utils.js";
-import { logProcess, logProcessError } from "../utils/logger.utils.js";
+import { logProcess, logProcessError, consoleLogger } from "../utils/logger.utils.js";
 
 export class InfisicalService {
   private readonly client: InfisicalSDK;
@@ -31,7 +31,7 @@ export class InfisicalService {
     validateInfisicalCredentials(this.clientId, this.clientSecret);
 
     try {
-      logProcess("Authenticating Infisical Client.....");
+      logProcess(consoleLogger, "Authenticating Infisical Client.....");
 
       const infisicalClient = await this.client.auth().universalAuth.login({
         clientId: this.clientId,
@@ -39,16 +39,16 @@ export class InfisicalService {
       });
 
       if (infisicalClient) {
-        logProcess("Infisical Client Authenticated!");
+        logProcess(consoleLogger, "Infisical Client Authenticated!");
       }
     } catch (error) {
-      logProcessError(`Authenticating Infisical Client:`, error);
+      logProcessError(consoleLogger, `Authenticating Infisical Client:`, error);
     }
   }
 
   async injectInfisicalSecrets() {
     try {
-      logProcess("Fetching Secrets from Infisical.....");
+      logProcess(consoleLogger, "Fetching Secrets from Infisical.....");
 
       await this.client.secrets().listSecrets({
         environment: this.environment,
@@ -56,7 +56,7 @@ export class InfisicalService {
         attachToProcessEnv: true,
       });
     } catch (error) {
-      logProcessError(`Fetching Infisical Secrets:`, error);
+      logProcessError(consoleLogger, `Fetching Infisical Secrets:`, error);
     }
   }
 

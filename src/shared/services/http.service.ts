@@ -1,6 +1,7 @@
 import axios from "axios";
+import { IHttpClient } from "../interfaces/http.interface.js";
 
-export class HttpService {
+export class AxiosHttpClient implements IHttpClient {
   private readonly apiUrl: string;
   private readonly apiKey: string;
   private readonly apiKeyName: string;
@@ -18,11 +19,11 @@ export class HttpService {
    * @param params
    * @param additionalUris - Additional URI segments to append to the endpoint, example: "v2", "details".
    */
-  public async makeApiRequest(
+  public async makeApiRequest<T = any>(
     endpoint?: string,
-    params?: {},
+    params?: Record<string, unknown>,
     additionalUris?: string[],
-  ) {
+  ): Promise<{ data: T; status: number }> {
     let fullEndpoint = endpoint ?? "";
 
     if (additionalUris && additionalUris.length > 0) {
@@ -31,12 +32,17 @@ export class HttpService {
       }
     }
 
-    return await axios.get(`${this.apiUrl}/${fullEndpoint}`, {
+    const response = await axios.get<T>(`${this.apiUrl}/${fullEndpoint}`, {
       params: {
         ...params,
         [this.apiKeyName]: this.apiKey,
       },
     });
+
+    return {
+      data: response.data,
+      status: response.status
+    };
   }
 
   /**
@@ -49,7 +55,7 @@ export class HttpService {
       if (error.response) {
         const method = error.config?.method?.toUpperCase();
         const url = error.config?.url;
-        const params = this.safetyCheckParams(error.config?.params);
+        const params = this.safetyCheckParams(error.config?.params as Record<string, unknown>);
 
         throw new Error(
           [

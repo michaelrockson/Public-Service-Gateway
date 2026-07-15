@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import responseHandler from "../http.controller.js";
+import { Request } from "express";
+import { BadRequestError, NotFoundError } from "../errors/api.errors.js";
 
 /**
  * Parses parameters from the request query string.
@@ -20,9 +20,8 @@ export function parseParams(req: Request, paramAttributes: string[]) {
  * Validates that required query parameters are present and numeric.
  *
  * @param params - Query parameters.
- * @param res - Response Object
  */
-export function validateParams(params: Record<string, unknown>, res: Response) {
+export function validateParams(params: Record<string, unknown>) {
   let missingParams: string[] = [];
 
   for (const [key, value] of Object.entries(params)) {
@@ -32,10 +31,7 @@ export function validateParams(params: Record<string, unknown>, res: Response) {
   }
 
   if (missingParams.length > 0) {
-    responseHandler.badRequest(
-      res,
-      `Missing required query parameter(s): ${missingParams.join(", ")}`,
-    );
+    throw new BadRequestError(`Missing required query parameter(s): ${missingParams.join(", ")}`);
   }
 }
 
@@ -43,11 +39,9 @@ export function validateParams(params: Record<string, unknown>, res: Response) {
  * Validates that the weather response exists before sending it.
  *
  * @param apiResponse - Response data from the service API.
- * @param res
  */
-export function validateResponse(apiResponse: unknown, res: Response) {
+export function validateResponse(apiResponse: unknown) {
   if (apiResponse === undefined || apiResponse === null) {
-    responseHandler.notFound(res, "Requested data is unavailable");
-    throw new Error("Requested data is unavailable");
+    throw new NotFoundError("Requested data is unavailable");
   }
 }

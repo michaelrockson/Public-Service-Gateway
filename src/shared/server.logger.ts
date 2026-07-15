@@ -1,38 +1,59 @@
 import winston from "winston";
-import { envProvider } from "./env.config.js";
+import { ILogger } from "./interfaces/logger.interface.js";
+import { IConfig } from "./interfaces/config.interface.js";
 
-const isProduction = envProvider.environment;
+export class WinstonLogger implements ILogger {
+  private logger: winston.Logger;
 
-const transports: winston.transport[] = [
-  new winston.transports.Console({
-    format: winston.format.combine(
-      winston.format.colorize(),
-      winston.format.simple(),
-    ),
-  }),
-];
+  constructor(config: IConfig) {
+    const isProduction = config.environment === "prod";
 
-if (isProduction) {
-  transports.push(
-    new winston.transports.File({
-      filename: "logs/error.log",
-      level: "error",
-    }),
-    new winston.transports.File({
-      filename: "logs/combined.log",
-    }),
-  );
+    const transports: winston.transport[] = [
+      new winston.transports.Console({
+        format: winston.format.combine(
+          winston.format.colorize(),
+          winston.format.simple(),
+        ),
+      }),
+    ];
+
+    if (isProduction) {
+      transports.push(
+        new winston.transports.File({
+          filename: "logs/error.log",
+          level: "error",
+        }),
+        new winston.transports.File({
+          filename: "logs/combined.log",
+        }),
+      );
+    }
+
+    this.logger = winston.createLogger({
+      level: config.logLevel || "info",
+      exitOnError: false,
+      format: winston.format.combine(
+        winston.format.timestamp({ format: "HH:mm:ss" }),
+        winston.format.errors({ stack: true }),
+        winston.format.json(),
+      ),
+      transports,
+    });
+  }
+
+  info(message: string, ...meta: any[]): void {
+    this.logger.info(message, ...meta);
+  }
+
+  error(message: string, ...meta: any[]): void {
+    this.logger.error(message, ...meta);
+  }
+
+  warn(message: string, ...meta: any[]): void {
+    this.logger.warn(message, ...meta);
+  }
+
+  debug(message: string, ...meta: any[]): void {
+    this.logger.debug(message, ...meta);
+  }
 }
-
-const logger = winston.createLogger({
-  level: envProvider.logLevel || "info",
-  exitOnError: false,
-  format: winston.format.combine(
-    winston.format.timestamp({ format: "HH:mm:ss" }),
-    winston.format.errors({ stack: true }),
-    winston.format.json(),
-  ),
-  transports,
-});
-
-export default logger;

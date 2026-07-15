@@ -1,14 +1,12 @@
 import { Request, Response } from "express";
 import { WeatherService } from "./weather.service.js";
-import responseHandler, {
-  ControllerResponseHandler,
-} from "../../shared/http.controller.js";
+import { IResponseHandler } from "../../shared/interfaces/response-handler.interface.js";
 
 export class WeatherController {
   private readonly httpClient: WeatherService;
-  private readonly responseHandler: ControllerResponseHandler;
+  private readonly responseHandler: IResponseHandler;
 
-  constructor(weatherService: WeatherService) {
+  constructor(weatherService: WeatherService, responseHandler: IResponseHandler) {
     this.httpClient = weatherService;
     this.responseHandler = responseHandler;
   }

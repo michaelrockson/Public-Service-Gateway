@@ -1,15 +1,13 @@
 import { Request, Response } from "express";
 import { NewsService } from "./news.service.js";
-import responseHandler, {
-  ControllerResponseHandler,
-} from "../../shared/http.controller.js";
+import { IResponseHandler } from "../../shared/interfaces/response-handler.interface.js";
 import { NewsSearchParams } from "./news.types.js";
 
 export class NewsController {
   private readonly httpClient: NewsService;
-  private readonly responseHandler: ControllerResponseHandler;
+  private readonly responseHandler: IResponseHandler;
 
-  constructor(newsService: NewsService) {
+  constructor(newsService: NewsService, responseHandler: IResponseHandler) {
     this.httpClient = newsService;
     this.responseHandler = responseHandler;
   }

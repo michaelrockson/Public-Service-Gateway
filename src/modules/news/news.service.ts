@@ -1,10 +1,10 @@
-import { envProvider } from "../../shared/env.config.js";
 import { NewsSearchParams } from "./news.types.js";
 import { BaseService } from "../../shared/services/base.service.js";
+import { IHttpClient } from "../../shared/interfaces/http.interface.js";
 
 export class NewsService extends BaseService {
-  constructor() {
-    super(envProvider.newsApiUrl, envProvider.newsApiKey, "apiKey");
+  constructor(httpClient: IHttpClient) {
+    super(httpClient);
   }
 
   async getNewsArticles(newsParams: NewsSearchParams) {

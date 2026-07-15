@@ -1,9 +1,9 @@
-import { envProvider } from "../../shared/env.config.js";
 import { BaseService } from "../../shared/services/base.service.js";
+import { IHttpClient } from "../../shared/interfaces/http.interface.js";
 
 export class CurrencyService extends BaseService {
-  constructor() {
-    super(envProvider.currencyApiUrl, envProvider.currencyApiKey, "access_key");
+  constructor(httpClient: IHttpClient) {
+    super(httpClient);
   }
 
   async getLiveRates(currencyParams: Record<string, string>): Promise<any> {

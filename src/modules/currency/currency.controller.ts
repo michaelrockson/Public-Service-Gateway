@@ -1,14 +1,12 @@
 import { Request, Response } from "express";
 import { CurrencyService } from "./currency.service.js";
-import responseHandler, {
-  ControllerResponseHandler,
-} from "../../shared/http.controller.js";
+import { IResponseHandler } from "../../shared/interfaces/response-handler.interface.js";
 
 export class CurrencyController {
   private readonly httpClient: CurrencyService;
-  private readonly responseHandler: ControllerResponseHandler;
+  private readonly responseHandler: IResponseHandler;
 
-  constructor(currencyService: CurrencyService) {
+  constructor(currencyService: CurrencyService, responseHandler: IResponseHandler) {
     this.httpClient = currencyService;
     this.responseHandler = responseHandler;
   }

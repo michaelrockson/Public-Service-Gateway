@@ -1,10 +1,10 @@
-import { envProvider } from "../../shared/env.config.js";
 import { HolidayResponse, PublicHolidaysParams } from "./holiday.types.js";
 import { BaseService } from "../../shared/services/base.service.js";
+import { IHttpClient } from "../../shared/interfaces/http.interface.js";
 
 export class HolidayService extends BaseService {
-  constructor() {
-    super(envProvider.holidayApiUrl);
+  constructor(httpClient: IHttpClient) {
+    super(httpClient);
   }
 
   async getPublicHolidays(

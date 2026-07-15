@@ -1,5 +1,5 @@
 import { BaseService } from "../../shared/services/base.service.js";
-import { envProvider } from "../../shared/env.config.js";
+import { IHttpClient } from "../../shared/interfaces/http.interface.js";
 import {
   EventsResponse,
   LeaguesResponse,
@@ -16,15 +16,18 @@ import {
 } from "./sports.types.js";
 
 export class SportsService extends BaseService {
-  constructor() {
-    super(envProvider.sportsApiUrl, envProvider.sportsApiKey);
+  private readonly apiKey: string;
+
+  constructor(httpClient: IHttpClient, apiKey: string) {
+    super(httpClient);
+    this.apiKey = apiKey;
   }
 
   async getSearchedTeams(
     sportsParams: SearchTeamsParams,
   ): Promise<TeamsResponse | undefined> {
     return this.executeRequest(
-      `${envProvider.sportsApiKey}/searchteams.php`,
+      `${this.apiKey}/searchteams.php`,
       sportsParams,
     );
   }
@@ -33,7 +36,7 @@ export class SportsService extends BaseService {
     sportsParams: SearchEventsParams,
   ): Promise<EventsResponse | undefined> {
     return this.executeRequest(
-      `${envProvider.sportsApiKey}/searchevents.php`,
+      `${this.apiKey}/searchevents.php`,
       sportsParams,
     );
   }
@@ -42,7 +45,7 @@ export class SportsService extends BaseService {
     sportsParams: SearchPlayersParams,
   ): Promise<PlayersResponse | undefined> {
     return this.executeRequest(
-      `${envProvider.sportsApiKey}/searchplayers.php`,
+      `${this.apiKey}/searchplayers.php`,
       sportsParams,
     );
   }
@@ -51,7 +54,7 @@ export class SportsService extends BaseService {
     sportsParams: SearchVenuesParams,
   ): Promise<VenuesResponse | undefined> {
     return this.executeRequest(
-      `${envProvider.sportsApiKey}/searchvenues.php`,
+      `${this.apiKey}/searchvenues.php`,
       sportsParams,
     );
   }
@@ -60,7 +63,7 @@ export class SportsService extends BaseService {
     sportsParams: LookupByIdParams,
   ): Promise<LeaguesResponse | undefined> {
     return this.executeRequest(
-      `${envProvider.sportsApiKey}/lookupleague.php`,
+      `${this.apiKey}/lookupleague.php`,
       sportsParams,
     );
   }
@@ -69,7 +72,7 @@ export class SportsService extends BaseService {
     sportsParams: LookupTableParams,
   ): Promise<TableResponse | undefined> {
     return this.executeRequest(
-      `${envProvider.sportsApiKey}/lookuptable.php`,
+      `${this.apiKey}/lookuptable.php`,
       sportsParams,
     );
   }

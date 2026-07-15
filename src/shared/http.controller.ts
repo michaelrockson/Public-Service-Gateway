@@ -1,13 +1,15 @@
 import { Request, Response } from "express";
-import { envProvider } from "./env.config.js";
+import { IResponseHandler } from "./interfaces/response-handler.interface.js";
+import { IConfig } from "./interfaces/config.interface.js";
+import { BadRequestError, NotFoundError } from "./errors/api.errors.js";
 import {
   parseParams,
   validateParams,
   validateResponse,
 } from "./utils/controller.utils.js";
 
-export class ControllerResponseHandler {
-  constructor() {}
+export class ControllerResponseHandler implements IResponseHandler {
+  constructor(private readonly config: IConfig) {}
 
   /**
    * Configurable method for handling incoming HTTP Requests
@@ -25,26 +27,28 @@ export class ControllerResponseHandler {
     fetchFunction: (params?: any) => Promise<any>,
     responseKey: string,
     requiredParams?: string[],
-  ) {
+  ): Promise<void> {
     try {
       let requestParams;
 
       if (requiredParams?.length) {
         requestParams = parseParams(req, requiredParams);
-        validateParams(requestParams, res);
-        if (res.headersSent) return;
+        validateParams(requestParams);
       }
 
       const serviceResponse = await fetchFunction(requestParams);
 
-      validateResponse(serviceResponse, res);
-      if (res.headersSent) return;
+      validateResponse(serviceResponse);
 
-      return this.successResponse(res, "Data fetched successfully", {
+      this.successResponse(res, "Data fetched successfully", {
         [responseKey]: serviceResponse,
       });
     } catch (error) {
-      if (!res.headersSent) {
+      if (error instanceof BadRequestError) {
+        this.badRequest(res, error.message);
+      } else if (error instanceof NotFoundError) {
+        this.notFound(res, error.message);
+      } else {
         this.internalServerError(res, "Failed to process request", error);
       }
     }
@@ -147,7 +151,7 @@ export class ControllerResponseHandler {
         context: string;
       }
     | undefined {
-    if (envProvider.environment === "prod") {
+    if (this.config.environment === "prod") {
       return undefined;
     }
 
@@ -157,7 +161,3 @@ export class ControllerResponseHandler {
     return { context: String(error) };
   }
 }
-
-let responseHandler = new ControllerResponseHandler();
-
-export default responseHandler;

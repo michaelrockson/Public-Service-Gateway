@@ -7,14 +7,15 @@ import { validateGatewayResources } from "../shared/utils/config/config.utils.js
 import {
   GatewayControllers,
   GatewayServices,
+  SharedDependencies
 } from "../shared/utils/config/config.types.js";
 
-export function registerGatewayResources(): GatewayControllers {
-  const weather = provideWeatherResources();
-  const news = provideNewsResources();
-  const currency = provideCurrencyResources();
-  const holiday = provideHolidayResources();
-  const sports = provideSportsResources();
+export function registerGatewayResources(deps: SharedDependencies): GatewayControllers {
+  const weather = provideWeatherResources(deps);
+  const news = provideNewsResources(deps);
+  const currency = provideCurrencyResources(deps);
+  const holiday = provideHolidayResources(deps);
+  const sports = provideSportsResources(deps);
 
   const gatewayServicesRegistry: GatewayServices = {
     weatherService: weather.service,
@@ -32,7 +33,7 @@ export function registerGatewayResources(): GatewayControllers {
     sportsController: sports.controller,
   };
 
-  validateGatewayResources(gatewayControllerRegistry, gatewayServicesRegistry);
+  validateGatewayResources(deps.logger, gatewayControllerRegistry, gatewayServicesRegistry);
 
   return gatewayControllerRegistry;
 }

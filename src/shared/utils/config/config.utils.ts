@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import path from "path";
-import { logBootstrapStep, logProcess } from "../logger.utils.js";
+import { logBootstrapStep, logProcess, consoleLogger } from "../logger.utils.js";
 import { GatewayControllers, GatewayServices } from "./config.types.js";
 
 export const envPath = path.join(process.cwd(), ".env");
@@ -50,7 +50,7 @@ export function validateInfisicalSecrets(secrets: Record<string, unknown>) {
     fetchedSecrets.push(key);
   }
   if (fetchedSecrets.length > 0) {
-    logProcess(`${fetchedSecrets.length} secret(s) injected from Infisical}`);
+    logProcess(consoleLogger, `${fetchedSecrets.length} secret(s) injected from Infisical}`);
   }
 
   if (missingSecrets.length > 0) {
@@ -123,11 +123,13 @@ export function validateInfisicalCredentials(
  * Validates that all gateway services and controllers booted successfully,
  * logging a success message if so.
  *
+ * @param logger - The logger instance.
  * @param gatewayControllers - A map of controller names to their booted instances.
  * @param gatewayServices - A map of service names to their booted instances.
  * @throws {Error} If any service or controller entry is falsy (failed to boot).
  */
 export function validateGatewayResources(
+  logger: any,
   gatewayControllers: GatewayControllers,
   gatewayServices: GatewayServices,
 ): void {
@@ -153,7 +155,7 @@ export function validateGatewayResources(
   }
 
   if (isGatewayServicesBooted && isGatewayControllersBooted) {
-    logBootstrapStep("Gateway Services and Controllers booted successfully");
+    logBootstrapStep(logger, "Gateway Services and Controllers booted successfully");
   }
 }
 
