@@ -1,15 +1,16 @@
 import { Request, Response } from "express";
 import { HolidayService } from "./holiday.service.js";
-import responseHandler, {
-  ControllerResponseHandler,
-} from "../../shared/http.controller.js";
+import { IResponseHandler } from "../../shared/interfaces/infrastructure/response.handler.interface.js";
 import { PublicHolidaysParams } from "./holiday.types.js";
 
 export class HolidayController {
   private readonly httpClient: HolidayService;
-  private readonly responseHandler: ControllerResponseHandler;
+  private readonly responseHandler: IResponseHandler;
 
-  constructor(holidayService: HolidayService) {
+  constructor(
+    holidayService: HolidayService,
+    responseHandler: IResponseHandler,
+  ) {
     this.httpClient = holidayService;
     this.responseHandler = responseHandler;
   }

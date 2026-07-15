@@ -1,14 +1,27 @@
 import { CurrencyService } from "./currency.service.js";
 import { CurrencyController } from "./currency.controller.js";
-import { ModuleResourcesProvider } from "../../shared/utils/config/config.types.js";
+import {
+  ModuleControllersProvider,
+  SharedDependencies,
+} from "../../shared/boostrap/bootstrap.types.js";
+import { AxiosHttpClient } from "../../shared/http/axios.client.js";
 
-export function provideCurrencyResources(): Extract<ModuleResourcesProvider, { name: "currency" }> {
-  const currencyService = new CurrencyService();
-  const currencyController = new CurrencyController(currencyService);
+export function provideCurrencyController(
+  deps: SharedDependencies,
+): Extract<ModuleControllersProvider, { name: "currency" }> {
+  const currencyHttpClient = new AxiosHttpClient(
+    deps.moduleConfig.currencyApiUrl,
+    deps.moduleConfig.currencyApiKey,
+    "access_key",
+  );
+  const currencyService = new CurrencyService(currencyHttpClient);
+  const currencyController = new CurrencyController(
+    currencyService,
+    deps.responseHandler,
+  );
 
   return {
     name: "currency",
-    service: currencyService,
-    controller: currencyController
+    controller: currencyController,
   };
 }

@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { WeatherController } from "./weather.controller.js";
 
-export function createWeatherRouter(
+export function provideWeatherRouter(
   weatherController: WeatherController,
 ): Router {
   const weatherRouter = Router();

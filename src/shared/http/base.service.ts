@@ -1,15 +1,10 @@
-import { HttpService } from "./http.service.js";
-import { AxiosResponse } from "axios";
+import { IHttpClient } from "../interfaces/infrastructure/http.interface.js";
 
 export abstract class BaseService {
-  protected readonly httpService: HttpService;
+  protected readonly httpService: IHttpClient;
 
-  protected constructor(
-    apiUrl: string,
-    apiKey: string = "",
-    apiKeyQueryParamName: string = "",
-  ) {
-    this.httpService = new HttpService(apiUrl, apiKey, apiKeyQueryParamName);
+  protected constructor(httpService: IHttpClient) {
+    this.httpService = httpService;
   }
 
   /**
@@ -22,7 +17,7 @@ export abstract class BaseService {
     pathParams?: string[],
   ): Promise<T | undefined> {
     try {
-      const response = await this.httpService.makeApiRequest(
+      const response = await this.httpService.makeApiRequest<T>(
         endpoint,
         queryParams,
         pathParams,
@@ -35,16 +30,16 @@ export abstract class BaseService {
 
   /**
    * Wrapper for making API requests to automatically handle try-catch
-   * and generic error reporting. Returns the full Axios response object.
+   * and generic error reporting. Returns the full response object.
    * Useful when the status code is needed.
    */
   protected async executeRawRequest<T = unknown>(
     endpoint?: string,
     queryParams?: any,
     pathParams?: string[],
-  ): Promise<AxiosResponse<T> | undefined> {
+  ): Promise<{ data: T; status?: number } | undefined> {
     try {
-      return await this.httpService.makeApiRequest(
+      return await this.httpService.makeApiRequest<T>(
         endpoint,
         queryParams,
         pathParams,

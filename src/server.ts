@@ -1,34 +1,54 @@
 import express, { type Express } from "express";
 import morgan from "morgan";
-import logger from "./shared/server.logger.js";
-import { createGatewayRouter } from "./modules/routes.registry.js";
-import { injectSecretsFromInfisical } from "./shared/services/infisical.service.js";
-import { populateEnvProvider } from "./shared/env.config.js";
-import { createMorganStream, logProcess } from "./shared/utils/logger.utils.js";
-import { bootGatewayResources } from "./shared/utils/server.utils.js";
+import { bootGatewayRouters } from "./modules/routes.registry.js";
+import { injectSecretsFromInfisical } from "./shared/boostrap/bootstrap.infisical.js";
+import {
+  consoleLogger,
+  createMorganStream,
+  logProcess,
+} from "./shared/logger/logger.utils.js";
+import { bootGatewayControllers } from "./shared/boostrap/bootstrap.utils.js";
+import { BootstrapSystem } from "./shared/boostrap/bootstrap.system.js";
+import { BootstrapModule } from "./shared/boostrap/bootstrap.module.js";
+import { WinstonLogger } from "./shared/logger/winston.logger.js";
+import { ControllerResponseHandler } from "./shared/http/response.handler.js";
+import { SharedDependencies } from "./shared/boostrap/bootstrap.types.js";
 
 async function startServer(): Promise<void> {
   const serverSecrets = await injectSecretsFromInfisical();
-  populateEnvProvider(serverSecrets);
 
-  const controllers = bootGatewayResources();
+  const systemConfig = new BootstrapSystem(serverSecrets.systemConfig);
+  const moduleConfig = new BootstrapModule(serverSecrets.moduleConfig);
+  const logger = new WinstonLogger(systemConfig);
+  const responseHandler = new ControllerResponseHandler(
+    systemConfig.environment,
+  );
+
+  const sharedDependencies: SharedDependencies = {
+    systemConfig,
+    moduleConfig,
+    logger,
+    responseHandler,
+  };
+
+  const controllers = bootGatewayControllers(sharedDependencies);
 
   const server: Express = express();
 
-  const port: number = Number(serverSecrets.port) || 3000;
-  const environment: string = serverSecrets.environment ?? "dev";
-  const gatewayRouter = createGatewayRouter(controllers);
+  const port: number = Number(systemConfig.port) || 3000;
+  const environment: string = systemConfig.environment ?? "dev";
+  const gatewayRouter = bootGatewayRouters(controllers);
 
-  server.use(morgan("combined", { stream: createMorganStream() }));
+  server.use(morgan("combined", { stream: createMorganStream(logger) }));
   server.use(express.json());
   server.use("/v1", gatewayRouter);
 
   server.listen(port, (): void => {
-    logProcess(`Server running on ${port}`);
-    logProcess(`Server environment: ${environment}`);
+    logProcess(logger, `Server running on ${port}`);
+    logProcess(logger, `Server environment: ${environment}`);
   });
 }
 
 await startServer().catch((error) => {
-  logger.error(`Error starting Server: ${error}`);
+  consoleLogger.error(`Error starting Server: ${error}`);
 });

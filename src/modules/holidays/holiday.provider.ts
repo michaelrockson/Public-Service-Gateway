@@ -1,14 +1,27 @@
 import { HolidayService } from "./holiday.service.js";
 import { HolidayController } from "./holiday.controller.js";
-import { ModuleResourcesProvider } from "../../shared/utils/config/config.types.js";
+import {
+  ModuleControllersProvider,
+  SharedDependencies,
+} from "../../shared/boostrap/bootstrap.types.js";
+import { AxiosHttpClient } from "../../shared/http/axios.client.js";
 
-export function provideHolidayResources(): Extract<ModuleResourcesProvider, { name: "holiday" }> {
-  const holidayService = new HolidayService();
-  const holidayController = new HolidayController(holidayService);
+export function provideHolidayController(
+  deps: SharedDependencies,
+): Extract<ModuleControllersProvider, { name: "holiday" }> {
+  const holidayHttpClient = new AxiosHttpClient(
+    deps.moduleConfig.holidayApiUrl,
+    "",
+    "",
+  );
+  const holidayService = new HolidayService(holidayHttpClient);
+  const holidayController = new HolidayController(
+    holidayService,
+    deps.responseHandler,
+  );
 
   return {
     name: "holiday",
-    service: holidayService,
-    controller: holidayController
+    controller: holidayController,
   };
 }

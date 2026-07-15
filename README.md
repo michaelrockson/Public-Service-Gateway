@@ -119,18 +119,18 @@ src/
 │       ├── holiday.routes.ts        # Route definitions for /api/v1/holiday
 │       └── holiday.types.ts         # Request parameter types
 └── shared/
-    ├── env.config.ts                # envProvider — synchronous config access
-    ├── http.controller.ts           # Shared ControllerResponseHandler
-    ├── server.logger.ts             # Winston logger instance
+    ├── config.service.ts                # envProvider — synchronous config access
+    ├── response.handler.ts           # Shared ControllerResponseHandler
+    ├── winston.logger.ts             # Winston logger instance
     ├── services/
     │   ├── base.service.ts          # Abstract base class for all API services
-    │   ├── http.service.ts          # Shared Axios wrapper (executeRequest / executeRawRequest)
-    │   └── infisical.service.ts     # Infisical auth and secret injection
+    │   ├── axios.client.ts          # Shared Axios wrapper (executeRequest / executeRawRequest)
+    │   └── bootstrap.infisical.ts     # Infisical auth and secret injection
     └── utils/
         ├── config.utils.ts          # getEnvVar, validateSecrets
-        ├── controller.utils.ts      # Shared controller helper utilities
+        ├── request.utils.ts      # Shared controller helper utilities
         ├── logger.utils.ts          # Morgan stream, logProcess, logBootstrapStep
-        └── server.utils.ts          # bootServices() — instantiates all services & controllers
+        └── bootstrap.utils.ts          # bootServices() — instantiates all services & controllers
 ```
 
 ## Architecture

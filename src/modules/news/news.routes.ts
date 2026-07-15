@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 import { NewsController } from "./news.controller.js";
 
-export function createNewsRouter(newsController: NewsController): Router {
+export function provideNewsRouter(newsController: NewsController): Router {
   const newsRouter = Router();
 
   newsRouter.get(

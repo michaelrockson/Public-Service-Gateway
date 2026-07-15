@@ -1,7 +1,7 @@
 import { HolidayController } from "./holiday.controller.js";
 import { Request, Response, Router } from "express";
 
-export function createHolidayRouter(
+export function provideHolidayRouter(
   holidayController: HolidayController,
 ): Router {
   const holidayRouter = Router();

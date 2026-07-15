@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import { SportsService } from "./sports.service.js";
-import responseHandler, {
-  ControllerResponseHandler,
-} from "../../shared/http.controller.js";
+import { IResponseHandler } from "../../shared/interfaces/infrastructure/response.handler.interface.js";
 import {
   LookupByIdParams,
   LookupTableParams,
@@ -14,9 +12,9 @@ import {
 
 export class SportsController {
   private readonly httpClient: SportsService;
-  private readonly responseHandler: ControllerResponseHandler;
+  private readonly responseHandler: IResponseHandler;
 
-  constructor(sportsService: SportsService) {
+  constructor(sportsService: SportsService, responseHandler: IResponseHandler) {
     this.httpClient = sportsService;
     this.responseHandler = responseHandler;
   }
