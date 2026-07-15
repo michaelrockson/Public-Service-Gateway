@@ -7,6 +7,13 @@ import {
 import { GatewayControllers, SharedDependencies } from "./gateway.types.js";
 import { registerGatewayControllers } from "../../modules/controllers.registry.js";
 
+/**
+ * Boots and registers all gateway controllers.
+ *
+ * @param deps - Shared dependencies required to initialize the controllers.
+ * @returns The registered gateway controllers.
+ * @throws {Error} If controller initialization fails.
+ */
 export function bootGatewayControllers(
   deps: SharedDependencies,
 ): GatewayControllers {

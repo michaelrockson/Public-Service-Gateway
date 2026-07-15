@@ -3,14 +3,9 @@ import { NewsController } from "../../modules/news/news.controller.js";
 import { CurrencyController } from "../../modules/currency/currency.controller.js";
 import { HolidayController } from "../../modules/holidays/holiday.controller.js";
 import { SportsController } from "../../modules/sports/sports.controller.js";
-import { WeatherService } from "../../modules/weather/weather.service.js";
-import { NewsService } from "../../modules/news/news.service.js";
-import { CurrencyService } from "../../modules/currency/currency.service.js";
-import { HolidayService } from "../../modules/holidays/holiday.service.js";
-import { SportsService } from "../../modules/sports/sports.service.js";
 import {
-  ISystemConfig,
   IModuleConfig,
+  ISystemConfig,
 } from "../interfaces/config/config.interface.js";
 import { ILogger } from "../interfaces/infrastructure/logger.interface.js";
 import { IResponseHandler } from "../interfaces/infrastructure/response.handler.interface.js";

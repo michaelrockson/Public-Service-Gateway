@@ -6,7 +6,7 @@ export interface IResponseHandler {
     res: Response,
     fetchFunction: (params?: any) => Promise<any>,
     responseKey: string,
-    requiredParams?: string[]
+    requiredParams?: string[],
   ): Promise<void>;
 
   successResponse(res: Response, message?: string, details?: unknown): void;

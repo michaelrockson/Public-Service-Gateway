@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request } from "express";
 import { BadRequestError, NotFoundError } from "./api.errors.js";
 
 /**

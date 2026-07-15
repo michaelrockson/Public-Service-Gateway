@@ -2,9 +2,9 @@ import { InfisicalSDK } from "@infisical/sdk";
 import dotenv from "dotenv";
 import path from "path";
 import {
+  consoleLogger,
   logProcess,
   logProcessError,
-  consoleLogger,
 } from "../logger/logger.utils.js";
 import {
   getEnvNumber,

@@ -3,9 +3,9 @@ import morgan from "morgan";
 import { createGatewayRouter } from "./modules/routes.registry.js";
 import { injectSecretsFromInfisical } from "./shared/boostrap/infisical.config.js";
 import {
+  consoleLogger,
   createMorganStream,
   logProcess,
-  consoleLogger,
 } from "./shared/logger/logger.utils.js";
 import { bootGatewayControllers } from "./shared/boostrap/bootstrap.utils.js";
 import { ServerConfigService } from "./shared/boostrap/server.config.service.js";
