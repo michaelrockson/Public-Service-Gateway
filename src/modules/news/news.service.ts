@@ -1,6 +1,6 @@
 import { NewsSearchParams } from "./news.types.js";
-import { BaseService } from "../../shared/services/base.service.js";
-import { IHttpClient } from "../../shared/interfaces/http.interface.js";
+import { BaseService } from "../../shared/http/base.service.js";
+import { IHttpClient } from "../../shared/interfaces/infrastructure/http.interface.js";
 
 export class NewsService extends BaseService {
   constructor(httpClient: IHttpClient) {

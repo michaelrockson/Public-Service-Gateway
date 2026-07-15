@@ -62,7 +62,7 @@ src/
 ├── server.ts                        # Entry point — bootstrap and startup
 │
 ├── modules/                         # Feature modules (one folder per domain)
-│   ├── resource.registry.ts         # Instantiates all providers → GatewayControllers
+│   ├── controllers.registry.ts         # Instantiates all providers → GatewayControllers
 │   ├── routes.registry.ts           # Mounts all module routers under /v1
 │   │
 │   ├── weather/
@@ -102,33 +102,33 @@ src/
 │
 └── shared/                          # Cross-cutting infrastructure
     ├── config/
-    │   ├── config.types.ts          # SharedDependencies, GatewayControllers, GatewayServices, ModuleResourcesProvider
-    │   └── env.config.ts            # ConfigService class (implements IConfig)
+    │   ├── gateway.types.ts          # SharedDependencies, GatewayControllers, GatewayServices, ModuleResourcesProvider
+    │   └── config.service.ts            # ConfigService class (implements IConfig)
     │
     ├── http/
     │   ├── api.errors.ts            # BadRequestError, NotFoundError (typed Error subclasses)
-    │   └── http.controller.ts       # ControllerResponseHandler (implements IResponseHandler)
+    │   └── response.handler.ts       # ControllerResponseHandler (implements IResponseHandler)
     │
     ├── interfaces/
     │   ├── config.interface.ts      # IConfig — shape of all runtime configuration
     │   ├── http.interface.ts        # IHttpClient — contract for HTTP clients (makeApiRequest / handleApiErrors)
     │   ├── logger.interface.ts      # ILogger — contract for loggers (info / error / warn / debug)
-    │   └── response-handler.interface.ts  # IResponseHandler — contract for response helpers
+    │   └── response.handler.interface.ts  # IResponseHandler — contract for response helpers
     │
     ├── logger/
-    │   └── server.logger.ts         # WinstonLogger class (implements ILogger)
+    │   └── winston.logger.ts         # WinstonLogger class (implements ILogger)
     │
     ├── services/
     │   ├── base.service.ts          # Abstract base: executeRequest / executeRawRequest (accepts IHttpClient)
-    │   ├── http.service.ts          # AxiosHttpClient (implements IHttpClient)
-    │   └── infisical.service.ts     # InfisicalService class + injectSecretsFromInfisical()
+    │   ├── axios.client.ts          # AxiosHttpClient (implements IHttpClient)
+    │   └── infisical.config.ts     # InfisicalService class + injectSecretsFromInfisical()
     │
     └── utils/
         ├── config.utils.ts          # validateEnvs / validateInfisicalSecrets / getEnvVar / getEnvNumber /
         │                            # validateInfisicalCredentials / validateGatewayResources / unpackResourceControllers
-        ├── controller.utils.ts      # parseParams / validateParams / validateResponse
+        ├── request.utils.ts      # parseParams / validateParams / validateResponse
         ├── logger.utils.ts          # logProcess / logBootstrapStep / logInboundRaw / createMorganStream / consoleLogger
-        └── server.utils.ts          # bootGatewayResources() → GatewayControllers
+        └── bootstrap.utils.ts          # bootGatewayResources() → GatewayControllers
 ```
 
 
@@ -208,10 +208,10 @@ WinstonLogger                 ControllerResponseHandler
            Provider functions        (construct AxiosHttpClient → Service → Controller)
                    │
                    ▼
-           resource.registry.ts      (builds + validates GatewayControllers / GatewayServices)
+           controllers.registry.ts      (builds + validates GatewayControllers / GatewayServices)
                    │
                    ▼
-           server.utils.ts           (bootGatewayResources → unpackResourceControllers)
+           bootstrap.utils.ts           (bootGatewayResources → unpackResourceControllers)
                    │
                    ▼
            routes.registry.ts        (createGatewayRouter → mounts module routers)
@@ -483,19 +483,19 @@ export function createWeatherRouter(weatherController: WeatherController): Route
 
 ## 10. Shared Layer
 
-### `config/env.config.ts` — `ConfigService`
+### `config/config.service.ts` — `ConfigService`
 
 A class implementing `IConfig`. Constructed once in `server.ts` from the
 `IConfig`-shaped object returned by `injectSecretsFromInfisical()`. After
 construction its properties are `readonly`, making it a stable, immutable
 config snapshot for the lifetime of the process.
 
-### `config/config.types.ts`
+### `config/gateway.types.ts`
 
 Defines the four shared types: `SharedDependencies`, `GatewayControllers`,
 `GatewayServices`, and `ModuleResourcesProvider`. See [Section 12](#12-type-system).
 
-### `services/infisical.service.ts`
+### `services/infisical.config.ts`
 
 Two exports:
 - `InfisicalService` class — authenticates with the Infisical SDK (universal
@@ -513,7 +513,7 @@ Abstract base class for all feature services. Constructor accepts an
 - `executeRawRequest<T>()` — returns the full `{ data: T; status?: number }`
   object, for when the status code carries semantic meaning.
 
-### `services/http.service.ts` — `AxiosHttpClient`
+### `services/axios.client.ts` — `AxiosHttpClient`
 
 Implements `IHttpClient`. Accepts `apiUrl`, `apiKey`, and `apiKeyName` at
 construction time.
@@ -524,7 +524,7 @@ construction time.
 - `handleApiErrors(error)` — normalises Axios errors into readable `Error`
   messages, redacting the API key in logged params via `safetyCheckParams()`.
 
-### `http/http.controller.ts` — `ControllerResponseHandler`
+### `http/response.handler.ts` — `ControllerResponseHandler`
 
 Implements `IResponseHandler`. Constructed once in `server.ts` and injected
 into every controller via `deps.responseHandler`. Core method is
@@ -552,7 +552,7 @@ lifecycle:
 | `BadRequestError` | 400 | `validateParams()` |
 | `NotFoundError` | 404 | `validateResponse()` |
 
-### `logger/server.logger.ts` — `WinstonLogger`
+### `logger/winston.logger.ts` — `WinstonLogger`
 
 Implements `ILogger`. Constructed once in `server.ts`.
 - Console transport is always active (colourised, simple format).
@@ -576,7 +576,7 @@ Named log helpers that accept an `ILogger` instance as their first argument:
 Also exports `consoleLogger` — a lightweight `ILogger` backed by the native
 `console` object, used for pre-bootstrap logging (before `WinstonLogger` exists).
 
-### `utils/controller.utils.ts`
+### `utils/request.utils.ts`
 
 | Function | Purpose |
 |---|---|
@@ -584,7 +584,7 @@ Also exports `consoleLogger` — a lightweight `ILogger` backed by the native
 | `validateParams(params)` | Throws `BadRequestError` listing missing params if any are falsy |
 | `validateResponse(data)` | Throws `NotFoundError` if `data` is `null` / `undefined` |
 
-### `utils/server.utils.ts`
+### `utils/bootstrap.utils.ts`
 
 Exports `bootGatewayResources(deps): GatewayControllers`. Wraps
 `registerGatewayResources(deps)` + `unpackResourceControllers()` in a
@@ -663,7 +663,7 @@ export interface IHttpClient {
 }
 ```
 
-### `IResponseHandler` (`response-handler.interface.ts`)
+### `IResponseHandler` (`response.handler.interface.ts`)
 
 Response utility contract. Implemented by `ControllerResponseHandler`.
 
@@ -681,7 +681,7 @@ export interface IResponseHandler {
 
 ## 12. Type System
 
-All shared gateway types live in `shared/config/config.types.ts`.
+All shared gateway types live in `shared/config/gateway.types.ts`.
 
 ### `SharedDependencies`
 
@@ -811,7 +811,7 @@ src/modules/maps/
 ```
 
 **2. Add the env vars to Infisical** and expose them in `shared/interfaces/config.interface.ts`
-(`IConfig` interface) and `shared/config/env.config.ts` (`ConfigService` class):
+(`IConfig` interface) and `shared/config/config.service.ts` (`ConfigService` class):
 ```typescript
 // config.interface.ts
 interface IConfig {
@@ -820,10 +820,10 @@ interface IConfig {
   mapsApiKey: string;
 }
 
-// env.config.ts — add matching readonly properties + constructor assignments
+// config.service.ts — add matching readonly properties + constructor assignments
 ```
 
-**3. Map the new vars in `infisical.service.ts`:**
+**3. Map the new vars in `infisical.config.ts`:**
 ```typescript
 const config = {
   // ...existing...
@@ -891,7 +891,7 @@ export function provideMapsResources(
 }
 ```
 
-**8. Update `config.types.ts`** — add the new variant to all three types:
+**8. Update `gateway.types.ts`** — add the new variant to all three types:
 ```typescript
 // ModuleResourcesProvider — new union member:
 | { name: "maps"; service: MapsService; controller: MapsController }
@@ -903,7 +903,7 @@ mapsController: MapsController;
 mapsService: MapsService;
 ```
 
-**9. Register in `resource.registry.ts`:**
+**9. Register in `controllers.registry.ts`:**
 ```typescript
 const maps = provideMapsResources(deps);
 

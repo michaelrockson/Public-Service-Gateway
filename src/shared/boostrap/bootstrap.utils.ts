@@ -1,58 +1,24 @@
-import { logBootstrapStep, logProcess, consoleLogger } from "./logger.utils.js";
-import { GatewayControllers } from "../config/config.types.js";
+import {
+  consoleLogger,
+  logBootstrapError,
+  logBootstrapStep,
+  logProcess,
+} from "../logger/logger.utils.js";
+import { GatewayControllers, SharedDependencies } from "./gateway.types.js";
+import { registerGatewayControllers } from "../../modules/controllers.registry.js";
 
-/**
- * Validates that all provided environment variables are set.
- *
- * @param secrets - A map of environment variable names to their resolved values.
- * @throws {Error} If one or more values are `undefined`, `null`, or an empty string.
- */
-export function validateEnvs(secrets: Record<string, unknown>) {
-  let missingEnvs: string[] = [];
-
-  for (const [key, value] of Object.entries(secrets)) {
-    if (value === undefined || value === null || value === "") {
-      missingEnvs.push(key);
-    }
-  }
-
-  if (missingEnvs.length > 0) {
-    throw new Error(
-      `${missingEnvs.length} missing environment variable(s): 
-      ${missingEnvs.join(", ")}`,
+export function bootGatewayControllers(
+  deps: SharedDependencies,
+): GatewayControllers {
+  try {
+    return registerGatewayControllers(deps);
+  } catch (error) {
+    logBootstrapError(
+      deps.logger,
+      "Booting module services & controllers",
+      error,
     );
-  }
-}
-
-/**
- * Validates secrets fetched from Infisical, logging how many were successfully
- * injected and throwing if any required secrets are missing.
- *
- * @param secrets - A map of secret names to their fetched values.
- * @throws {Error} If one or more values are `undefined`, `null`, or an empty string.
- */
-export function validateInfisicalSecrets(secrets: Record<string, unknown>) {
-  let missingSecrets: string[] = [];
-  let fetchedSecrets: string[] = [];
-
-  for (const [key, value] of Object.entries(secrets)) {
-    if (value === undefined || value === null || value === "") {
-      missingSecrets.push(key);
-    }
-    fetchedSecrets.push(key);
-  }
-  if (fetchedSecrets.length > 0) {
-    logProcess(
-      consoleLogger,
-      `${fetchedSecrets.length} secret(s) injected from Infisical}`,
-    );
-  }
-
-  if (missingSecrets.length > 0) {
-    throw new Error(
-      `${missingSecrets.length} missing environment variable(s): \n
-      ${missingSecrets.join("\n ").toUpperCase()}`,
-    );
+    throw new Error();
   }
 }
 
@@ -99,6 +65,29 @@ export function getEnvNumber(key: string, fallback?: number): number {
 }
 
 /**
+ * Validates that all provided environment variables are set.
+ *
+ * @param secrets - A map of environment variable names to their resolved values.
+ * @throws {Error} If one or more values are `undefined`, `null`, or an empty string.
+ */
+export function validateEnvs(secrets: Record<string, unknown>) {
+  let missingEnvs: string[] = [];
+
+  for (const [key, value] of Object.entries(secrets)) {
+    if (value === undefined || value === null || value === "") {
+      missingEnvs.push(key);
+    }
+  }
+
+  if (missingEnvs.length > 0) {
+    throw new Error(
+      `${missingEnvs.length} missing environment variable(s): 
+      ${missingEnvs.join(", ")}`,
+    );
+  }
+}
+
+/**
  * Validates that Infisical authentication credentials are present.
  *
  * @param clientId - The Infisical client ID.
@@ -115,6 +104,38 @@ export function validateInfisicalCredentials(
 }
 
 /**
+ * Validates secrets fetched from Infisical, logging how many were successfully
+ * injected and throwing if any required secrets are missing.
+ *
+ * @param secrets - A map of secret names to their fetched values.
+ * @throws {Error} If one or more values are `undefined`, `null`, or an empty string.
+ */
+export function validateInfisicalSecrets(secrets: Record<string, unknown>) {
+  let missingSecrets: string[] = [];
+  let fetchedSecrets: string[] = [];
+
+  for (const [key, value] of Object.entries(secrets)) {
+    if (value === undefined || value === null || value === "") {
+      missingSecrets.push(key);
+    }
+    fetchedSecrets.push(key);
+  }
+  if (fetchedSecrets.length > 0) {
+    logProcess(
+      consoleLogger,
+      `${fetchedSecrets.length} secret(s) injected from Infisical}`,
+    );
+  }
+
+  if (missingSecrets.length > 0) {
+    throw new Error(
+      `${missingSecrets.length} missing environment variable(s): \n
+      ${missingSecrets.join("\n ").toUpperCase()}`,
+    );
+  }
+}
+
+/**
  * Validates that all gateway controllers booted successfully,
  * logging a success message if so.
  *
@@ -122,7 +143,7 @@ export function validateInfisicalCredentials(
  * @param gatewayControllers - A map of controller names to their booted instances.
  * @throws {Error} If any controller entry is falsy (failed to boot).
  */
-export function validateGatewayResources(
+export function validateGatewayControllers(
   logger: any,
   gatewayControllers: GatewayControllers,
 ): void {

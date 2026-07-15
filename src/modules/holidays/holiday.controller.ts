@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { HolidayService } from "./holiday.service.js";
-import { IResponseHandler } from "../../shared/interfaces/response-handler.interface.js";
+import { IResponseHandler } from "../../shared/interfaces/infrastructure/response.handler.interface.js";
 import { PublicHolidaysParams } from "./holiday.types.js";
 
 export class HolidayController {

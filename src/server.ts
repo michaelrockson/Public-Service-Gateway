@@ -1,17 +1,17 @@
 import express, { type Express } from "express";
 import morgan from "morgan";
 import { createGatewayRouter } from "./modules/routes.registry.js";
-import { injectSecretsFromInfisical } from "./shared/services/infisical.service.js";
+import { injectSecretsFromInfisical } from "./shared/boostrap/infisical.config.js";
 import {
   createMorganStream,
   logProcess,
   consoleLogger,
-} from "./shared/utils/logger.utils.js";
-import { bootGatewayResources } from "./shared/utils/server.utils.js";
-import { ConfigService } from "./shared/config/env.config.js";
-import { WinstonLogger } from "./shared/logger/server.logger.js";
-import { ControllerResponseHandler } from "./shared/http/http.controller.js";
-import { SharedDependencies } from "./shared/config/config.types.js";
+} from "./shared/logger/logger.utils.js";
+import { bootGatewayControllers } from "./shared/boostrap/bootstrap.utils.js";
+import { ConfigService } from "./shared/boostrap/config.service.js";
+import { WinstonLogger } from "./shared/logger/winston.logger.js";
+import { ControllerResponseHandler } from "./shared/http/response.handler.js";
+import { SharedDependencies } from "./shared/boostrap/gateway.types.js";
 
 async function startServer(): Promise<void> {
   const serverSecrets = await injectSecretsFromInfisical();
@@ -26,7 +26,7 @@ async function startServer(): Promise<void> {
     responseHandler,
   };
 
-  const controllers = bootGatewayResources(sharedDependencies);
+  const controllers = bootGatewayControllers(sharedDependencies);
 
   const server: Express = express();
 

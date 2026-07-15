@@ -3,8 +3,8 @@ import { WeatherController } from "./weather.controller.js";
 import {
   ModuleResourcesProvider,
   SharedDependencies,
-} from "../../shared/config/config.types.js";
-import { AxiosHttpClient } from "../../shared/services/http.service.js";
+} from "../../shared/boostrap/gateway.types.js";
+import { AxiosHttpClient } from "../../shared/http/axios.client.js";
 
 export function provideWeatherResources(
   deps: SharedDependencies,

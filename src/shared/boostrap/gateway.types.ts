@@ -8,9 +8,9 @@ import { NewsService } from "../../modules/news/news.service.js";
 import { CurrencyService } from "../../modules/currency/currency.service.js";
 import { HolidayService } from "../../modules/holidays/holiday.service.js";
 import { SportsService } from "../../modules/sports/sports.service.js";
-import { IConfig } from "../interfaces/config.interface.js";
-import { ILogger } from "../interfaces/logger.interface.js";
-import { IResponseHandler } from "../interfaces/response-handler.interface.js";
+import { IConfig } from "../interfaces/config/config.interface.js";
+import { ILogger } from "../interfaces/infrastructure/logger.interface.js";
+import { IResponseHandler } from "../interfaces/infrastructure/response.handler.interface.js";
 
 export type SharedDependencies = {
   config: IConfig;

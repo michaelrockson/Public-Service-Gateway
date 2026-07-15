@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { NewsService } from "./news.service.js";
-import { IResponseHandler } from "../../shared/interfaces/response-handler.interface.js";
+import { IResponseHandler } from "../../shared/interfaces/infrastructure/response.handler.interface.js";
 import { NewsSearchParams } from "./news.types.js";
 
 export class NewsController {

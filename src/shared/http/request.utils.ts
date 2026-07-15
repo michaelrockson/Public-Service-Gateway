@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { BadRequestError, NotFoundError } from "../http/api.errors.js";
+import { BadRequestError, NotFoundError } from "./api.errors.js";
 
 /**
  * Parses parameters from the request query string.

@@ -1,4 +1,4 @@
-import { IHttpClient } from "../interfaces/http.interface.js";
+import { IHttpClient } from "../interfaces/infrastructure/http.interface.js";
 
 export abstract class BaseService {
   protected readonly httpService: IHttpClient;

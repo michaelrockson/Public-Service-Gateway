@@ -1,5 +1,5 @@
 import axios from "axios";
-import { IHttpClient } from "../interfaces/http.interface.js";
+import { IHttpClient } from "../interfaces/infrastructure/http.interface.js";
 
 export class AxiosHttpClient implements IHttpClient {
   private readonly apiUrl: string;
@@ -19,7 +19,7 @@ export class AxiosHttpClient implements IHttpClient {
    * @param params
    * @param additionalUris - Additional URI segments to append to the endpoint, example: "v2", "details".
    */
-  public async makeApiRequest<T = any>(
+  public async makeApiRequest<T = unknown>(
     endpoint?: string,
     params?: Record<string, unknown>,
     additionalUris?: string[],

@@ -1,11 +1,11 @@
 import winston from "winston";
-import { ILogger } from "../interfaces/logger.interface.js";
-import { IConfig } from "../interfaces/config.interface.js";
+import { ILogger } from "../interfaces/infrastructure/logger.interface.js";
+import { ILoggerConfig } from "../interfaces/config/logger.config.interface.js";
 
 export class WinstonLogger implements ILogger {
   private logger: winston.Logger;
 
-  constructor(config: IConfig) {
+  constructor(config: ILoggerConfig) {
     const isProduction = config.environment === "prod";
 
     const transports: winston.transport[] = [

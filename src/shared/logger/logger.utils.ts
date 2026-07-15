@@ -1,4 +1,4 @@
-import { ILogger } from "../interfaces/logger.interface.js";
+import { ILogger } from "../interfaces/infrastructure/logger.interface.js";
 
 export function logProcess(logger: ILogger, step: string): void {
   logger.info(`[PROCESS] ${step}`);
