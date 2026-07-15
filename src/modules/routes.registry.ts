@@ -6,7 +6,7 @@ import { createHolidayRouter } from "./holidays/holiday.routes.js";
 import { createSportsRouter } from "./sports/sports.routes.js";
 import { GatewayControllers } from "../shared/boostrap/bootstrap.types.js";
 
-export function createGatewayRouter(controllers: GatewayControllers): Router {
+export function bootGatewayRouters(controllers: GatewayControllers): Router {
   const apiRouter = Router();
 
   apiRouter.use("/weather", createWeatherRouter(controllers.weatherController));
