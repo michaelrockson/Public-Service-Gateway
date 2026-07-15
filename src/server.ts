@@ -18,7 +18,7 @@ async function startServer(): Promise<void> {
 
   const config = new ConfigService(serverSecrets);
   const logger = new WinstonLogger(config);
-  const responseHandler = new ControllerResponseHandler(config);
+  const responseHandler = new ControllerResponseHandler(config.environment);
 
   const sharedDependencies: SharedDependencies = {
     config,

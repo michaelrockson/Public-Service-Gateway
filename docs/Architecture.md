@@ -1,4 +1,4 @@
-﻿# API Gateway Architecture Guide
+# API Gateway Architecture Guide
 
 A reference for any developer picking up this codebase. Covers the startup
 sequence, dependency flow, module structure, the resource registration pattern,
@@ -13,13 +13,15 @@ the shared type system, and the conventions to follow when adding new modules.
 4. [Startup Sequence](#4-startup-sequence)
 5. [Dependency Flow](#5-dependency-flow)
 6. [Secrets & Configuration](#6-secrets--configuration)
-7. [Resource Registration Pattern](#7-resource-registration-pattern)
-8. [Module Structure](#8-module-structure)
-9. [Shared Layer](#9-shared-layer)
-10. [Type System](#10-type-system)
-11. [Available Routes](#11-available-routes)
-12. [Adding a New Module](#12-adding-a-new-module)
-13. [Environment Variables](#13-environment-variables)
+7. [Dependency Injection Pattern](#7-dependency-injection-pattern)
+8. [Resource Registration Pattern](#8-resource-registration-pattern)
+9. [Module Structure](#9-module-structure)
+10. [Shared Layer](#10-shared-layer)
+11. [Interface Layer](#11-interface-layer)
+12. [Type System](#12-type-system)
+13. [Available Routes](#13-available-routes)
+14. [Adding a New Module](#14-adding-a-new-module)
+15. [Environment Variables](#15-environment-variables)
 
 
 ## 1. Project Overview
@@ -32,6 +34,11 @@ Secrets management is handled by Infisical. No API keys or runtime
 configuration are stored locally in `.env`; `.env` contains only the five
 credentials needed to reach Infisical itself.
 
+All shared infrastructure (`ConfigService`, `WinstonLogger`,
+`ControllerResponseHandler`) is instantiated once in `server.ts` and
+propagated downward via a `SharedDependencies` object no singletons,
+no module-level state.
+
 
 ## 2. Tech Stack
 
@@ -41,9 +48,9 @@ credentials needed to reach Infisical itself.
 | Language | TypeScript 6, strict mode, `NodeNext` modules |
 | Framework | Express 5 |
 | Secrets | Infisical SDK (`@infisical/sdk`) |
-| HTTP client | Axios (via shared `HttpService`) |
-| Logging | Winston |
-| Request logging | Morgan (piped through Winston) |
+| HTTP client | Axios (via `AxiosHttpClient` implementing `IHttpClient`) |
+| Logging | Winston (wrapped in `WinstonLogger` implementing `ILogger`) |
+| Request logging | Morgan (piped through `WinstonLogger` via `createMorganStream`) |
 | Local env loading | dotenv |
 | Dev server | `tsx watch` |
 
@@ -59,7 +66,7 @@ src/
 │   ├── routes.registry.ts           # Mounts all module routers under /v1
 │   │
 │   ├── weather/
-│   │   ├── weather.provider.ts      # Factory: WeatherService + WeatherController
+│   │   ├── weather.provider.ts      # Factory: AxiosHttpClient → WeatherService → WeatherController
 │   │   ├── weather.service.ts
 │   │   ├── weather.controller.ts
 │   │   ├── weather.routes.ts
@@ -94,20 +101,34 @@ src/
 │       └── sports.types.ts
 │
 └── shared/                          # Cross-cutting infrastructure
-    ├── env.config.ts                # envProvider singleton + populateEnvProvider()
-    ├── http.controller.ts           # ControllerResponseHandler (shared response utils)
-    ├── server.logger.ts             # Winston logger instance
+    ├── config/
+    │   ├── config.types.ts          # SharedDependencies, GatewayControllers, GatewayServices, ModuleResourcesProvider
+    │   └── env.config.ts            # ConfigService class (implements IConfig)
+    │
+    ├── http/
+    │   ├── api.errors.ts            # BadRequestError, NotFoundError (typed Error subclasses)
+    │   └── http.controller.ts       # ControllerResponseHandler (implements IResponseHandler)
+    │
+    ├── interfaces/
+    │   ├── config.interface.ts      # IConfig — shape of all runtime configuration
+    │   ├── http.interface.ts        # IHttpClient — contract for HTTP clients (makeApiRequest / handleApiErrors)
+    │   ├── logger.interface.ts      # ILogger — contract for loggers (info / error / warn / debug)
+    │   └── response-handler.interface.ts  # IResponseHandler — contract for response helpers
+    │
+    ├── logger/
+    │   └── server.logger.ts         # WinstonLogger class (implements ILogger)
+    │
     ├── services/
-    │   ├── base.service.ts          # Abstract base: executeRequest / executeRawRequest
-    │   ├── http.service.ts          # Axios wrapper: makeApiRequest / handleApiErrors
-    │   └── infisical.service.ts     # Infisical auth + secret injection
+    │   ├── base.service.ts          # Abstract base: executeRequest / executeRawRequest (accepts IHttpClient)
+    │   ├── http.service.ts          # AxiosHttpClient (implements IHttpClient)
+    │   └── infisical.service.ts     # InfisicalService class + injectSecretsFromInfisical()
+    │
     └── utils/
+        ├── config.utils.ts          # validateEnvs / validateInfisicalSecrets / getEnvVar / getEnvNumber /
+        │                            # validateInfisicalCredentials / validateGatewayResources / unpackResourceControllers
         ├── controller.utils.ts      # parseParams / validateParams / validateResponse
-        ├── logger.utils.ts          # logProcess / logBootstrapStep / createMorganStream
-        ├── server.utils.ts          # bootGatewayResources() → GatewayControllers
-        └── config/
-            ├── config.types.ts      # GatewayControllers, GatewayServices, ModuleResourcesProvider
-            └── config.utils.ts      # validateGatewayResources / unpackResourceControllers / env helpers
+        ├── logger.utils.ts          # logProcess / logBootstrapStep / logInboundRaw / createMorganStream / consoleLogger
+        └── server.utils.ts          # bootGatewayResources() → GatewayControllers
 ```
 
 
@@ -123,27 +144,39 @@ startServer()
 │         Reads the five Infisical bootstrap vars from the local .env,
 │         authenticates with the Infisical SDK, and calls listSecrets()
 │         with attachToProcessEnv: true — injecting all runtime secrets
-│         into process.env. Returns a typed AppSecrets object.
+│         into process.env. Maps process.env values into a typed IConfig
+│         object and returns it.
 │
-├── 2. populateEnvProvider(serverSecrets)
-│         Merges AppSecrets into the shared envProvider singleton via
-│         Object.assign. After this point any class can read config
-│         synchronously from envProvider without touching process.env.
+├── 2. new ConfigService(serverSecrets)
+│         Constructs a ConfigService instance (implements IConfig) from the
+│         returned secrets object. This is the single source of truth for
+│         all runtime configuration. No singletons; config is passed as a
+│         dependency.
 │
-├── 3. bootGatewayResources()
-│         Calls registerGatewayResources() which invokes each module's
-│         provider function, builds the GatewayControllers and
-│         GatewayServices registries, validates they are all truthy,
-│         and returns GatewayControllers (the controller map).
-│         Then calls unpackResourceControllers() to strip any falsy
-│         entries before handing the map to the router.
+├── 3. new WinstonLogger(config)
+│         Constructs a WinstonLogger (implements ILogger). Reads
+│         config.logLevel and config.environment to configure transports
+│         (console always; file transports only when environment === "prod").
 │
-├── 4. createGatewayRouter(controllers)
-│         Receives the live GatewayControllers map. Passes each
-│         controller instance into its module's router factory, mounts
-│         all routers under /v1, and returns the configured Express Router.
+├── 4. new ControllerResponseHandler(config)
+│         Constructs the shared response handler (implements IResponseHandler).
+│         Reads config.environment to determine error verbosity in responses.
 │
-└── 5. server.listen(port)
+├── 5. bootGatewayResources({ config, logger, responseHandler })
+│         Packages the three shared instances into a SharedDependencies object
+│         and calls registerGatewayResources(deps), which invokes each module's
+│         provider function. Each provider constructs its own AxiosHttpClient,
+│         Service, and Controller using the injected dependencies.
+│         validateGatewayResources() asserts all instances are truthy.
+│         unpackResourceControllers() strips falsy entries and returns
+│         GatewayControllers.
+│
+├── 6. createGatewayRouter(controllers)
+│         Receives the live GatewayControllers map. Passes each controller
+│         into its module's router factory, mounts all routers under /v1,
+│         and returns the configured Express Router.
+│
+└── 7. server.listen(port)
           Server is live. Incoming requests flow:
           Express → gatewayRouter → module router → controller → service.
 ```
@@ -160,28 +193,31 @@ dotenv (.env)
 InfisicalService             (bootstraps remote secrets into process.env)
     │
     ▼
-envProvider                  (populated once, read synchronously by services)
+ConfigService                (typed IConfig; instantiated once in server.ts)
     │
-    ▼
-Services                     (read envProvider in constructors, call HttpService)
-    │
-    ▼
-Controllers                  (receive service instance via constructor injection)
-    │
-    ▼
-Providers                    (factory functions: new Service → new Controller)
-    │
-    ▼
-resource.registry.ts         (calls all providers, builds + validates registries)
-    │
-    ▼
-server.utils.ts              (bootGatewayResources → unpackResourceControllers)
-    │
-    ▼
-routes.registry.ts           (createGatewayRouter → mounts module routers)
-    │
-    ▼
-Express Server
+    ├──────────────────────────────────┐
+    ▼                                  ▼
+WinstonLogger                 ControllerResponseHandler
+(ILogger)                     (IResponseHandler)
+    │                                  │
+    └──────────────┬───────────────────┘
+                   ▼
+           SharedDependencies        ({ config, logger, responseHandler })
+                   │
+                   ▼
+           Provider functions        (construct AxiosHttpClient → Service → Controller)
+                   │
+                   ▼
+           resource.registry.ts      (builds + validates GatewayControllers / GatewayServices)
+                   │
+                   ▼
+           server.utils.ts           (bootGatewayResources → unpackResourceControllers)
+                   │
+                   ▼
+           routes.registry.ts        (createGatewayRouter → mounts module routers)
+                   │
+                   ▼
+           Express Server
 ```
 
 Key rules enforced by this flow:
@@ -190,18 +226,20 @@ Key rules enforced by this flow:
 - A controller never knows which route mounted it.
 - A router never knows how the server bootstrapped.
 - Services must **never** be instantiated at module load time. All
-  instantiation happens inside provider functions, which are only called
-  after `populateEnvProvider()` has completed. Violating this causes
-  `envProvider` values to be `undefined` at construction time.
+  instantiation happens inside provider functions, which are called
+  only after `ConfigService` has been constructed and passed in.
+- No module reads `process.env` directly; all config is accessed through
+  the injected `IConfig` (`deps.config`).
 
 
 ## 6. Secrets & Configuration
 
 ### Two-step bootstrap
 
-**Step 1 Local `.env` (Infisical credentials only)**
+**Step 1 — Local `.env` (Infisical credentials only)**
 
-The local `.env` contains only these five values, read by dotenv on startup:
+The local `.env` contains only these five values, read by dotenv on startup
+(via `dotenv.config()` called at module evaluation time in `config.utils.ts`):
 
 ```
 INFISICAL_SITE_URL
@@ -211,22 +249,32 @@ INFISICAL_ENVIRONMENT
 INFISICAL_PROJECT_ID
 ```
 
-**Step 2 Remote secrets (from Infisical)**
+**Step 2 — Remote secrets (from Infisical)**
 
-`injectSecretsFromInfisical()` authenticates and fetches all remaining
-secrets, attaching them to `process.env`. They are then mapped into a
-typed `AppSecrets` object and passed to `populateEnvProvider()`.
+`injectSecretsFromInfisical()` constructs an `InfisicalService`, authenticates
+via universal auth, calls `listSecrets()` with `attachToProcessEnv: true`,
+then reads the now-populated `process.env` values into a typed `IConfig`
+-shaped object. `validateInfisicalSecrets()` checks for missing keys and
+logs the count of injected secrets before returning.
 
-### Accessing config in services
+### Accessing config in modules
 
-Always read from `envProvider`, never from `process.env` directly:
+Always read from the injected `deps.config`, never from `process.env` directly:
 
 ```typescript
-// correct
-super(envProvider.weatherApiUrl, envProvider.weatherApiKey, "appid");
+// correct — inside a provider function
+const weatherHttpClient = new AxiosHttpClient(
+  deps.config.weatherApiUrl,
+  deps.config.weatherApiKey,
+  "appid",
+);
 
 // avoid
-super(process.env.WEATHER_API_URL, process.env.WEATHER_API_KEY, "appid");
+const weatherHttpClient = new AxiosHttpClient(
+  process.env.WEATHER_API_URL!,
+  process.env.WEATHER_API_KEY!,
+  "appid",
+);
 ```
 
 ### Working directory note
@@ -237,7 +285,49 @@ super(process.env.WEATHER_API_URL, process.env.WEATHER_API_KEY, "appid");
 bootstrap will fail with `Missing required environment variable: INFISICAL_SITE_URL`.
 
 
-## 7. Resource Registration Pattern
+## 7. Dependency Injection Pattern
+
+`server.ts` constructs three shared infrastructure objects and bundles them
+into a `SharedDependencies` struct, which is then threaded through the
+entire bootstrap chain:
+
+```typescript
+const config          = new ConfigService(serverSecrets);   // IConfig
+const logger          = new WinstonLogger(config);           // ILogger
+const responseHandler = new ControllerResponseHandler(config); // IResponseHandler
+
+const sharedDependencies: SharedDependencies = { config, logger, responseHandler };
+```
+
+**Provider functions** receive `deps: SharedDependencies` and use it to:
+1. Construct an `AxiosHttpClient` with the appropriate URL and key from `deps.config`.
+2. Construct the module's `Service`, passing the `AxiosHttpClient`.
+3. Construct the module's `Controller`, passing the `Service` and `deps.responseHandler`.
+
+```typescript
+// weather/weather.provider.ts
+export function provideWeatherResources(
+  deps: SharedDependencies,
+): Extract<ModuleResourcesProvider, { name: "weather" }> {
+  const weatherHttpClient = new AxiosHttpClient(
+    deps.config.weatherApiUrl,
+    deps.config.weatherApiKey,
+    "appid",
+  );
+  const weatherService    = new WeatherService(weatherHttpClient);
+  const weatherController = new WeatherController(weatherService, deps.responseHandler);
+  return { name: "weather", service: weatherService, controller: weatherController };
+}
+```
+
+This pattern means:
+- No module ever imports `ConfigService`, `WinstonLogger`, or
+  `ControllerResponseHandler` directly.
+- All cross-cutting concerns are swappable behind interfaces.
+- Testing a module only requires a mock `SharedDependencies`.
+
+
+## 8. Resource Registration Pattern
 
 The gateway uses a **provider → registry → validation → boot** pattern to
 instantiate and validate all modules before the server starts accepting requests.
@@ -245,14 +335,14 @@ instantiate and validate all modules before the server starts accepting requests
 ### Step-by-step
 
 ```
-provideXxxResources()            — module-level factory function
+provideXxxResources(deps)        — module-level factory, receives SharedDependencies
     ↓
 { name, service, controller }    — typed as a ModuleResourcesProvider discriminated union member
     ↓
-registerGatewayResources()       — builds GatewayControllers + GatewayServices maps,
-                                   calls validateGatewayResources() to assert all are truthy
+registerGatewayResources(deps)   — builds GatewayControllers + GatewayServices maps,
+                                   calls validateGatewayResources(logger, controllers, services)
     ↓
-bootGatewayResources()           — wraps registerGatewayResources() in error handling,
+bootGatewayResources(deps)       — wraps registerGatewayResources() in error handling,
                                    passes the result through unpackResourceControllers()
     ↓
 GatewayControllers               — passed directly to createGatewayRouter()
@@ -264,9 +354,16 @@ Each module exports a provider factory with a narrowed return type:
 
 ```typescript
 // holidays/holiday.provider.ts
-export function provideHolidayResources(): Extract<ModuleResourcesProvider, { name: "holiday" }> {
-  const holidayService = new HolidayService();
-  const holidayController = new HolidayController(holidayService);
+export function provideHolidayResources(
+  deps: SharedDependencies,
+): Extract<ModuleResourcesProvider, { name: "holiday" }> {
+  const holidayHttpClient = new AxiosHttpClient(
+    deps.config.holidayApiUrl,
+    "",        // Nager.Date requires no API key
+    "",
+  );
+  const holidayService    = new HolidayService(holidayHttpClient);
+  const holidayController = new HolidayController(holidayService, deps.responseHandler);
   return { name: "holiday", service: holidayService, controller: holidayController };
 }
 ```
@@ -277,7 +374,7 @@ types rather than the full union.
 
 ### Registry maps
 
-`registerGatewayResources()` calls each provider once, destructures the
+`registerGatewayResources()` calls each provider with `deps`, destructures the
 result, and assembles the two typed maps:
 
 ```typescript
@@ -294,64 +391,76 @@ const gatewayControllerRegistry: GatewayControllers = {
 };
 ```
 
-`validateGatewayResources()` iterates both maps and throws if any entry is
-falsy, logging a bootstrap success message if all are present.
+`validateGatewayResources(deps.logger, gatewayControllerRegistry, gatewayServicesRegistry)`
+iterates both maps and throws if any entry is falsy, logging a bootstrap
+success message if all are present.
 
 
-## 8. Module Structure
+## 9. Module Structure
 
 Each feature module follows a five-file structure:
 
 ```
-module.provider.ts    — Factory: creates service + controller, returns typed pair
-module.service.ts     — Outbound HTTP calls to the third-party API
-module.controller.ts  — Receives HTTP requests, delegates to service via ControllerResponseHandler
+module.provider.ts    — Factory: creates AxiosHttpClient → service → controller, returns typed pair
+module.service.ts     — Outbound HTTP calls to the third-party API (extends BaseService)
+module.controller.ts  — Receives HTTP requests, delegates to service via IResponseHandler
 module.routes.ts      — Defines routes, exported as a factory function
 module.types.ts       — TypeScript interfaces for request params and API response shapes
 ```
 
 ### Provider
 
-Creates one service and one controller and returns them as a named pair.
+Receives `SharedDependencies`, constructs the `AxiosHttpClient` (with the
+appropriate base URL, API key, and key param name from `deps.config`),
+creates the service and controller, and returns them as a named pair.
 This is the only place where `new XxxService()` and `new XxxController()`
-are called. See 7 for details.
+are called. See [Section 7](#7-dependency-injection-pattern) for details.
 
 ### Service
 
 Owns all outbound HTTP communication with the upstream API. Extends
-`BaseService`, which provides `executeRequest()` (returns `response.data`)
-and `executeRawRequest()` (returns the full `AxiosResponse`, useful when
-the HTTP status code itself carries meaning, as in `IsTodayPublicHoliday`).
+`BaseService`, which accepts an `IHttpClient` via its constructor and
+provides `executeRequest()` (returns `response.data`) and
+`executeRawRequest()` (returns the full `{ data, status }` object, useful
+when the HTTP status code itself carries meaning, as with `IsTodayPublicHoliday`).
 
 ```typescript
 export class WeatherService extends BaseService {
-  constructor() {
-    super(envProvider.weatherApiUrl, envProvider.weatherApiKey, "appid");
+  constructor(httpClient: IHttpClient) {
+    super(httpClient);
   }
   async getCurrentWeather(params: CurrentWeatherParams) {
     return this.executeRequest("weather", params);
+  }
+  async getWeatherForecast(params: CurrentWeatherParams) {
+    return this.executeRequest("forecast", params);
   }
 }
 ```
 
 ### Controller
 
-Receives its service via constructor injection. Delegates all request
-lifecycle concerns (param parsing, validation, error catching, JSON
-formatting) to `ControllerResponseHandler` via `handleRequest()`.
+Receives its service via constructor injection **and** the shared
+`IResponseHandler` (sourced from `deps.responseHandler` in the provider).
+Delegates all request lifecycle concerns (param parsing, validation, error
+catching, JSON formatting) to `IResponseHandler` via `handleRequest()`.
 
 ```typescript
 export class WeatherController {
   private readonly httpClient: WeatherService;
-  constructor(weatherService: WeatherService) {
-    this.httpClient = weatherService;
+  private readonly responseHandler: IResponseHandler;
+
+  constructor(weatherService: WeatherService, responseHandler: IResponseHandler) {
+    this.httpClient      = weatherService;
+    this.responseHandler = responseHandler;
   }
+
   async handleCurrentWeatherRequest(req: Request, res: Response) {
-    await responseHandler.handleRequest(
+    return this.responseHandler.handleRequest(
       req, res,
       (params) => this.httpClient.getCurrentWeather(params),
-      "weather",
-      ["q", "units"],
+      "currentWeather",
+      ["lat", "lon"],
     );
   }
 }
@@ -359,7 +468,7 @@ export class WeatherController {
 
 ### Routes
 
-Exported as a factory function never a module-level router instance.
+Exported as a factory function — never a module-level router instance.
 Receives the controller instance as its only argument.
 
 ```typescript
@@ -372,96 +481,116 @@ export function createWeatherRouter(weatherController: WeatherController): Route
 ```
 
 
-## 9. Shared Layer
+## 10. Shared Layer
+
+### `config/env.config.ts` — `ConfigService`
+
+A class implementing `IConfig`. Constructed once in `server.ts` from the
+`IConfig`-shaped object returned by `injectSecretsFromInfisical()`. After
+construction its properties are `readonly`, making it a stable, immutable
+config snapshot for the lifetime of the process.
+
+### `config/config.types.ts`
+
+Defines the four shared types: `SharedDependencies`, `GatewayControllers`,
+`GatewayServices`, and `ModuleResourcesProvider`. See [Section 12](#12-type-system).
 
 ### `services/infisical.service.ts`
 
 Two exports:
-- `InfisicalService` class authenticates with Infisical SDK (universal auth)
-  and calls `listSecrets()` with `attachToProcessEnv: true`.
-- `injectSecretsFromInfisical()` function orchestrates auth + injection,
-  maps the resolved `process.env` values into a typed `AppSecrets` object,
+- `InfisicalService` class — authenticates with the Infisical SDK (universal
+  auth) and calls `listSecrets()` with `attachToProcessEnv: true`.
+- `injectSecretsFromInfisical()` — orchestrates auth + injection, maps the
+  resolved `process.env` values into a typed `IConfig`-shaped object,
   validates them with `validateInfisicalSecrets()`, and returns the object.
-
-### `env.config.ts`
-
-Exports `envProvider` (a plain `AppConfig` object, initially `{}` cast) and
-`populateEnvProvider(config)` which calls `Object.assign(envProvider, config)`.
-After `populateEnvProvider()` runs, any constructor can safely read from
-`envProvider` synchronously.
 
 ### `services/base.service.ts`
 
-Abstract base class for all feature services. Constructor accepts
-`apiUrl`, `apiKey`, and `apiKeyQueryParamName` and creates an `HttpService`
-instance. Exposes:
+Abstract base class for all feature services. Constructor accepts an
+`IHttpClient` instance. Exposes:
 
-- `executeRequest<T>()` calls `makeApiRequest()` and returns `response.data`.
-- `executeRawRequest<T>()` returns the full `AxiosResponse<T>`, for when
-  the status code carries semantic meaning (e.g. holiday status check).
+- `executeRequest<T>()` — calls `makeApiRequest()` and returns `response.data`.
+- `executeRawRequest<T>()` — returns the full `{ data: T; status?: number }`
+  object, for when the status code carries semantic meaning.
 
-### `services/http.service.ts`
+### `services/http.service.ts` — `AxiosHttpClient`
 
-Thin Axios wrapper. Accepts `apiUrl`, `apiKey`, `apiKeyName` at construction.
+Implements `IHttpClient`. Accepts `apiUrl`, `apiKey`, and `apiKeyName` at
+construction time.
 
-- `makeApiRequest(endpoint?, params?, additionalUris?)` builds the full
-  URL by joining `apiUrl`, `endpoint`, and any `additionalUris` segments;
-  appends the API key as a query param.
-- `handleApiErrors(error)` normalises Axios errors into readable `Error`
+- `makeApiRequest(endpoint?, params?, additionalUris?)` — builds the full URL
+  by joining `apiUrl`, `endpoint`, and any `additionalUris` segments; appends
+  the API key as a query param using `apiKeyName`.
+- `handleApiErrors(error)` — normalises Axios errors into readable `Error`
   messages, redacting the API key in logged params via `safetyCheckParams()`.
 
-### `http.controller.ts`
+### `http/http.controller.ts` — `ControllerResponseHandler`
 
-`ControllerResponseHandler` a singleton (`responseHandler`) used by all
-controllers. Core method is `handleRequest()` which handles the full request
-lifecycle:
+Implements `IResponseHandler`. Constructed once in `server.ts` and injected
+into every controller via `deps.responseHandler`. Core method is
+`handleRequest()` which handles the full request lifecycle:
 
-1. Parses query params from `req.query` via `parseParams()`.
-2. Validates required params via `validateParams()`; sends 400 and returns if invalid.
+1. If `requiredParams` is provided, parses query params via `parseParams()`.
+2. Validates required params via `validateParams()`; throws `BadRequestError` if any are missing.
 3. Calls the provided `fetchFunction` (delegated to the service).
-4. Validates the response via `validateResponse()`; sends 404 if absent.
+4. Validates the response via `validateResponse()`; throws `NotFoundError` if absent.
 5. Sends `200` with the result wrapped under `responseKey`.
-6. Catches unexpected errors and sends `500`.
+6. Catches `BadRequestError` → `400`, `NotFoundError` → `404`, anything else → `500`.
 
 Also exposes: `successResponse`, `badRequest`, `notFound`, `badGatewayError`,
 `internalServerError`.
 
-### `server.logger.ts`
+Error details in responses are suppressed when `config.environment === "prod"`.
 
-Configures a Winston logger with:
-- A console transport (always active, colourised, simple format).
-- File transports to `logs/error.log` and `logs/combined.log` (active when
-  `envProvider.environment` is truthy, i.e. non-empty).
-- Timestamp, error-stack, and JSON formatting on all outputs.
+### `http/api.errors.ts`
+
+Typed `Error` subclasses used as discriminated signals within the request
+lifecycle:
+
+| Class | HTTP status | Thrown by |
+|---|---|---|
+| `BadRequestError` | 400 | `validateParams()` |
+| `NotFoundError` | 404 | `validateResponse()` |
+
+### `logger/server.logger.ts` — `WinstonLogger`
+
+Implements `ILogger`. Constructed once in `server.ts`.
+- Console transport is always active (colourised, simple format).
+- File transports (`logs/error.log`, `logs/combined.log`) are added only
+  when `config.environment === "prod"`.
+- All transports use timestamp, error-stack, and JSON formatting.
 
 ### `utils/logger.utils.ts`
 
-Named log helpers with log-level prefixes:
+Named log helpers that accept an `ILogger` instance as their first argument:
 
 | Function | Prefix | Level |
 |---|---|---|
-| `logProcess()` | `[PROCESS]` | `info` |
-| `logProcessError()` | `[PROCESS]` | `error` |
-| `logBootstrapStep()` | `[BOOTSTRAP]` | `info` |
-| `logBootstrapError()` | `[BOOTSTRAP]` | `error` |
-| `logInboundRaw()` | `[INBOUND]` | `info` |
-| `createMorganStream()` | — | Pipes Morgan output to `logInboundRaw` |
+| `logProcess(logger, step)` | `[PROCESS]` | `info` |
+| `logProcessError(logger, step, error)` | `[PROCESS]` | `error` |
+| `logBootstrapStep(logger, step)` | `[BOOTSTRAP]` | `info` |
+| `logBootstrapError(logger, step, error)` | `[BOOTSTRAP]` | `error` |
+| `logInboundRaw(logger, message)` | `[INBOUND]` | `info` |
+| `createMorganStream(logger)` | — | Pipes Morgan output to `logInboundRaw` |
+
+Also exports `consoleLogger` — a lightweight `ILogger` backed by the native
+`console` object, used for pre-bootstrap logging (before `WinstonLogger` exists).
 
 ### `utils/controller.utils.ts`
 
 | Function | Purpose |
 |---|---|
 | `parseParams(req, attrs)` | Extracts named keys from `req.query` into a plain record |
-| `validateParams(params, res)` | Sends `400` and lists missing params if any are falsy |
-| `validateResponse(data, res)` | Sends `404` and throws if `data` is `null` / `undefined` |
+| `validateParams(params)` | Throws `BadRequestError` listing missing params if any are falsy |
+| `validateResponse(data)` | Throws `NotFoundError` if `data` is `null` / `undefined` |
 
 ### `utils/server.utils.ts`
 
-Exports `bootGatewayResources(): GatewayControllers`. Wraps
-`registerGatewayResources()` + `unpackResourceControllers()` in a try/catch
-that calls `logBootstrapError()` and re-throws on failure.
+Exports `bootGatewayResources(deps): GatewayControllers`. Wraps
+`registerGatewayResources(deps)` + `unpackResourceControllers()` in a
+try/catch that calls `logBootstrapError(deps.logger, ...)` and re-throws on failure.
 
-### `utils/config/config.utils.ts`
+### `utils/config.utils.ts`
 
 | Function | Purpose |
 |---|---|
@@ -470,13 +599,101 @@ that calls `logBootstrapError()` and re-throws on failure.
 | `validateInfisicalCredentials(id, secret)` | Throws if either Infisical credential is missing |
 | `getEnvVar(key, fallback?)` | Reads a string from `process.env`, throws if absent and no fallback |
 | `getEnvNumber(key, fallback?)` | Like `getEnvVar` but parses as `number` |
-| `validateGatewayResources(controllers, services)` | Iterates both maps, throws if any entry is falsy |
+| `validateGatewayResources(logger, controllers, services)` | Iterates both maps, throws if any entry is falsy |
 | `unpackResourceControllers(registry)` | Copies only truthy entries into a new `GatewayControllers` object |
 
+> `dotenv.config()` is called at module evaluation time inside this file,
+> ensuring `.env` is loaded before any `getEnvVar` calls during the
+> Infisical bootstrap.
 
-## 10. Type System
 
-All shared types live in `shared/utils/config/config.types.ts`.
+## 11. Interface Layer
+
+All cross-cutting contracts live in `shared/interfaces/`. Concrete classes
+implement these interfaces; modules depend only on the interface, never the
+concrete class.
+
+### `IConfig` (`config.interface.ts`)
+
+Shape of all runtime configuration. Implemented by `ConfigService`.
+
+```typescript
+export interface IConfig {
+  environment: string;
+  port: number;
+  logLevel: string;
+  weatherApiUrl: string;
+  weatherApiKey: string;
+  newsApiUrl: string;
+  newsApiKey: string;
+  currencyApiUrl: string;
+  currencyApiKey: string;
+  holidayApiUrl: string;
+  sportsApiUrl: string;
+  sportsApiKey: string;
+}
+```
+
+### `ILogger` (`logger.interface.ts`)
+
+Logging contract. Implemented by `WinstonLogger`; `consoleLogger` is a
+lightweight inline implementation used before the logger is constructed.
+
+```typescript
+export interface ILogger {
+  info(message: string, ...meta: any[]): void;
+  error(message: string, ...meta: any[]): void;
+  warn(message: string, ...meta: any[]): void;
+  debug(message: string, ...meta: any[]): void;
+}
+```
+
+### `IHttpClient` (`http.interface.ts`)
+
+HTTP client contract. Implemented by `AxiosHttpClient`.
+
+```typescript
+export interface IHttpClient {
+  makeApiRequest<T = unknown>(
+    endpoint?: string,
+    params?: Record<string, unknown>,
+    additionalUris?: string[],
+  ): Promise<{ data: T; status?: number }>;
+  handleApiErrors(error: unknown): never;
+}
+```
+
+### `IResponseHandler` (`response-handler.interface.ts`)
+
+Response utility contract. Implemented by `ControllerResponseHandler`.
+
+```typescript
+export interface IResponseHandler {
+  handleRequest(req, res, fetchFunction, responseKey, requiredParams?): Promise<void>;
+  successResponse(res, message?, details?): void;
+  badRequest(res, message?, details?): void;
+  notFound(res, message?, details?): void;
+  badGatewayError(res, message?, details?): void;
+  internalServerError(res, message?, details?): void;
+}
+```
+
+
+## 12. Type System
+
+All shared gateway types live in `shared/config/config.types.ts`.
+
+### `SharedDependencies`
+
+The bundle of shared infrastructure passed through the entire bootstrap chain:
+
+```typescript
+export type SharedDependencies = {
+  config:          IConfig;
+  logger:          ILogger;
+  responseHandler: IResponseHandler;
+};
+```
 
 ### `ModuleResourcesProvider`
 
@@ -495,8 +712,8 @@ export type ModuleResourcesProvider =
 
 ### `GatewayControllers`
 
-The typed controller map, keyed by camelCase names. This single type is
-used by `registerGatewayResources()`, `bootGatewayResources()`, and
+The typed controller map, keyed by camelCase names. Used by
+`registerGatewayResources()`, `bootGatewayResources()`, and
 `createGatewayRouter()` — keeping it the single source of truth:
 
 ```typescript
@@ -511,8 +728,8 @@ export type GatewayControllers = {
 
 ### `GatewayServices`
 
-Mirrors `GatewayControllers` for the service layer, used only for
-validation inside `registerGatewayResources()`:
+Mirrors `GatewayControllers` for the service layer, used only for validation
+inside `registerGatewayResources()`:
 
 ```typescript
 export type GatewayServices = {
@@ -525,7 +742,7 @@ export type GatewayServices = {
 ```
 
 
-## 11. Available Routes
+## 13. Available Routes
 
 All routes are mounted under `/v1`.
 
@@ -533,8 +750,8 @@ All routes are mounted under `/v1`.
 
 | Method | Path | Required query params | Description |
 |---|---|---|---|
-| `GET` | `/current` | `q`, `units` | Current weather for a location |
-| `GET` | `/forecast` | `q`, `units` | Multi-day forecast for a location |
+| `GET` | `/current` | `lat`, `lon` | Current weather for a location |
+| `GET` | `/forecast` | `lat`, `lon` | Multi-day forecast for a location |
 
 ### News `/v1/news`
 
@@ -564,9 +781,9 @@ All routes are mounted under `/v1`.
 | `GET` | `/AvailableCountries` | Countries supported by the API |
 | `GET` | `/CountryInfo` | Metadata for a country |
 | `GET` | `/LongWeekend` | Long weekends for a year + country |
-| `GET` | `/IsTodayPublicHoliday` | 200 = yes, 204 = no |
+| `GET` | `/IsTodayPublicHoliday` | `true` = today is a holiday, `false` = it is not |
 
-### Sports`/v1/sports`
+### Sports `/v1/sports`
 
 | Method | Path | Description |
 |---|---|---|
@@ -578,7 +795,7 @@ All routes are mounted under `/v1`.
 | `GET` | `/lookUpTable` | Look up a league table by ID |
 
 
-## 12. Adding a New Module
+## 14. Adding a New Module
 
 Follow these steps to add a new domain (e.g. `maps`). There are exactly
 nine touchpoints, in this order:
@@ -593,21 +810,33 @@ src/modules/maps/
     maps.provider.ts
 ```
 
-**2. Add the env vars to Infisical** and expose them in `env.config.ts`
-(`AppConfig` interface + `injectSecretsFromInfisical` config object):
+**2. Add the env vars to Infisical** and expose them in `shared/interfaces/config.interface.ts`
+(`IConfig` interface) and `shared/config/env.config.ts` (`ConfigService` class):
 ```typescript
-interface AppConfig {
+// config.interface.ts
+interface IConfig {
   // ...existing...
   mapsApiUrl: string;
   mapsApiKey: string;
 }
+
+// env.config.ts — add matching readonly properties + constructor assignments
 ```
 
-**3. Implement the service** extend `BaseService`, read from `envProvider`:
+**3. Map the new vars in `infisical.service.ts`:**
+```typescript
+const config = {
+  // ...existing...
+  mapsApiUrl: getEnvVar("MAPS_API_URL", ""),
+  mapsApiKey: getEnvVar("MAPS_API_KEY", ""),
+} as const;
+```
+
+**4. Implement the service** — extend `BaseService`, accept `IHttpClient`:
 ```typescript
 export class MapsService extends BaseService {
-  constructor() {
-    super(envProvider.mapsApiUrl, envProvider.mapsApiKey, "key");
+  constructor(httpClient: IHttpClient) {
+    super(httpClient);
   }
   async geocode(params: Record<string, string>) {
     return this.executeRequest("geocode/json", params);
@@ -615,19 +844,27 @@ export class MapsService extends BaseService {
 }
 ```
 
-**4. Implement the controller** inject service via constructor:
+**5. Implement the controller** — inject service and `IResponseHandler`:
 ```typescript
 export class MapsController {
   private readonly httpClient: MapsService;
-  constructor(mapsService: MapsService) { this.httpClient = mapsService; }
+  private readonly responseHandler: IResponseHandler;
+  constructor(mapsService: MapsService, responseHandler: IResponseHandler) {
+    this.httpClient      = mapsService;
+    this.responseHandler = responseHandler;
+  }
   async handleGeocodeRequest(req: Request, res: Response) {
-    await responseHandler.handleRequest(req, res,
-      (params) => this.httpClient.geocode(params), "geocode", ["address"]);
+    await this.responseHandler.handleRequest(
+      req, res,
+      (params) => this.httpClient.geocode(params),
+      "geocode",
+      ["address"],
+    );
   }
 }
 ```
 
-**5. Implement the router** export a factory function:
+**6. Implement the router** — export a factory function:
 ```typescript
 export function createMapsRouter(mapsController: MapsController): Router {
   const router = Router();
@@ -638,16 +875,23 @@ export function createMapsRouter(mapsController: MapsController): Router {
 }
 ```
 
-**6. Add the provider:**
+**7. Implement the provider** — construct `AxiosHttpClient` → service → controller:
 ```typescript
-export function provideMapsResources(): Extract<ModuleResourcesProvider, { name: "maps" }> {
-  const mapsService = new MapsService();
-  const mapsController = new MapsController(mapsService);
+export function provideMapsResources(
+  deps: SharedDependencies,
+): Extract<ModuleResourcesProvider, { name: "maps" }> {
+  const mapsHttpClient = new AxiosHttpClient(
+    deps.config.mapsApiUrl,
+    deps.config.mapsApiKey,
+    "key",
+  );
+  const mapsService    = new MapsService(mapsHttpClient);
+  const mapsController = new MapsController(mapsService, deps.responseHandler);
   return { name: "maps", service: mapsService, controller: mapsController };
 }
 ```
 
-**7. Update `config.types.ts`** add the new variant to all three types:
+**8. Update `config.types.ts`** — add the new variant to all three types:
 ```typescript
 // ModuleResourcesProvider — new union member:
 | { name: "maps"; service: MapsService; controller: MapsController }
@@ -659,22 +903,22 @@ mapsController: MapsController;
 mapsService: MapsService;
 ```
 
-**8. Register in `resource.registry.ts`:**
+**9. Register in `resource.registry.ts`:**
 ```typescript
-const maps = provideMapsResources();
+const maps = provideMapsResources(deps);
 
-const gatewayServicesRegistry: GatewayServices    = { ...existing, mapsService: maps.service };
+const gatewayServicesRegistry: GatewayServices      = { ...existing, mapsService: maps.service };
 const gatewayControllerRegistry: GatewayControllers = { ...existing, mapsController: maps.controller };
 ```
 
-**9. Mount in `routes.registry.ts`:**
+**10. Mount in `routes.registry.ts`:**
 ```typescript
 import { createMapsRouter } from "./maps/maps.routes.js";
 apiRouter.use("/maps", createMapsRouter(controllers.mapsController));
 ```
 
 
-## 13. Environment Variables
+## 15. Environment Variables
 
 ### Local `.env` (bootstrap only)
 
@@ -691,9 +935,9 @@ Only these five values belong in `.env`. Everything else lives in Infisical.
 ### Infisical secrets (runtime)
 
 Fetched at startup, injected into `process.env`, then mapped into
-`envProvider` via `populateEnvProvider()`.
+a typed `IConfig` object and passed to `new ConfigService(config)`.
 
-| Infisical variable | `envProvider` key | Purpose |
+| Infisical variable | `IConfig` / `ConfigService` key | Purpose |
 |---|---|---|
 | `PORT` | `port` | Server listen port (default: `3000`) |
 | `ENVIRONMENT` | `environment` | App environment label (default: `"dev"`) |

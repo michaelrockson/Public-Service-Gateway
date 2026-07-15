@@ -26,14 +26,6 @@ export type GatewayControllers = {
   sportsController: SportsController;
 };
 
-export type GatewayServices = {
-  weatherService: WeatherService;
-  newsService: NewsService;
-  currencyService: CurrencyService;
-  holidayService: HolidayService;
-  sportsService: SportsService;
-};
-
 export type ModuleResourcesProvider =
   | { name: "weather"; service: WeatherService; controller: WeatherController }
   | { name: "news"; service: NewsService; controller: NewsController }

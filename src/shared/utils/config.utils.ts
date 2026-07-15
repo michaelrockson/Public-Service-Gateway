@@ -1,13 +1,5 @@
-import dotenv from "dotenv";
-import path from "path";
 import { logBootstrapStep, logProcess, consoleLogger } from "./logger.utils.js";
-import { GatewayControllers, GatewayServices } from "../config/config.types.js";
-
-export const envPath = path.join(process.cwd(), ".env");
-
-dotenv.config({
-  path: envPath,
-});
+import { GatewayControllers } from "../config/config.types.js";
 
 /**
  * Validates that all provided environment variables are set.
@@ -123,62 +115,24 @@ export function validateInfisicalCredentials(
 }
 
 /**
- * Validates that all gateway services and controllers booted successfully,
+ * Validates that all gateway controllers booted successfully,
  * logging a success message if so.
  *
  * @param logger - The logger instance.
  * @param gatewayControllers - A map of controller names to their booted instances.
- * @param gatewayServices - A map of service names to their booted instances.
- * @throws {Error} If any service or controller entry is falsy (failed to boot).
+ * @throws {Error} If any controller entry is falsy (failed to boot).
  */
 export function validateGatewayResources(
   logger: any,
   gatewayControllers: GatewayControllers,
-  gatewayServices: GatewayServices,
 ): void {
-  let isGatewayServicesBooted: boolean | undefined = undefined;
-  let isGatewayControllersBooted: boolean | undefined = undefined;
-
-  for (const [key, gatewayService] of Object.entries(gatewayServices)) {
-    if (!gatewayService) {
-      throw new Error(
-        `${key} service is not registered, check module resource registry`,
-      );
-    }
-    isGatewayServicesBooted = true;
-  }
-
   for (const [key, gatewayController] of Object.entries(gatewayControllers)) {
     if (!gatewayController) {
       throw new Error(
         `${key} controller is not registered, check module resource registry`,
       );
     }
-    isGatewayControllersBooted = true;
   }
 
-  if (isGatewayServicesBooted && isGatewayControllersBooted) {
-    logBootstrapStep(
-      logger,
-      "Gateway Services and Controllers booted successfully",
-    );
-  }
-}
-
-export function unpackResourceControllers(
-  gatewayControllerRegistry: GatewayControllers,
-): GatewayControllers {
-  const resourceControllers = {} as GatewayControllers;
-
-  for (const key of Object.keys(gatewayControllerRegistry) as Array<
-    keyof GatewayControllers
-  >) {
-    if (gatewayControllerRegistry[key]) {
-      Object.assign(resourceControllers, {
-        [key]: gatewayControllerRegistry[key],
-      });
-    }
-  }
-
-  return resourceControllers;
+  logBootstrapStep(logger, "Gateway Controllers booted successfully");
 }

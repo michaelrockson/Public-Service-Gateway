@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 
 import { IResponseHandler } from "../interfaces/response-handler.interface.js";
-import { IConfig } from "../interfaces/config.interface.js";
 import { BadRequestError, NotFoundError } from "./api.errors.js";
 import {
   parseParams,
@@ -10,7 +9,7 @@ import {
 } from "../utils/controller.utils.js";
 
 export class ControllerResponseHandler implements IResponseHandler {
-  constructor(private readonly config: IConfig) {}
+  constructor(private readonly environment: string) {}
 
   /**
    * Configurable method for handling incoming HTTP Requests
@@ -144,6 +143,7 @@ export class ControllerResponseHandler implements IResponseHandler {
 
   /**
    * Parses error instances for extra context.
+   * Suppressed entirely in production.
    *
    * @param error - Request error object.
    */
@@ -152,7 +152,7 @@ export class ControllerResponseHandler implements IResponseHandler {
         context: string;
       }
     | undefined {
-    if (this.config.environment === "prod") {
+    if (this.environment === "prod") {
       return undefined;
     }
 

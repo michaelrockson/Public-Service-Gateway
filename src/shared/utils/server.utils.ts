@@ -1,5 +1,4 @@
 import { logBootstrapError } from "./logger.utils.js";
-import { unpackResourceControllers } from "./config.utils.js";
 import {
   GatewayControllers,
   SharedDependencies,
@@ -10,8 +9,7 @@ export function bootGatewayResources(
   deps: SharedDependencies,
 ): GatewayControllers {
   try {
-    const registeredResources = registerGatewayResources(deps);
-    return unpackResourceControllers(registeredResources);
+    return registerGatewayResources(deps);
   } catch (error) {
     logBootstrapError(
       deps.logger,
