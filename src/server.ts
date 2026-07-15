@@ -8,7 +8,8 @@ import {
   consoleLogger,
 } from "./shared/logger/logger.utils.js";
 import { bootGatewayControllers } from "./shared/boostrap/bootstrap.utils.js";
-import { ConfigService } from "./shared/boostrap/config.service.js";
+import { ServerConfigService } from "./shared/boostrap/server.config.service.js";
+import { ModuleConfigService } from "./shared/boostrap/module.config.service.js";
 import { WinstonLogger } from "./shared/logger/winston.logger.js";
 import { ControllerResponseHandler } from "./shared/http/response.handler.js";
 import { SharedDependencies } from "./shared/boostrap/gateway.types.js";
@@ -16,12 +17,16 @@ import { SharedDependencies } from "./shared/boostrap/gateway.types.js";
 async function startServer(): Promise<void> {
   const serverSecrets = await injectSecretsFromInfisical();
 
-  const config = new ConfigService(serverSecrets);
-  const logger = new WinstonLogger(config);
-  const responseHandler = new ControllerResponseHandler(config.environment);
+  const systemConfig = new ServerConfigService(serverSecrets.systemConfig);
+  const moduleConfig = new ModuleConfigService(serverSecrets.moduleConfig);
+  const logger = new WinstonLogger(systemConfig);
+  const responseHandler = new ControllerResponseHandler(
+    systemConfig.environment,
+  );
 
   const sharedDependencies: SharedDependencies = {
-    config,
+    systemConfig,
+    moduleConfig,
     logger,
     responseHandler,
   };
@@ -30,8 +35,8 @@ async function startServer(): Promise<void> {
 
   const server: Express = express();
 
-  const port: number = Number(config.port) || 3000;
-  const environment: string = config.environment ?? "dev";
+  const port: number = Number(systemConfig.port) || 3000;
+  const environment: string = systemConfig.environment ?? "dev";
   const gatewayRouter = createGatewayRouter(controllers);
 
   server.use(morgan("combined", { stream: createMorganStream(logger) }));

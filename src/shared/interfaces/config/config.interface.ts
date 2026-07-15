@@ -7,14 +7,14 @@ import { IHolidayConfig } from "./holiday.config.interface.js";
 import { ISportsConfig } from "./sports.config.interface.js";
 
 /**
- * Full application config — an intersection of all module-level config interfaces.
- * ConfigService implements this type.
- * Consumers that need only a subset should depend on the relevant sub-interface
- * (e.g. WinstonLogger depends on ILoggerConfig, not IConfig).
+ * System-level config (port, environment, log levels).
  */
-export type IConfig = IServerConfig &
-  ILoggerConfig &
-  IWeatherConfig &
+export type ISystemConfig = IServerConfig & ILoggerConfig;
+
+/**
+ * Module-level config (API URLs, keys, etc.).
+ */
+export type IModuleConfig = IWeatherConfig &
   INewsConfig &
   ICurrencyConfig &
   IHolidayConfig &

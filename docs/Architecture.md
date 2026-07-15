@@ -402,7 +402,7 @@ Each feature module follows a five-file structure:
 
 ```
 module.provider.ts    — Factory: creates AxiosHttpClient → service → controller, returns typed pair
-module.service.ts     — Outbound HTTP calls to the third-party API (extends BaseService)
+module.config.service.ts     — Outbound HTTP calls to the third-party API (extends BaseService)
 module.controller.ts  — Receives HTTP requests, delegates to service via IResponseHandler
 module.routes.ts      — Defines routes, exported as a factory function
 module.types.ts       — TypeScript interfaces for request params and API response shapes

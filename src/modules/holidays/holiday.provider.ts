@@ -1,16 +1,16 @@
 import { HolidayService } from "./holiday.service.js";
 import { HolidayController } from "./holiday.controller.js";
 import {
-  ModuleResourcesProvider,
+  ModuleControllersProvider,
   SharedDependencies,
 } from "../../shared/boostrap/gateway.types.js";
 import { AxiosHttpClient } from "../../shared/http/axios.client.js";
 
-export function provideHolidayResources(
+export function provideHolidayController(
   deps: SharedDependencies,
-): Extract<ModuleResourcesProvider, { name: "holiday" }> {
+): Extract<ModuleControllersProvider, { name: "holiday" }> {
   const holidayHttpClient = new AxiosHttpClient(
-    deps.config.holidayApiUrl,
+    deps.moduleConfig.holidayApiUrl,
     "",
     "",
   );
@@ -22,7 +22,6 @@ export function provideHolidayResources(
 
   return {
     name: "holiday",
-    service: holidayService,
     controller: holidayController,
   };
 }

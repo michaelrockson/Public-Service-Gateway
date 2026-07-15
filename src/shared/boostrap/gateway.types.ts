@@ -8,12 +8,16 @@ import { NewsService } from "../../modules/news/news.service.js";
 import { CurrencyService } from "../../modules/currency/currency.service.js";
 import { HolidayService } from "../../modules/holidays/holiday.service.js";
 import { SportsService } from "../../modules/sports/sports.service.js";
-import { IConfig } from "../interfaces/config/config.interface.js";
+import {
+  ISystemConfig,
+  IModuleConfig,
+} from "../interfaces/config/config.interface.js";
 import { ILogger } from "../interfaces/infrastructure/logger.interface.js";
 import { IResponseHandler } from "../interfaces/infrastructure/response.handler.interface.js";
 
 export type SharedDependencies = {
-  config: IConfig;
+  systemConfig: ISystemConfig;
+  moduleConfig: IModuleConfig;
   logger: ILogger;
   responseHandler: IResponseHandler;
 };
@@ -26,13 +30,12 @@ export type GatewayControllers = {
   sportsController: SportsController;
 };
 
-export type ModuleResourcesProvider =
-  | { name: "weather"; service: WeatherService; controller: WeatherController }
-  | { name: "news"; service: NewsService; controller: NewsController }
+export type ModuleControllersProvider =
+  | { name: "weather"; controller: WeatherController }
+  | { name: "news"; controller: NewsController }
   | {
       name: "currency";
-      service: CurrencyService;
       controller: CurrencyController;
     }
-  | { name: "holiday"; service: HolidayService; controller: HolidayController }
-  | { name: "sports"; service: SportsService; controller: SportsController };
+  | { name: "holiday"; controller: HolidayController }
+  | { name: "sports"; controller: SportsController };

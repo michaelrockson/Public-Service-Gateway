@@ -1,17 +1,17 @@
 import { NewsService } from "./news.service.js";
 import { NewsController } from "./news.controller.js";
 import {
-  ModuleResourcesProvider,
+  ModuleControllersProvider,
   SharedDependencies,
 } from "../../shared/boostrap/gateway.types.js";
 import { AxiosHttpClient } from "../../shared/http/axios.client.js";
 
-export function provideNewsResources(
+export function provideNewsController(
   deps: SharedDependencies,
-): Extract<ModuleResourcesProvider, { name: "news" }> {
+): Extract<ModuleControllersProvider, { name: "news" }> {
   const newsHttpClient = new AxiosHttpClient(
-    deps.config.newsApiUrl,
-    deps.config.newsApiKey,
+    deps.moduleConfig.newsApiUrl,
+    deps.moduleConfig.newsApiKey,
     "apiKey",
   );
   const newsService = new NewsService(newsHttpClient);
@@ -19,7 +19,6 @@ export function provideNewsResources(
 
   return {
     name: "news",
-    service: newsService,
     controller: newsController,
   };
 }

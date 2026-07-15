@@ -1,17 +1,17 @@
 import { WeatherService } from "./weather.service.js";
 import { WeatherController } from "./weather.controller.js";
 import {
-  ModuleResourcesProvider,
+  ModuleControllersProvider,
   SharedDependencies,
 } from "../../shared/boostrap/gateway.types.js";
 import { AxiosHttpClient } from "../../shared/http/axios.client.js";
 
-export function provideWeatherResources(
+export function provideWeatherController(
   deps: SharedDependencies,
-): Extract<ModuleResourcesProvider, { name: "weather" }> {
+): Extract<ModuleControllersProvider, { name: "weather" }> {
   const weatherHttpClient = new AxiosHttpClient(
-    deps.config.weatherApiUrl,
-    deps.config.weatherApiKey,
+    deps.moduleConfig.weatherApiUrl,
+    deps.moduleConfig.weatherApiKey,
     "appid",
   );
   const weatherService = new WeatherService(weatherHttpClient);
@@ -22,7 +22,6 @@ export function provideWeatherResources(
 
   return {
     name: "weather",
-    service: weatherService,
     controller: weatherController,
   };
 }

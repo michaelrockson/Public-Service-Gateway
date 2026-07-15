@@ -1,9 +1,6 @@
-import { IConfig } from "../interfaces/config/config.interface.js";
+import { IModuleConfig } from "../interfaces/config/config.interface.js";
 
-export class ConfigService implements IConfig {
-  public readonly environment: string;
-  public readonly port: number;
-  public readonly logLevel: string;
+export class ModuleConfigService implements IModuleConfig {
   public readonly weatherApiUrl: string;
   public readonly weatherApiKey: string;
   public readonly newsApiUrl: string;
@@ -14,10 +11,7 @@ export class ConfigService implements IConfig {
   public readonly sportsApiUrl: string;
   public readonly sportsApiKey: string;
 
-  constructor(config: IConfig) {
-    this.environment = config.environment;
-    this.port = config.port;
-    this.logLevel = config.logLevel;
+  constructor(config: IModuleConfig) {
     this.weatherApiUrl = config.weatherApiUrl;
     this.weatherApiKey = config.weatherApiKey;
     this.newsApiUrl = config.newsApiUrl;

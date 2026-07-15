@@ -1,22 +1,22 @@
-import { provideWeatherResources } from "./weather/weather.provider.js";
-import { provideCurrencyResources } from "./currency/currency.provider.js";
-import { provideNewsResources } from "./news/news.provider.js";
-import { provideHolidayResources } from "./holidays/holiday.provider.js";
-import { provideSportsResources } from "./sports/sports.provider.js";
 import {
   GatewayControllers,
   SharedDependencies,
 } from "../shared/boostrap/gateway.types.js";
 import { validateGatewayControllers } from "../shared/boostrap/bootstrap.utils.js";
+import { provideWeatherController } from "./weather/weather.provider.js";
+import { provideNewsController } from "./news/news.provider.js";
+import { provideCurrencyController } from "./currency/currency.provider.js";
+import { provideHolidayController } from "./holidays/holiday.provider.js";
+import { provideSportsController } from "./sports/sports.provider.js";
 
 export function registerGatewayControllers(
   deps: SharedDependencies,
 ): GatewayControllers {
-  const weather = provideWeatherResources(deps);
-  const news = provideNewsResources(deps);
-  const currency = provideCurrencyResources(deps);
-  const holiday = provideHolidayResources(deps);
-  const sports = provideSportsResources(deps);
+  const weather = provideWeatherController(deps);
+  const news = provideNewsController(deps);
+  const currency = provideCurrencyController(deps);
+  const holiday = provideHolidayController(deps);
+  const sports = provideSportsController(deps);
 
   const gatewayControllerRegistry: GatewayControllers = {
     weatherController: weather.controller,
