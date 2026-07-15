@@ -1,6 +1,6 @@
 import express, { type Express } from "express";
 import morgan from "morgan";
-import { bootGatewayRouters } from "./modules/routes.registry.js";
+import { useGatewayRouters } from "./modules/routes.registry.js";
 import { injectSecretsFromInfisical } from "./shared/boostrap/bootstrap.infisical.js";
 import {
   consoleLogger,
@@ -37,7 +37,7 @@ async function startServer(): Promise<void> {
 
   const port: number = Number(systemConfig.port) || 3000;
   const environment: string = systemConfig.environment ?? "dev";
-  const gatewayRouter = bootGatewayRouters(controllers);
+  const gatewayRouter = useGatewayRouters(controllers);
 
   server.use(morgan("combined", { stream: createMorganStream(logger) }));
   server.use(express.json());
