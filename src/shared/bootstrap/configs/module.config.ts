@@ -1,6 +1,6 @@
-import { IModuleConfig } from "../interfaces/config/config.interface.js";
+import { IModuleConfig } from "../../interfaces/config/index.interface.js";
 
-export class BootstrapModule implements IModuleConfig {
+export class ModuleConfig implements IModuleConfig {
   public readonly weatherApiUrl: string;
   public readonly weatherApiKey: string;
   public readonly newsApiUrl: string;

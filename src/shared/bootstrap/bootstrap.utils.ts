@@ -30,12 +30,12 @@ export function bootGatewayControllers(
 }
 
 /**
- * Retrieves a string environment variable, optionally falling back to a default value.
+ * Retrieves a string secrets variable, optionally falling back to a default value.
  *
- * @param key - The name of the environment variable to read.
- * @param fallback - A default value to use if the environment variable is not set.
- * @returns The environment variable's value, or the fallback if provided.
- * @throws {Error} If the environment variable is not set and no fallback is provided.
+ * @param key - The name of the secrets variable to read.
+ * @param fallback - A default value to use if the secrets variable is not set.
+ * @returns The secrets variable's value, or the fallback if provided.
+ * @throws {Error} If the secrets variable is not set and no fallback is provided.
  */
 export function getEnvVar(key: string, fallback?: string): string {
   const value: string | undefined = process.env[key] ?? fallback;
@@ -46,12 +46,12 @@ export function getEnvVar(key: string, fallback?: string): string {
 }
 
 /**
- * Retrieves a numeric environment variable, optionally falling back to a default value.
+ * Retrieves a numeric secrets variable, optionally falling back to a default value.
  *
- * @param key - The name of the environment variable to read.
- * @param fallback - A default numeric value to use if the environment variable is not set.
+ * @param key - The name of the secrets variable to read.
+ * @param fallback - A default numeric value to use if the secrets variable is not set.
  * @returns The parsed numeric value, or the fallback if provided.
- * @throws {Error} If the environment variable is not set and no fallback is provided,
+ * @throws {Error} If the secrets variable is not set and no fallback is provided,
  * or if the value cannot be parsed as a number.
  */
 export function getEnvNumber(key: string, fallback?: number): number {
@@ -72,9 +72,9 @@ export function getEnvNumber(key: string, fallback?: number): number {
 }
 
 /**
- * Validates that all provided environment variables are set.
+ * Validates that all provided secrets variables are set.
  *
- * @param secrets - A map of environment variable names to their resolved values.
+ * @param secrets - A map of secrets variable names to their resolved values.
  * @throws {Error} If one or more values are `undefined`, `null`, or an empty string.
  */
 export function validateEnvs(secrets: Record<string, unknown>) {

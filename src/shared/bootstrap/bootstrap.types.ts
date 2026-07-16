@@ -6,7 +6,7 @@ import { SportsController } from "../../modules/sports/sports.controller.js";
 import {
   IModuleConfig,
   ISystemConfig,
-} from "../interfaces/config/config.interface.js";
+} from "../interfaces/config/index.interface.js";
 import { ILogger } from "../interfaces/infrastructure/logger.interface.js";
 import { IResponseHandler } from "../interfaces/infrastructure/response.handler.interface.js";
 
