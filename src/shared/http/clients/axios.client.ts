@@ -1,5 +1,5 @@
 import axios from "axios";
-import { IHttpClient } from "../interfaces/infrastructure/http.interface.js";
+import { IHttpClient } from "../../interfaces/infrastructure/http.interface.js";
 
 export class AxiosHttpClient implements IHttpClient {
   private readonly apiUrl: string;
@@ -21,7 +21,7 @@ export class AxiosHttpClient implements IHttpClient {
    */
   public async makeApiRequest<T = unknown>(
     endpoint?: string,
-    params?: Record<string, unknown>,
+    params?: any,
     additionalUris?: string[],
   ): Promise<{ data: T; status: number }> {
     let fullEndpoint = endpoint ?? "";

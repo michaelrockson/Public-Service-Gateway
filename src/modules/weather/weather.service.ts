@@ -1,17 +1,28 @@
 import { CurrentWeatherParams } from "./weather.types.js";
-import { BaseService } from "../../shared/http/base.service.js";
 import { IHttpClient } from "../../shared/interfaces/infrastructure/http.interface.js";
 
-export class WeatherService extends BaseService {
+export class WeatherService {
+  private readonly httpClient: IHttpClient;
+
   constructor(httpClient: IHttpClient) {
-    super(httpClient);
+    this.httpClient = httpClient;
   }
 
   async getCurrentWeather(weatherParams: CurrentWeatherParams) {
-    return this.executeRequest("weather", weatherParams);
+    try {
+      const response = await this.httpClient.makeApiRequest("weather", weatherParams);
+      return response.data;
+    } catch (error) {
+      this.httpClient.handleApiErrors(error);
+    }
   }
 
   async getWeatherForecast(weatherParams: CurrentWeatherParams) {
-    return this.executeRequest("forecast", weatherParams);
+    try {
+      const response = await this.httpClient.makeApiRequest("forecast", weatherParams);
+      return response.data;
+    } catch (error) {
+      this.httpClient.handleApiErrors(error);
+    }
   }
 }

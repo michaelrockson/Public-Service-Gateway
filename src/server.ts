@@ -11,7 +11,7 @@ import { bootGatewayControllers } from "./shared/bootstrap/bootstrap.utils.js";
 import { BootstrapSystem } from "./shared/bootstrap/bootstrap.system.js";
 import { BootstrapModule } from "./shared/bootstrap/bootstrap.module.js";
 import { WinstonLogger } from "./shared/logger/winston.logger.js";
-import { ControllerResponseHandler } from "./shared/http/response.handler.js";
+import { ControllerResponseHandler } from "./shared/http/handlers/response.handler.js";
 import { SharedDependencies } from "./shared/bootstrap/bootstrap.types.js";
 
 async function startServer(): Promise<void> {

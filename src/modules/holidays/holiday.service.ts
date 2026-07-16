@@ -1,64 +1,97 @@
 import { HolidayResponse, PublicHolidaysParams } from "./holiday.types.js";
-import { BaseService } from "../../shared/http/base.service.js";
 import { IHttpClient } from "../../shared/interfaces/infrastructure/http.interface.js";
 
-export class HolidayService extends BaseService {
+export class HolidayService {
+  private readonly httpClient: IHttpClient;
+
   constructor(httpClient: IHttpClient) {
-    super(httpClient);
+    this.httpClient = httpClient;
   }
 
   async getPublicHolidays(
     holidayParams: PublicHolidaysParams,
   ): Promise<HolidayResponse | undefined> {
-    return this.executeRequest("PublicHolidays", "", [
-      `${holidayParams.year}`,
-      `${holidayParams.countryCode}`,
-    ]);
+    try {
+      const response = await this.httpClient.makeApiRequest("PublicHolidays", undefined, [
+        `${holidayParams.year}`,
+        `${holidayParams.countryCode}`,
+      ]);
+      return response.data as HolidayResponse;
+    } catch (error) {
+      this.httpClient.handleApiErrors(error);
+    }
   }
 
   async getNextPublicHolidays(
     holidayParams: PublicHolidaysParams,
   ): Promise<HolidayResponse | undefined> {
-    return this.executeRequest("NextPublicHolidays", "", [
-      `${holidayParams.countryCode}`,
-    ]);
+    try {
+      const response = await this.httpClient.makeApiRequest("NextPublicHolidays", undefined, [
+        `${holidayParams.countryCode}`,
+      ]);
+      return response.data as HolidayResponse;
+    } catch (error) {
+      this.httpClient.handleApiErrors(error);
+    }
   }
 
   async getNextPublicHolidaysWorldwide(): Promise<HolidayResponse | undefined> {
-    return this.executeRequest("NextPublicHolidaysWorldwide");
+    try {
+      const response = await this.httpClient.makeApiRequest("NextPublicHolidaysWorldwide");
+      return response.data as HolidayResponse;
+    } catch (error) {
+      this.httpClient.handleApiErrors(error);
+    }
   }
 
   async getAvailableCountries(): Promise<HolidayResponse | undefined> {
-    return this.executeRequest("AvailableCountries");
+    try {
+      const response = await this.httpClient.makeApiRequest("AvailableCountries");
+      return response.data as HolidayResponse;
+    } catch (error) {
+      this.httpClient.handleApiErrors(error);
+    }
   }
 
   async getCountryInfo(
     holidayParams: PublicHolidaysParams,
   ): Promise<HolidayResponse | undefined> {
-    return this.executeRequest("CountryInfo", "", [
-      `${holidayParams.countryCode}`,
-    ]);
+    try {
+      const response = await this.httpClient.makeApiRequest("CountryInfo", undefined, [
+        `${holidayParams.countryCode}`,
+      ]);
+      return response.data as HolidayResponse;
+    } catch (error) {
+      this.httpClient.handleApiErrors(error);
+    }
   }
 
   async getLongWeekend(
     holidayParams: PublicHolidaysParams,
   ): Promise<HolidayResponse | undefined> {
-    return this.executeRequest("LongWeekend", "", [
-      `${holidayParams.year}`,
-      `${holidayParams.countryCode}`,
-    ]);
+    try {
+      const response = await this.httpClient.makeApiRequest("LongWeekend", undefined, [
+        `${holidayParams.year}`,
+        `${holidayParams.countryCode}`,
+      ]);
+      return response.data as HolidayResponse;
+    } catch (error) {
+      this.httpClient.handleApiErrors(error);
+    }
   }
 
   async IsTodayPublicHoliday(
     holidayParams: PublicHolidaysParams,
   ): Promise<unknown> {
-    const response = await this.executeRawRequest("IsTodayPublicHoliday", "", [
-      `${holidayParams.countryCode}`,
-    ]);
-    if (response) {
+    try {
+      const response = await this.httpClient.makeApiRequest("IsTodayPublicHoliday", undefined, [
+        `${holidayParams.countryCode}`,
+      ]);
       if (response.status === 200) return true;
       if (response.status === 204) return false;
       return response.data;
+    } catch (error) {
+      this.httpClient.handleApiErrors(error);
     }
   }
 }

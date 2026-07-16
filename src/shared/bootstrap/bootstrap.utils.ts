@@ -12,7 +12,7 @@ import { registerGatewayControllers } from "../../modules/controllers.registry.j
  *
  * @param deps - Shared dependencies required to initialize the controllers.
  * @returns The registered gateway controllers.
- * @throws {Error} If controller initialization fails.
+ * @throws {Error} If handlers initialization fails.
  */
 export function bootGatewayControllers(
   deps: SharedDependencies,
@@ -22,7 +22,7 @@ export function bootGatewayControllers(
   } catch (error) {
     logBootstrapError(
       deps.logger,
-      "Booting module services & controllers",
+      "Booting module clients & controllers",
       error,
     );
     throw new Error();
@@ -147,8 +147,8 @@ export function validateInfisicalSecrets(secrets: Record<string, unknown>) {
  * logging a success message if so.
  *
  * @param logger - The logger instance.
- * @param gatewayControllers - A map of controller names to their booted instances.
- * @throws {Error} If any controller entry is falsy (failed to boot).
+ * @param gatewayControllers - A map of handlers names to their booted instances.
+ * @throws {Error} If any handlers entry is falsy (failed to boot).
  */
 export function validateGatewayControllers(
   logger: any,
