@@ -1,8 +1,8 @@
 # API Routes Reference
 
-A complete reference for all endpoints exposed by the Public Service Gateway, with ready-to-use Postman examples.
+A complete reference for all endpoints exposed by the Public Services Gateway, with ready-to-use Postman examples.
 
-All routes are versioned under `/api/v1`. No authentication headers are required from the client the gateway handles upstream API authentication automatically using secrets fetched from Infisical at startup.
+All routes are versioned under `/v1`. No authentication headers are required from the client the gateway handles upstream API authentication automatically using secrets fetched from Infisical at startup.
 
 ## Postman Setup
 
@@ -16,620 +16,1089 @@ All routes are versioned under `/api/v1`. No authentication headers are required
 
 ## Table of Contents
 
-1. [Weather](#1-weather----apiv1weather)
-2. [News](#2-news----apiv1news)
-3. [Currency](#3-currency----apiv1currency)
-4. [Public Holidays](#4-public-holidays----apiv1holiday)
-5. [Sports](#5-sports----apiv1sports)
+1. [Weather](#1-weather----v1weather)
+2. [News](#2-news----v1news)
+3. [Currency](#3-currency----v1currency)
+4. [Public Holidays](#4-public-holidays----v1holiday)
+5. [Sports](#5-sports----v1sports)
 
-
-## 1. Weather `/api/v1/weather`
-
-**Upstream API:** [OpenWeatherMap](https://openweathermap.org/api)
-
-| Method | Endpoint | Required Params |
-|---|---|---|
-| GET | `/api/v1/weather/current` | `lat`, `lon` |
-| GET | `/api/v1/weather/forecast` | `lat`, `lon` |
-
-
-### GET /api/v1/weather/current
-
-Fetches current weather conditions for a given location.
-
-**Query Parameters**
-
-| Parameter | Required | Description |
-|---|---|---|
-| `lat` | Yes | Latitude coordinate |
-| `lon` | Yes | Longitude coordinate |
-
-**Postman Example**
-```
-GET {{baseUrl}}/api/v1/weather/current?lat=51.5074&lon=-0.1278
-```
-
-**Successful Response**
-```json
-{
-  "currentWeather": {
-    "details": "...OpenWeatherMap response..."
-  }
-}
-```
-
-**Error Responses**
-- `400 Bad Request` `lat` or `lon` missing
-- `500 Internal Server Error` upstream API request failed
 
 ---
 
-### GET /api/v1/weather/forecast
+## 1. Weather — `/v1/weather`
 
-Fetches a 5-day / 3-hour interval weather forecast for a given location.
+**Upstream API:** [OpenWeatherMap](https://openweathermap.org/api)
+
+| Method | Endpoint | Required params | Optional params |
+|---|---|---|---|
+| GET | `/v1/weather/current` | `lat`, `lon` | `units`, `lang`, `mode`, `cnt` |
+| GET | `/v1/weather/forecast` | `lat`, `lon` | `units`, `lang`, `mode`, `cnt` |
+
+---
+
+### GET /v1/weather/current
+
+Returns current weather conditions for a given location.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `lat` | Yes | Latitude coordinate |
-| `lon` | Yes | Longitude coordinate |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `lat` | Yes | number | Latitude of the location |
+| `lon` | Yes | number | Longitude of the location |
+| `units` | No | string | Unit system: `standard` (default), `metric`, or `imperial` |
+| `lang` | No | string | Language code for weather descriptions (e.g. `en`, `fr`) |
+| `mode` | No | string | Response format: `json` (default) or `xml` |
+| `cnt` | No | string | Number of results to return |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/weather/forecast?lat=51.5074&lon=-0.1278
+GET {{baseUrl}}/v1/weather/current?lat=51.5074&lon=-0.1278
+GET {{baseUrl}}/v1/weather/current?lat=5.6037&lon=-0.1870&units=metric
 ```
 
-**Successful Response**
+**Successful Response** `200 OK`
 ```json
 {
-  "forecastWeather": {
-    "details": "...OpenWeatherMap response..."
+  "message": "Data fetched successfully",
+  "details": {
+    "currentWeather": {
+      "coord": { "lon": -0.1278, "lat": 51.5074 },
+      "weather": [{ "id": 800, "main": "Clear", "description": "clear sky" }],
+      "main": {
+        "temp": 289.15,
+        "feels_like": 288.45,
+        "humidity": 65
+      },
+      "wind": { "speed": 3.6 },
+      "name": "London"
+    }
   }
 }
 ```
 
 **Error Responses**
-- `400 Bad Request` `lat` or `lon` missing
-- `500 Internal Server Error` upstream API request failed
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `lat` or `lon` is missing |
+| `404 Not Found` | Upstream returned no data |
+| `500 Internal Server Error` | Upstream API request failed |
+
+---
+
+### GET /v1/weather/forecast
+
+Returns a 5-day / 3-hour interval weather forecast for a given location.
+
+**Query Parameters**
+
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `lat` | Yes | number | Latitude of the location |
+| `lon` | Yes | number | Longitude of the location |
+| `units` | No | string | Unit system: `standard` (default), `metric`, or `imperial` |
+| `lang` | No | string | Language code for weather descriptions |
+| `mode` | No | string | Response format: `json` (default) or `xml` |
+| `cnt` | No | string | Number of forecast time steps to return |
+
+**Postman Example**
+```
+GET {{baseUrl}}/v1/weather/forecast?lat=51.5074&lon=-0.1278
+GET {{baseUrl}}/v1/weather/forecast?lat=5.6037&lon=-0.1870&units=metric&cnt=10
+```
+
+**Successful Response** `200 OK`
+```json
+{
+  "message": "Data fetched successfully",
+  "details": {
+    "forecastWeather": {
+      "list": [
+        {
+          "dt": 1720000000,
+          "main": { "temp": 288.5, "humidity": 70 },
+          "weather": [{ "description": "light rain" }],
+          "dt_txt": "2026-07-16 12:00:00"
+        }
+      ],
+      "city": { "name": "London", "country": "GB" }
+    }
+  }
+}
+```
+
+**Error Responses**
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `lat` or `lon` is missing |
+| `404 Not Found` | Upstream returned no data |
+| `500 Internal Server Error` | Upstream API request failed |
 
 
-## 2. News `/api/v1/news`
+---
+
+## 2. News — `/v1/news`
 
 **Upstream API:** [NewsAPI](https://newsapi.org/)
 
-| Method | Endpoint | Required Params |
-|---|---|---|
-| GET | `/api/v1/news/top-headlines` | `country` |
-| GET | `/api/v1/news/topic` | `q` |
+| Method | Endpoint | Required params | Optional params |
+|---|---|---|---|
+| GET | `/v1/news/topic` | `q` | `searchIn`, `sources`, `domains`, `from`, `to`, `language`, `sortBy`, `pageSize`, `page` |
+| GET | `/v1/news/top-headlines` | `country` | `q`, `sources`, `language`, `pageSize`, `page` |
 
+---
 
-### GET /api/v1/news/top-headlines
+### GET /v1/news/topic
 
-Fetches current top headlines filtered by country.
+Searches all news articles matching a keyword or phrase via NewsAPI's `everything` endpoint.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `country` | Yes | Two-letter country code (e.g. `us`, `gb`, `gh`) |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `q` | Yes | string | Search term or phrase (e.g. `technology`, `climate change`) |
+| `searchIn` | No | string | Fields to search: `title`, `description`, or `content` |
+| `sources` | No | string | Comma-separated source IDs (e.g. `bbc-news,cnn`) |
+| `domains` | No | string | Comma-separated domains to restrict results (e.g. `bbc.co.uk`) |
+| `from` | No | string | Oldest article date in ISO 8601 format (e.g. `2026-01-01`) |
+| `to` | No | string | Newest article date in ISO 8601 format |
+| `language` | No | string | Language code: `ar`, `de`, `en`, `es`, `fr`, `it`, `nl`, `no`, `pt`, `ru`, `sv`, `zh` |
+| `sortBy` | No | string | Sort order: `relevancy`, `popularity`, or `publishedAt` |
+| `pageSize` | No | number | Results per page (max 100, default 20) |
+| `page` | No | number | Page number to return |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/news/top-headlines?country=us
+GET {{baseUrl}}/v1/news/topic?q=technology
+GET {{baseUrl}}/v1/news/topic?q=climate+change&language=en&sortBy=publishedAt&pageSize=10
 ```
 
-**Successful Response**
+**Successful Response** `200 OK`
 ```json
 {
-  "Top Headlines": {
-    "details": "...NewsAPI response..."
+  "message": "Data fetched successfully",
+  "details": {
+    "Related Article(s)": {
+      "status": "ok",
+      "totalResults": 1234,
+      "articles": [
+        {
+          "source": { "id": "bbc-news", "name": "BBC News" },
+          "title": "Tech industry sees record growth",
+          "description": "...",
+          "url": "https://bbc.co.uk/...",
+          "publishedAt": "2026-07-15T10:00:00Z"
+        }
+      ]
+    }
   }
 }
 ```
 
 **Error Responses**
-- `400 Bad Request` `country` missing
-- `500 Internal Server Error` upstream API request failed
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `q` is missing |
+| `404 Not Found` | Upstream returned no data |
+| `500 Internal Server Error` | Upstream API request failed |
 
+---
 
-### GET /api/v1/news/topic
+### GET /v1/news/top-headlines
 
-Fetches news articles matching a search term or phrase.
+Fetches current top headlines filtered by country via NewsAPI's `top-headlines` endpoint.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `q` | Yes | Search term or phrase (e.g. `technology`, `climate change`) |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `country` | Yes | string | Two-letter country code (e.g. `us`, `gb`, `gh`) |
+| `q` | No | string | Optional keyword to filter headlines |
+| `sources` | No | string | Comma-separated source IDs |
+| `language` | No | string | Language code |
+| `pageSize` | No | number | Results per page (max 100, default 20) |
+| `page` | No | number | Page number to return |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/news/topic?q=technology
+GET {{baseUrl}}/v1/news/top-headlines?country=us
+GET {{baseUrl}}/v1/news/top-headlines?country=gb&q=economy&pageSize=5
 ```
 
-**Successful Response**
+**Successful Response** `200 OK`
 ```json
 {
-  "Related Article(s)": {
-    "details": "...NewsAPI response..."
+  "message": "Data fetched successfully",
+  "details": {
+    "Top Headlines": {
+      "status": "ok",
+      "totalResults": 38,
+      "articles": [
+        {
+          "source": { "id": "cnn", "name": "CNN" },
+          "title": "Breaking: Markets rally on positive data",
+          "url": "https://cnn.com/...",
+          "publishedAt": "2026-07-16T08:30:00Z"
+        }
+      ]
+    }
   }
 }
 ```
 
 **Error Responses**
-- `400 Bad Request` `q` missing
-- `500 Internal Server Error` upstream API request failed
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `country` is missing |
+| `404 Not Found` | Upstream returned no data |
+| `500 Internal Server Error` | Upstream API request failed |
 
 
-## 3. Currency `/api/v1/currency`
+---
 
-**Upstream API:** [ExchangeRates.Host](https://exchangerate.host/)
+## 3. Currency — `/v1/currency`
 
-| Method | Endpoint | Required Params |
+**Upstream API:** [Currencylayer](https://currencylayer.com/)
+
+| Method | Endpoint | Required params |
 |---|---|---|
-| GET | `/api/v1/currency/list` | None |
-| GET | `/api/v1/currency/live` | `symbols` |
-| GET | `/api/v1/currency/historical` | `date` |
-| GET | `/api/v1/currency/convert` | `from`, `to`, `amount` |
-| GET | `/api/v1/currency/timeframe` | `start_date`, `end_date` |
-| GET | `/api/v1/currency/change` | `start_date`, `end_date` |
+| GET | `/v1/currency/list` | None |
+| GET | `/v1/currency/live` | `symbols` |
+| GET | `/v1/currency/historical` | `date` |
+| GET | `/v1/currency/convert` | `from`, `to`, `amount` |
+| GET | `/v1/currency/timeframe` | `start_date`, `end_date` |
+| GET | `/v1/currency/change` | `start_date`, `end_date` |
 
+---
 
-### GET /api/v1/currency/list
+### GET /v1/currency/list
 
-Returns all currency codes and names supported by the upstream API.
+Returns all currency codes and names supported by the Currencylayer API.
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/currency/list
+GET {{baseUrl}}/v1/currency/list
 ```
 
-### GET /api/v1/currency/live
+**Successful Response** `200 OK`
+```json
+{
+  "message": "Data fetched successfully",
+  "details": {
+    "All Supported Currencies": {
+      "success": true,
+      "currencies": {
+        "USD": "United States Dollar",
+        "GBP": "British Pound Sterling",
+        "EUR": "Euro",
+        "GHS": "Ghanaian Cedi"
+      }
+    }
+  }
+}
+```
 
-Fetches real-time exchange rates for one or more currencies, relative to a base currency (default: USD).
+---
+
+### GET /v1/currency/live
+
+Returns real-time exchange rates relative to a base currency (default: USD).
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `symbols` | Yes | Comma-separated currency codes (e.g. `USD,EUR,GBP`) |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `symbols` | Yes | string | Comma-separated currency codes to return (e.g. `EUR,GBP,GHS`) |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/currency/live?symbols=USD,EUR,GBP
+GET {{baseUrl}}/v1/currency/live?symbols=EUR,GBP,GHS
 ```
 
-### GET /api/v1/currency/historical
+**Successful Response** `200 OK`
+```json
+{
+  "message": "Data fetched successfully",
+  "details": {
+    "Live Currency Rates": {
+      "success": true,
+      "source": "USD",
+      "quotes": {
+        "USDEUR": 0.91,
+        "USDGBP": 0.78,
+        "USDGHS": 15.2
+      }
+    }
+  }
+}
+```
 
-Fetches exchange rates for a specific past date.
+**Error Responses**
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `symbols` is missing |
+| `404 Not Found` | Upstream returned no data |
+| `500 Internal Server Error` | Upstream API request failed |
+
+---
+
+### GET /v1/currency/historical
+
+Returns exchange rates for a specific past date.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `date` | Yes | Date in `YYYY-MM-DD` format |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `date` | Yes | string | Date in `YYYY-MM-DD` format |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/currency/historical?date=2025-01-01
+GET {{baseUrl}}/v1/currency/historical?date=2025-01-01
 ```
 
-### GET /api/v1/currency/convert
+**Successful Response** `200 OK`
+```json
+{
+  "message": "Data fetched successfully",
+  "details": {
+    "Historical Rates": {
+      "success": true,
+      "date": "2025-01-01",
+      "quotes": {
+        "USDEUR": 0.89,
+        "USDGBP": 0.77
+      }
+    }
+  }
+}
+```
+
+**Error Responses**
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `date` is missing |
+| `404 Not Found` | Upstream returned no data |
+| `500 Internal Server Error` | Upstream API request failed |
+
+---
+
+### GET /v1/currency/convert
 
 Converts a specified amount from one currency to another.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `from` | Yes | Source currency code (e.g. `USD`) |
-| `to` | Yes | Target currency code (e.g. `GBP`) |
-| `amount` | Yes | Numeric amount to convert |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `from` | Yes | string | Source currency code (e.g. `USD`) |
+| `to` | Yes | string | Target currency code (e.g. `GBP`) |
+| `amount` | Yes | number | Numeric amount to convert |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/currency/convert?from=USD&to=GBP&amount=100
+GET {{baseUrl}}/v1/currency/convert?from=USD&to=GBP&amount=100
+GET {{baseUrl}}/v1/currency/convert?from=EUR&to=GHS&amount=50
 ```
 
-### GET /api/v1/currency/timeframe
+**Successful Response** `200 OK`
+```json
+{
+  "message": "Data fetched successfully",
+  "details": {
+    "Conversion Rates": {
+      "success": true,
+      "query": { "from": "USD", "to": "GBP", "amount": 100 },
+      "result": 78.42
+    }
+  }
+}
+```
 
-Fetches exchange rates for every day within a specified date range.
+**Error Responses**
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `from`, `to`, or `amount` is missing |
+| `404 Not Found` | Upstream returned no data |
+| `500 Internal Server Error` | Upstream API request failed |
+
+---
+
+### GET /v1/currency/timeframe
+
+Returns exchange rates for every day within a specified date range.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `start_date` | Yes | Start date in `YYYY-MM-DD` format |
-| `end_date` | Yes | End date in `YYYY-MM-DD` format |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `start_date` | Yes | string | Start date in `YYYY-MM-DD` format |
+| `end_date` | Yes | string | End date in `YYYY-MM-DD` format |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/currency/timeframe?start_date=2025-01-01&end_date=2025-01-31
+GET {{baseUrl}}/v1/currency/timeframe?start_date=2025-01-01&end_date=2025-01-07
 ```
 
-### GET /api/v1/currency/change
+**Successful Response** `200 OK`
+```json
+{
+  "message": "Data fetched successfully",
+  "details": {
+    "Timeframe Rates": {
+      "success": true,
+      "start_date": "2025-01-01",
+      "end_date": "2025-01-07",
+      "quotes": {
+        "2025-01-01": { "USDEUR": 0.89, "USDGBP": 0.77 },
+        "2025-01-02": { "USDEUR": 0.90, "USDGBP": 0.78 }
+      }
+    }
+  }
+}
+```
 
-Returns the rate of change (margin and percentage) for currencies between two dates.
+**Error Responses**
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `start_date` or `end_date` is missing |
+| `404 Not Found` | Upstream returned no data |
+| `500 Internal Server Error` | Upstream API request failed |
+
+---
+
+### GET /v1/currency/change
+
+Returns the margin and percentage rate of change for currencies between two dates.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `start_date` | Yes | Start date in `YYYY-MM-DD` format |
-| `end_date` | Yes | End date in `YYYY-MM-DD` format |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `start_date` | Yes | string | Start date in `YYYY-MM-DD` format |
+| `end_date` | Yes | string | End date in `YYYY-MM-DD` format |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/currency/change?start_date=2025-01-01&end_date=2025-01-31
+GET {{baseUrl}}/v1/currency/change?start_date=2025-01-01&end_date=2025-01-31
 ```
 
-## 4. Public Holidays `/api/v1/holiday`
+**Successful Response** `200 OK`
+```json
+{
+  "message": "Data fetched successfully",
+  "details": {
+    "Changed Rates": {
+      "success": true,
+      "start_date": "2025-01-01",
+      "end_date": "2025-01-31",
+      "quotes": {
+        "USDEUR": { "start_rate": 0.89, "end_rate": 0.91, "change": 0.02, "change_pct": 2.24 },
+        "USDGBP": { "start_rate": 0.77, "end_rate": 0.78, "change": 0.01, "change_pct": 1.3 }
+      }
+    }
+  }
+}
+```
 
-**Upstream API:** [Nager.Date](https://date.nager.at/)
+**Error Responses**
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `start_date` or `end_date` is missing |
+| `404 Not Found` | Upstream returned no data |
+| `500 Internal Server Error` | Upstream API request failed |
 
-| Method | Endpoint | Required Params |
+
+---
+
+## 4. Public Holidays — `/v1/holiday`
+
+**Upstream API:** [Nager.Date](https://date.nager.at/) — no API key required.
+
+> **Note:** Holiday params (`year`, `countryCode`) are passed as **URL path segments**, not query parameters, by the `HolidayService`. The query params listed below are parsed by the controller and forwarded to the service, which builds the correct path internally (e.g. `PublicHolidays/2026/US`).
+
+| Method | Endpoint | Required params |
 |---|---|---|
-| GET | `/api/v1/holiday/AvailableCountries` | None |
-| GET | `/api/v1/holiday/PublicHolidays` | `year`, `countryCode` |
-| GET | `/api/v1/holiday/NextPublicHolidays` | `countryCode` |
-| GET | `/api/v1/holiday/NextPublicHolidaysWorldwide` | None |
-| GET | `/api/v1/holiday/CountryInfo` | `countryCode` |
-| GET | `/api/v1/holiday/LongWeekend` | `year`, `countryCode` |
-| GET | `/api/v1/holiday/IsTodayPublicHoliday` | `countryCode` |
+| GET | `/v1/holiday/AvailableCountries` | None |
+| GET | `/v1/holiday/PublicHolidays` | `year`, `countryCode` |
+| GET | `/v1/holiday/NextPublicHolidays` | `countryCode` |
+| GET | `/v1/holiday/NextPublicHolidaysWorldwide` | None |
+| GET | `/v1/holiday/CountryInfo` | `countryCode` |
+| GET | `/v1/holiday/LongWeekend` | `year`, `countryCode` |
+| GET | `/v1/holiday/IsTodayPublicHoliday` | `countryCode` |
 
-### GET /api/v1/holiday/AvailableCountries
+---
+
+### GET /v1/holiday/AvailableCountries
 
 Returns the full list of countries supported by the Nager.Date API.
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/holiday/AvailableCountries
+GET {{baseUrl}}/v1/holiday/AvailableCountries
 ```
 
-### GET /api/v1/holiday/PublicHolidays
+**Successful Response** `200 OK`
+```json
+{
+  "message": "Data fetched successfully",
+  "details": {
+    "Available Countries": [
+      { "countryCode": "AD", "name": "Andorra" },
+      { "countryCode": "GH", "name": "Ghana" },
+      { "countryCode": "US", "name": "United States" }
+    ]
+  }
+}
+```
+
+---
+
+### GET /v1/holiday/PublicHolidays
 
 Returns all public holidays for a given country and year.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `year` | Yes | Four-digit year (e.g. `2026`) |
-| `countryCode` | Yes | Two-letter country code (e.g. `US`, `GB`, `GH`) |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `year` | Yes | number | Four-digit year (e.g. `2026`) |
+| `countryCode` | Yes | string | ISO 3166-1 alpha-2 country code (e.g. `US`, `GB`, `GH`) |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/holiday/PublicHolidays?year=2026&countryCode=US
+GET {{baseUrl}}/v1/holiday/PublicHolidays?year=2026&countryCode=US
+GET {{baseUrl}}/v1/holiday/PublicHolidays?year=2026&countryCode=GH
 ```
 
-### GET /api/v1/holiday/NextPublicHolidays
+**Successful Response** `200 OK`
+```json
+{
+  "message": "Data fetched successfully",
+  "details": {
+    "Public Holidays": [
+      {
+        "date": "2026-01-01",
+        "name": "New Year's Day",
+        "countryCode": "US",
+        "nationalHoliday": true,
+        "subdivisionCodes": null,
+        "holidayTypes": ["Public"]
+      }
+    ]
+  }
+}
+```
+
+**Error Responses**
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `year` or `countryCode` is missing |
+| `404 Not Found` | Upstream returned no data |
+| `500 Internal Server Error` | Upstream API request failed |
+
+---
+
+### GET /v1/holiday/NextPublicHolidays
 
 Returns the upcoming public holidays for a given country.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `countryCode` | Yes | Two-letter country code |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `countryCode` | Yes | string | ISO 3166-1 alpha-2 country code |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/holiday/NextPublicHolidays?countryCode=GB
+GET {{baseUrl}}/v1/holiday/NextPublicHolidays?countryCode=GB
 ```
 
-### GET /api/v1/holiday/NextPublicHolidaysWorldwide
+**Successful Response** `200 OK`
+```json
+{
+  "message": "Data fetched successfully",
+  "details": {
+    "Next Public Holidays": [
+      {
+        "date": "2026-08-31",
+        "name": "Summer Bank Holiday",
+        "countryCode": "GB",
+        "nationalHoliday": false,
+        "subdivisionCodes": ["GB-ENG", "GB-WLS"],
+        "holidayTypes": ["Public"]
+      }
+    ]
+  }
+}
+```
 
-Returns the next public holidays across all countries supported by the API.
+**Error Responses**
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `countryCode` is missing |
+| `404 Not Found` | Upstream returned no data |
+| `500 Internal Server Error` | Upstream API request failed |
+
+---
+
+### GET /v1/holiday/NextPublicHolidaysWorldwide
+
+Returns the next public holidays across all countries supported by the Nager.Date API.
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/holiday/NextPublicHolidaysWorldwide
+GET {{baseUrl}}/v1/holiday/NextPublicHolidaysWorldwide
 ```
 
-### GET /api/v1/holiday/CountryInfo
+**Successful Response** `200 OK`
+```json
+{
+  "message": "Data fetched successfully",
+  "details": {
+    "Next Public Holidays Worldwide": [
+      {
+        "date": "2026-07-17",
+        "name": "Republic Day",
+        "countryCode": "KR",
+        "nationalHoliday": true,
+        "holidayTypes": ["Public"]
+      }
+    ]
+  }
+}
+```
 
-Returns metadata about a country full name, region, borders, etc.
+---
+
+### GET /v1/holiday/CountryInfo
+
+Returns metadata about a country — full name, official languages, region, and border countries.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `countryCode` | Yes | Two-letter country code |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `countryCode` | Yes | string | ISO 3166-1 alpha-2 country code |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/holiday/CountryInfo?countryCode=US
+GET {{baseUrl}}/v1/holiday/CountryInfo?countryCode=GH
 ```
 
-### GET /api/v1/holiday/LongWeekend
+**Successful Response** `200 OK`
+```json
+{
+  "message": "Data fetched successfully",
+  "details": {
+    "Country Info": {
+      "commonName": "Ghana",
+      "officialName": "Republic of Ghana",
+      "countryCode": "GH",
+      "region": "Africa",
+      "borders": [
+        { "commonName": "Ivory Coast", "countryCode": "CI" },
+        { "commonName": "Burkina Faso", "countryCode": "BF" }
+      ]
+    }
+  }
+}
+```
 
-Returns all long weekends (public holidays adjacent to weekends) for a given country and year.
+**Error Responses**
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `countryCode` is missing |
+| `404 Not Found` | Upstream returned no data |
+| `500 Internal Server Error` | Upstream API request failed |
+
+---
+
+### GET /v1/holiday/LongWeekend
+
+Returns all long weekends (public holidays adjacent to a Saturday or Sunday) for a given country and year.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `year` | Yes | Four-digit year (e.g. `2026`) |
-| `countryCode` | Yes | Two-letter country code |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `year` | Yes | number | Four-digit year (e.g. `2026`) |
+| `countryCode` | Yes | string | ISO 3166-1 alpha-2 country code |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/holiday/LongWeekend?year=2026&countryCode=US
+GET {{baseUrl}}/v1/holiday/LongWeekend?year=2026&countryCode=US
 ```
 
+**Successful Response** `200 OK`
+```json
+{
+  "message": "Data fetched successfully",
+  "details": {
+    "Long Weekend": [
+      {
+        "startDate": "2026-05-23",
+        "endDate": "2026-05-25",
+        "dayCount": 3,
+        "needBridgeDay": false
+      }
+    ]
+  }
+}
+```
 
-### GET /api/v1/holiday/IsTodayPublicHoliday
+**Error Responses**
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `year` or `countryCode` is missing |
+| `404 Not Found` | Upstream returned no data |
+| `500 Internal Server Error` | Upstream API request failed |
 
-Returns whether today is a public holiday in the given country.
+---
+
+### GET /v1/holiday/IsTodayPublicHoliday
+
+Returns whether today is a public holiday in the given country. The upstream Nager.Date API responds with `HTTP 200` for yes and `HTTP 204` for no. The gateway normalises this into a boolean.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `countryCode` | Yes | Two-letter country code |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `countryCode` | Yes | string | ISO 3166-1 alpha-2 country code |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/holiday/IsTodayPublicHoliday?countryCode=US
+GET {{baseUrl}}/v1/holiday/IsTodayPublicHoliday?countryCode=US
 ```
 
-**Response**
-- `true` HTTP 200, today is a public holiday
-- `false` HTTP 204, today is not a public holiday
+**Successful Response** `200 OK`
+```json
+{
+  "message": "Data fetched successfully",
+  "details": {
+    "Is Today Public Holiday": true
+  }
+}
+```
+> Returns `true` if today is a public holiday, `false` if not.
 
-## 5. Sports `/api/v1/sports`
+**Error Responses**
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `countryCode` is missing |
+| `500 Internal Server Error` | Upstream API request failed |
+
+
+---
+
+## 5. Sports — `/v1/sports`
 
 **Upstream API:** [TheSportsDB](https://www.thesportsdb.com/api.php)
 
-| Method | Endpoint | Required Params |
-|---|---|---|
-| GET | `/api/v1/sports/searchTeams` | `t` |
-| GET | `/api/v1/sports/searchEvents` | `e` |
-| GET | `/api/v1/sports/searchPlayers` | `p` |
-| GET | `/api/v1/sports/searchVenues` | `v` |
-| GET | `/api/v1/sports/lookUpLeague` | `id` |
-| GET | `/api/v1/sports/lookUpTable` | `l` |
+> **Note:** The TheSportsDB API key is embedded as a **path segment** in every request (e.g. `/{apiKey}/searchteams.php`). This is handled internally by `SportsService` — the API key is never exposed to the client.
 
-### GET /api/v1/sports/searchTeams
+| Method | Endpoint | Required params | Optional params |
+|---|---|---|---|
+| GET | `/v1/sports/searchTeams` | `t` | — |
+| GET | `/v1/sports/searchEvents` | `e`, `s` | `s` (season) |
+| GET | `/v1/sports/searchPlayers` | `p` | — |
+| GET | `/v1/sports/searchVenues` | `v` | — |
+| GET | `/v1/sports/lookUpLeague` | `id` | — |
+| GET | `/v1/sports/lookUpTable` | `l` | `s` (season) |
+
+---
+
+### GET /v1/sports/searchTeams
 
 Searches for sports teams by name.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `t` | Yes | Team name to search for (e.g. `Arsenal`) |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `t` | Yes | string | Team name to search for (e.g. `Arsenal`) |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/sports/searchTeams?t=Arsenal
+GET {{baseUrl}}/v1/sports/searchTeams?t=Arsenal
+GET {{baseUrl}}/v1/sports/searchTeams?t=Real+Madrid
 ```
 
-**Successful Response**
+**Successful Response** `200 OK`
 ```json
 {
-  "Sports Teams": {
-    "teams": [
-      {
-        "idTeam": "133604",
-        "strTeam": "Arsenal",
-        "strTeamBadge": "https://...",
-        "strSport": "Soccer",
-        "strLeague": "English Premier League",
-        "idLeague": "4328",
-        "strCountry": "England",
-        "strStadium": "Emirates Stadium",
-        "strDescriptionEN": "...",
-        "intFormedYear": "1886"
-      }
-    ]
+  "message": "Data fetched successfully",
+  "details": {
+    "Sports Teams": {
+      "teams": [
+        {
+          "idTeam": "133604",
+          "strTeam": "Arsenal",
+          "strTeamBadge": "https://www.thesportsdb.com/images/media/team/badge/...",
+          "strSport": "Soccer",
+          "strLeague": "English Premier League",
+          "idLeague": "4328",
+          "strCountry": "England",
+          "strStadium": "Emirates Stadium",
+          "strDescriptionEN": "Arsenal Football Club is a professional football club...",
+          "intFormedYear": "1886"
+        }
+      ]
+    }
   }
 }
 ```
 
 **Error Responses**
-- `400 Bad Request` `t` missing
-- `500 Internal Server Error` upstream API request failed
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `t` is missing |
+| `404 Not Found` | No teams found |
+| `500 Internal Server Error` | Upstream API request failed |
 
-### GET /api/v1/sports/searchEvents
+---
 
-Searches for sports events by event name and optionally by season.
+### GET /v1/sports/searchEvents
+
+Searches for sports events by event name, optionally filtered by season.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `e` | Yes | Event name to search for (e.g. `Arsenal_vs_Chelsea`) |
-| `s` | No | Season to filter by (e.g. `2024-2025`) |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `e` | Yes | string | Event name to search for (e.g. `Arsenal_vs_Chelsea`) |
+| `s` | Yes | string | Season to filter by (e.g. `2024-2025`) |
+
+> **Note:** Both `e` and `s` are validated as required by the controller. Supply both params for reliable results.
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/sports/searchEvents?e=Arsenal_vs_Chelsea&s=2024-2025
+GET {{baseUrl}}/v1/sports/searchEvents?e=Arsenal_vs_Chelsea&s=2024-2025
 ```
 
-**Successful Response**
+**Successful Response** `200 OK`
 ```json
 {
-  "Sports Events": {
-    "events": [
-      {
-        "idEvent": "1234567",
-        "strEvent": "Arsenal vs Chelsea",
-        "strSport": "Soccer",
-        "idLeague": "4328",
-        "strLeague": "English Premier League",
-        "strSeason": "2024-2025",
-        "strHomeTeam": "Arsenal",
-        "strAwayTeam": "Chelsea",
-        "intHomeScore": "2",
-        "intAwayScore": "1",
-        "dateEvent": "2024-10-05",
-        "strTime": "12:30:00",
-        "strVenue": "Emirates Stadium",
-        "strStatus": "Match Finished"
-      }
-    ]
+  "message": "Data fetched successfully",
+  "details": {
+    "Sports Events": {
+      "events": [
+        {
+          "idEvent": "1234567",
+          "strEvent": "Arsenal vs Chelsea",
+          "strSport": "Soccer",
+          "idLeague": "4328",
+          "strLeague": "English Premier League",
+          "strSeason": "2024-2025",
+          "strHomeTeam": "Arsenal",
+          "strAwayTeam": "Chelsea",
+          "intHomeScore": "2",
+          "intAwayScore": "1",
+          "dateEvent": "2024-10-05",
+          "strTime": "12:30:00",
+          "strVenue": "Emirates Stadium",
+          "strStatus": "Match Finished"
+        }
+      ]
+    }
   }
 }
 ```
 
 **Error Responses**
-- `400 Bad Request` `e` missing
-- `500 Internal Server Error` upstream API request failed
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `e` or `s` is missing |
+| `404 Not Found` | No events found |
+| `500 Internal Server Error` | Upstream API request failed |
 
-### GET /api/v1/sports/searchPlayers
+---
+
+### GET /v1/sports/searchPlayers
 
 Searches for players by name.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `p` | Yes | Player name to search for (e.g. `Bukayo Saka`) |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `p` | Yes | string | Player name to search for (e.g. `Bukayo Saka`) |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/sports/searchPlayers?p=Bukayo+Saka
+GET {{baseUrl}}/v1/sports/searchPlayers?p=Bukayo+Saka
+GET {{baseUrl}}/v1/sports/searchPlayers?p=Mohamed+Salah
 ```
 
-**Successful Response**
+**Successful Response** `200 OK`
 ```json
 {
-  "Team Players": {
-    "player": [
-      {
-        "idPlayer": "34146937",
-        "strPlayer": "Bukayo Saka",
-        "idTeam": "133604",
-        "strTeam": "Arsenal",
-        "strSport": "Soccer",
-        "strNationality": "England",
-        "dateBorn": "2001-09-05",
-        "strPosition": "Winger",
-        "strThumb": "https://...",
-        "strDescriptionEN": "..."
-      }
-    ]
+  "message": "Data fetched successfully",
+  "details": {
+    "Team Players": {
+      "player": [
+        {
+          "idPlayer": "34146937",
+          "strPlayer": "Bukayo Saka",
+          "idTeam": "133604",
+          "strTeam": "Arsenal",
+          "strSport": "Soccer",
+          "strNationality": "England",
+          "dateBorn": "2001-09-05",
+          "strPosition": "Winger",
+          "strThumb": "https://www.thesportsdb.com/images/media/player/thumb/...",
+          "strDescriptionEN": "Bukayo Saka is an English professional footballer..."
+        }
+      ]
+    }
   }
 }
 ```
 
 **Error Responses**
-- `400 Bad Request` `p` missing
-- `500 Internal Server Error` upstream API request failed
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `p` is missing |
+| `404 Not Found` | No players found |
+| `500 Internal Server Error` | Upstream API request failed |
 
+---
 
-### GET /api/v1/sports/searchVenues
+### GET /v1/sports/searchVenues
 
 Searches for sports venues by name.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `v` | Yes | Venue name to search for (e.g. `Emirates`) |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `v` | Yes | string | Venue name to search for (e.g. `Emirates`) |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/sports/searchVenues?v=Emirates
+GET {{baseUrl}}/v1/sports/searchVenues?v=Emirates
+GET {{baseUrl}}/v1/sports/searchVenues?v=Old+Trafford
 ```
 
-**Successful Response**
+**Successful Response** `200 OK`
 ```json
 {
-  "Sports Venues": {
-    "venues": [
-      {
-        "idVenue": "15269",
-        "strVenue": "Emirates Stadium",
-        "strCountry": "England",
-        "strLocation": "London",
-        "intCapacity": "60704"
-      }
-    ]
+  "message": "Data fetched successfully",
+  "details": {
+    "Sports Venues": {
+      "venues": [
+        {
+          "idVenue": "15269",
+          "strVenue": "Emirates Stadium",
+          "strCountry": "England",
+          "strLocation": "London",
+          "intCapacity": "60704"
+        }
+      ]
+    }
   }
 }
 ```
 
 **Error Responses**
-- `400 Bad Request` `v` missing
-- `500 Internal Server Error` upstream API request failed
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `v` is missing |
+| `404 Not Found` | No venues found |
+| `500 Internal Server Error` | Upstream API request failed |
 
-### GET /api/v1/sports/lookUpLeague
+---
+
+### GET /v1/sports/lookUpLeague
 
 Looks up details for a specific league by its TheSportsDB league ID.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `id` | Yes | TheSportsDB league ID (e.g. `4328`) |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `id` | Yes | string | TheSportsDB league ID (e.g. `4328` for English Premier League) |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/sports/lookUpLeague?id=4328
+GET {{baseUrl}}/v1/sports/lookUpLeague?id=4328
+GET {{baseUrl}}/v1/sports/lookUpLeague?id=4335
 ```
 
-**Successful Response**
+**Successful Response** `200 OK`
 ```json
 {
-  "Sports League(s)": {
-    "leagues": [
-      {
-        "idLeague": "4328",
-        "strLeague": "English Premier League",
-        "strSport": "Soccer",
-        "strCountry": "England",
-        "strBadge": "https://...",
-        "strDescriptionEN": "..."
-      }
-    ]
+  "message": "Data fetched successfully",
+  "details": {
+    "Sports League(s)": {
+      "leagues": [
+        {
+          "idLeague": "4328",
+          "strLeague": "English Premier League",
+          "strSport": "Soccer",
+          "strCountry": "England",
+          "strBadge": "https://www.thesportsdb.com/images/media/league/badge/...",
+          "strDescriptionEN": "The Premier League is the top level of the English football league system..."
+        }
+      ]
+    }
   }
 }
 ```
 
 **Error Responses**
-- `400 Bad Request` `id` missing
-- `500 Internal Server Error` upstream API request failed
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `id` is missing |
+| `404 Not Found` | No league found |
+| `500 Internal Server Error` | Upstream API request failed |
 
-### GET /api/v1/sports/lookUpTable
+---
+
+### GET /v1/sports/lookUpTable
 
 Looks up the league standings table for a given league, optionally filtered by season.
 
 **Query Parameters**
 
-| Parameter | Required | Description |
-|---|---|---|
-| `l` | Yes | TheSportsDB league ID (e.g. `4328`) |
-| `s` | No | Season to filter by (e.g. `2024-2025`) |
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `l` | Yes | string | TheSportsDB league ID (e.g. `4328`) |
+| `s` | No | string | Season to filter by (e.g. `2024-2025`). Defaults to current season. |
 
 **Postman Example**
 ```
-GET {{baseUrl}}/api/v1/sports/lookUpTable?l=4328&s=2024-2025
+GET {{baseUrl}}/v1/sports/lookUpTable?l=4328
+GET {{baseUrl}}/v1/sports/lookUpTable?l=4328&s=2024-2025
 ```
 
-**Successful Response**
+**Successful Response** `200 OK`
 ```json
 {
-  "Sports Table(s)": {
-    "table": [
-      {
-        "idTeam": "133604",
-        "strTeam": "Arsenal",
-        "strBadge": "https://...",
-        "intRank": "1",
-        "intPlayed": "38",
-        "intWin": "28",
-        "intDraw": "5",
-        "intLoss": "5",
-        "intPoints": "89"
-      }
-    ]
+  "message": "Data fetched successfully",
+  "details": {
+    "Sports Table(s)": {
+      "table": [
+        {
+          "idTeam": "133604",
+          "strTeam": "Arsenal",
+          "strBadge": "https://www.thesportsdb.com/images/media/team/badge/...",
+          "intRank": "1",
+          "intPlayed": "38",
+          "intWin": "28",
+          "intDraw": "5",
+          "intLoss": "5",
+          "intPoints": "89"
+        }
+      ]
+    }
   }
 }
 ```
 
 **Error Responses**
-- `400 Bad Request` `l` missing
-- `500 Internal Server Error` upstream API request failed
+| Status | Reason |
+|---|---|
+| `400 Bad Request` | `l` is missing |
+| `404 Not Found` | No table data found |
+| `500 Internal Server Error` | Upstream API request failed |

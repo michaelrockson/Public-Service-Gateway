@@ -3,7 +3,7 @@ import { HolidayController } from "./holiday.controller.js";
 import {
   ModuleControllersProvider,
   SharedDependencies,
-} from "../../shared/boostrap/bootstrap.types.js";
+} from "../../shared/bootstrap/bootstrap.types.js";
 import { AxiosHttpClient } from "../../shared/http/axios.client.js";
 
 export function provideHolidayController(
