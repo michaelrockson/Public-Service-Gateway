@@ -4,7 +4,7 @@ import { provideNewsRouter } from "./news/news.routes.js";
 import { provideCurrencyRouter } from "./currency/currency.routes.js";
 import { provideHolidayRouter } from "./holidays/holiday.routes.js";
 import { provideSportsRouter } from "./sports/sports.routes.js";
-import { GatewayControllers } from "../shared/boostrap/bootstrap.types.js";
+import { GatewayControllers } from "../shared/bootstrap/bootstrap.types.js";
 
 export function useGatewayRouters(controllers: GatewayControllers): Router {
   const apiRouter = Router();
