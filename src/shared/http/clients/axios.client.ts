@@ -1,5 +1,5 @@
 import axios from "axios";
-import { IHttpClient } from "../interfaces/infrastructure/http.interface.js";
+import { IHttpClient } from "../../interfaces/infrastructure/http.interface.js";
 
 export class AxiosHttpClient implements IHttpClient {
   private readonly apiUrl: string;

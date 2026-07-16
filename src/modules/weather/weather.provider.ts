@@ -4,7 +4,7 @@ import {
   ModuleControllersProvider,
   SharedDependencies,
 } from "../../shared/bootstrap/bootstrap.types.js";
-import { AxiosHttpClient } from "../../shared/http/axios.client.js";
+import { AxiosHttpClient } from "../../shared/http/clients/axios.client.js";
 
 export function provideWeatherController(
   deps: SharedDependencies,

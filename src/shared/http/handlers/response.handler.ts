@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 
-import { IResponseHandler } from "../interfaces/infrastructure/response.handler.interface.js";
-import { BadRequestError, NotFoundError } from "./api.errors.js";
+import { IResponseHandler } from "../../interfaces/infrastructure/response.handler.interface.js";
 import {
+  BadRequestError,
+  NotFoundError,
   parseParams,
   validateParams,
   validateResponse,
-} from "./request.utils.js";
+} from "../request.utils.js";
 
 export class ControllerResponseHandler implements IResponseHandler {
   constructor(private readonly environment: string) {}

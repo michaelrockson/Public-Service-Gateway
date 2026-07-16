@@ -1,5 +1,4 @@
 import { Request } from "express";
-import { BadRequestError, NotFoundError } from "./api.errors.js";
 
 /**
  * Parses parameters from the request query string.
@@ -45,5 +44,29 @@ export function validateParams(params: Record<string, unknown>) {
 export function validateResponse(apiResponse: unknown) {
   if (apiResponse === undefined || apiResponse === null) {
     throw new NotFoundError("Requested data is unavailable");
+  }
+}
+
+/**
+ * Error thrown when a client sends an invalid or malformed request.
+ *
+ * Typically corresponds to an HTTP 400 Bad Request response.
+ */
+export class BadRequestError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "BadRequestError";
+  }
+}
+
+/**
+ * Error thrown when a requested resource cannot be found.
+ *
+ * Typically corresponds to an HTTP 404 Not Found response.
+ */
+export class NotFoundError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "NotFoundError";
   }
 }
