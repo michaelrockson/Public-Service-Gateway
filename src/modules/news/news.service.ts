@@ -10,7 +10,10 @@ export class NewsService {
 
   async getNewsArticles(newsParams: NewsSearchParams) {
     try {
-      const response = await this.httpClient.makeApiRequest("everything", newsParams);
+      const response = await this.httpClient.makeApiRequest(
+        "everything",
+        newsParams,
+      );
       return response.data;
     } catch (error) {
       this.httpClient.handleApiErrors(error);
@@ -19,7 +22,10 @@ export class NewsService {
 
   async getTopHeadlines(newsParams: NewsSearchParams) {
     try {
-      const response = await this.httpClient.makeApiRequest("top-headlines", newsParams);
+      const response = await this.httpClient.makeApiRequest(
+        "top-headlines",
+        newsParams,
+      );
       return response.data;
     } catch (error) {
       this.httpClient.handleApiErrors(error);

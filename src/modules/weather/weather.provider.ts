@@ -9,12 +9,12 @@ import { AxiosHttpClient } from "../../shared/http/clients/axios.client.js";
 export function provideWeatherController(
   deps: SharedDependencies,
 ): Extract<ModuleControllersProvider, { name: "weather" }> {
-  const weatherHttpClient = new AxiosHttpClient(
+  const currentHttpClient = new AxiosHttpClient(
     deps.moduleConfig.weatherApiUrl,
     deps.moduleConfig.weatherApiKey,
     "appid",
   );
-  const weatherService = new WeatherService(weatherHttpClient);
+  const weatherService = new WeatherService(currentHttpClient);
   const weatherController = new WeatherController(
     weatherService,
     deps.responseHandler,

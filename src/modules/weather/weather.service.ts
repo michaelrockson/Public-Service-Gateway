@@ -10,7 +10,10 @@ export class WeatherService {
 
   async getCurrentWeather(weatherParams: CurrentWeatherParams) {
     try {
-      const response = await this.httpClient.makeApiRequest("weather", weatherParams);
+      const response = await this.httpClient.makeApiRequest(
+        "weather",
+        weatherParams,
+      );
       return response.data;
     } catch (error) {
       this.httpClient.handleApiErrors(error);
@@ -19,7 +22,10 @@ export class WeatherService {
 
   async getWeatherForecast(weatherParams: CurrentWeatherParams) {
     try {
-      const response = await this.httpClient.makeApiRequest("forecast", weatherParams);
+      const response = await this.httpClient.makeApiRequest(
+        "forecast",
+        weatherParams,
+      );
       return response.data;
     } catch (error) {
       this.httpClient.handleApiErrors(error);

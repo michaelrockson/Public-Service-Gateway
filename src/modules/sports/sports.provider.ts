@@ -9,13 +9,13 @@ import { AxiosHttpClient } from "../../shared/http/clients/axios.client.js";
 export function provideSportsController(
   deps: SharedDependencies,
 ): Extract<ModuleControllersProvider, { name: "sports" }> {
-  const sportsHttpClient = new AxiosHttpClient(
+  const currentHttpClient = new AxiosHttpClient(
     deps.moduleConfig.sportsApiUrl,
     deps.moduleConfig.sportsApiKey,
     "",
   );
   const sportsService = new SportsService(
-    sportsHttpClient,
+    currentHttpClient,
     deps.moduleConfig.sportsApiKey,
   );
   const sportsController = new SportsController(

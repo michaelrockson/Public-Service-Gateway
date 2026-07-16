@@ -1,9 +1,9 @@
 {
-  "name": "Public_Services_API_Gateway",
+  "name": "PublicServiceGateway",
   "version": "1.0.0",
-  "main": "index.js",
-  "repository": "https://github.com/michaelrockson/Personal-Blogging-Platform-Flask-API.git",
-  "author": "rocksoncodes <michaelrockszn@gmail.com>",
+  "main": "server.js",
+  "repository": "https://github.com/michaelrockson/Public-Service-Gateway.git",
+  "author": "michaelrockson",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -29,5 +29,7 @@
     "express": "^5.2.1",
     "morgan": "^1.11.0",
     "winston": "^3.19.0"
-  }
+  },
+  "description": "An express API gateway that consumes multiple public APIs and exposes unified endpoints for various client uses.",
+  "private": null
 }
