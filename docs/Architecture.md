@@ -34,7 +34,7 @@ Secrets management is handled by Infisical. No API keys or runtime
 configuration are stored locally in `.env`; `.env` contains only the five
 credentials needed to reach Infisical itself.
 
-Shared infrastructure (`BootstrapSystem`, `BootstrapModule`, `WinstonLogger`,
+Shared infrastructure (`SystemConfig`, `ModuleConfig`, `WinstonLogger`,
 `ControllerResponseHandler`) is instantiated once in `server.ts` and
 propagated downward via a `SharedDependencies` object no singletons,
 no module-level state.
@@ -109,9 +109,9 @@ src/
 │
 └── shared/                              # Cross-cutting infrastructure
     ├── bootstrap/                       # Bootstrap lifecycle
-    │   ├── bootstrap.infisical.ts       # injectSecretsFromInfisical() — Infisical auth & secret injection
-    │   ├── bootstrap.module.ts          # BootstrapModule class (implements IModuleConfig)
-    │   ├── bootstrap.system.ts          # BootstrapSystem class (implements ISystemConfig)
+    │   ├── infisical.secrets.ts       # injectSecretsFromInfisical() — Infisical auth & secret injection
+    │   ├── module.config.ts          # ModuleConfig class (implements IModuleConfig)
+    │   ├── system.config.ts          # SystemConfig class (implements ISystemConfig)
     │   ├── bootstrap.types.ts           # SharedDependencies, GatewayControllers, ModuleControllersProvider
     │   └── bootstrap.utils.ts           # bootGatewayControllers(), getEnvVar/Number, validateEnvs, etc.
     │
@@ -124,14 +124,14 @@ src/
     │
     ├── interfaces/
     │   ├── config/                      # Per-concern config interfaces
-    │   │   ├── config.interface.ts      # Composes ISystemConfig & IModuleConfig from sub-interfaces
-    │   │   ├── server.config.interface.ts
-    │   │   ├── logger.config.interface.ts
-    │   │   ├── weather.config.interface.ts
-    │   │   ├── news.config.interface.ts
-    │   │   ├── currency.config.interface.ts
-    │   │   ├── holiday.config.interface.ts
-    │   │   └── sports.config.interface.ts
+    │   │   ├── index.interface.ts      # Composes ISystemConfig & IModuleConfig from sub-interfaces
+    │   │   ├── server.index.interface.ts
+    │   │   ├── logger.index.interface.ts
+    │   │   ├── weather.index.interface.ts
+    │   │   ├── news.index.interface.ts
+    │   │   ├── currency.index.interface.ts
+    │   │   ├── holiday.index.interface.ts
+    │   │   └── sports.index.interface.ts
     │   │
     │   └── infrastructure/              # Cross-cutting infrastructure contracts
     │       ├── http.interface.ts        # IHttpClient
@@ -160,19 +160,19 @@ startServer()
 │         values into two typed objects systemConfig and moduleConfig
 │         and returns { systemConfig, moduleConfig }.
 │
-├── 2. new BootstrapSystem(serverSecrets.systemConfig)
-│         Constructs a BootstrapSystem instance (implements ISystemConfig)
+├── 2. new SystemConfig(serverSecrets.systemConfig)
+│         Constructs a SystemConfig instance (implements ISystemConfig)
 │         from the returned systemConfig object. Holds readonly values for
 │         environment, port and logLevel.
 │
-├── 3. new BootstrapModule(serverSecrets.moduleConfig)
-│         Constructs a BootstrapModule instance (implements IModuleConfig)
+├── 3. new ModuleConfig(serverSecrets.moduleConfig)
+│         Constructs a ModuleConfig instance (implements IModuleConfig)
 │         from the returned moduleConfig object. Holds readonly API URLs
 │         and keys for all five feature modules.
 │
 ├── 4. new WinstonLogger(systemConfig)
 │         Constructs a WinstonLogger (implements ILogger). Accepts an
-│         ILoggerConfig (satisfied by BootstrapSystem). Console transport
+│         ILoggerConfig (satisfied by SystemConfig). Console transport
 │         is always active; file transports are added only when
 │         environment === "prod".
 │
@@ -213,7 +213,7 @@ injectSecretsFromInfisical()     (Infisical SDK — injects runtime secrets into
     │
     ├─────────────────────────────────────┐
     ▼                                     ▼
-BootstrapSystem                   BootstrapModule
+SystemConfig                   ModuleConfig
 (ISystemConfig)                   (IModuleConfig)
     │                                     │
     ├──────────────┐                      │
@@ -249,7 +249,7 @@ Key rules enforced by this flow:
 - A router never knows how the server bootstrapped.
 - Services must **never** be instantiated at module load time. All
   instantiation happens inside provider functions, which are called
-  only after `BootstrapSystem` and `BootstrapModule` have been constructed.
+  only after `SystemConfig` and `ModuleConfig` have been constructed.
 - No module reads `process.env` directly; all config is accessed through
   the injected `ISystemConfig` (`deps.systemConfig`) or `IModuleConfig`
   (`deps.moduleConfig`).
@@ -263,7 +263,7 @@ Key rules enforced by this flow:
 
 The local `.env` contains only these five values, read by dotenv on startup
 via `dotenv.config({ path: path.join(process.cwd(), ".env") })` inside
-`bootstrap.infisical.ts`:
+`infisical.secrets.ts`:
 
 ```
 INFISICAL_SITE_URL
@@ -338,8 +338,8 @@ into a `SharedDependencies` struct, which is then threaded through the
 entire bootstrap chain:
 
 ```typescript
-const systemConfig    = new BootstrapSystem(serverSecrets.systemConfig);   // ISystemConfig
-const moduleConfig    = new BootstrapModule(serverSecrets.moduleConfig);   // IModuleConfig
+const systemConfig    = new SystemConfig(serverSecrets.systemConfig);   // ISystemConfig
+const moduleConfig    = new ModuleConfig(serverSecrets.moduleConfig);   // IModuleConfig
 const logger          = new WinstonLogger(systemConfig);                   // ILogger
 const responseHandler = new ControllerResponseHandler(systemConfig.environment); // IResponseHandler
 
@@ -374,7 +374,7 @@ export function provideWeatherController(
 ```
 
 This pattern means:
-- No module ever imports `BootstrapSystem`, `BootstrapModule`, `WinstonLogger`,
+- No module ever imports `SystemConfig`, `ModuleConfig`, `WinstonLogger`,
   or `ControllerResponseHandler` directly.
 - All cross-cutting concerns are swappable behind interfaces.
 - Testing a module only requires a mock `SharedDependencies`.
@@ -539,14 +539,14 @@ export function provideWeatherRouter(weatherController: WeatherController): Rout
 
 ## 10. Shared Layer
 
-### `boostrap/bootstrap.system.ts`  `BootstrapSystem`
+### `boostrap/system.config.ts`  `SystemConfig`
 
 A class implementing `ISystemConfig`. Constructed once in `server.ts` from
 the `systemConfig` slice returned by `injectSecretsFromInfisical()`. After
 construction its three properties (`environment`, `port`, `logLevel`) are
 `readonly`, making it a stable, immutable system config snapshot.
 
-### `boostrap/bootstrap.module.ts` `BootstrapModule`
+### `boostrap/module.config.ts` `ModuleConfig`
 
 A class implementing `IModuleConfig`. Constructed once in `server.ts` from
 the `moduleConfig` slice returned by `injectSecretsFromInfisical()`. After
@@ -557,7 +557,7 @@ construction all nine API URL/key properties are `readonly`.
 Defines the three shared gateway types: `SharedDependencies`,
 `GatewayControllers`, and `ModuleControllersProvider`. See [Section 12](#12-type-system).
 
-### `boostrap/bootstrap.infisical.ts`
+### `boostrap/infisical.secrets.ts`
 
 Single export: `injectSecretsFromInfisical()` orchestrates Infisical
 authentication (universal auth via `InfisicalSDK`), secret injection
@@ -638,7 +638,7 @@ lifecycle:
 
 ### `logger/winston.logger.ts` — `WinstonLogger`
 
-Implements `ILogger`. Accepts an `ILoggerConfig` (satisfied by `BootstrapSystem`).
+Implements `ILogger`. Accepts an `ILoggerConfig` (satisfied by `SystemConfig`).
 - Console transport is always active (colourised, simple format).
 - File transports (`logs/error.log`, `logs/combined.log`) are added only
   when `config.environment === "prod"`.
@@ -668,11 +668,11 @@ split into two sub-folders:
 
 ### `interfaces/config/` — Configuration contracts
 
-`config.interface.ts` composes the two top-level config types from smaller,
+`index.interface.ts` composes the two top-level config types from smaller,
 per-concern interfaces:
 
 ```typescript
-// System-level: port, environment, log settings
+// System-level: port, secrets, log settings
 export type ISystemConfig = IServerConfig & ILoggerConfig;
 
 // Module-level: API URLs and keys for each feature module
@@ -856,14 +856,14 @@ src/modules/maps/
 
 **2. Add a per-concern config interface** in `shared/interfaces/config/`:
 ```typescript
-// maps.config.interface.ts
+// maps.index.interface.ts
 export interface IMapsConfig {
   mapsApiUrl: string;
   mapsApiKey: string;
 }
 ```
 
-**3. Extend `IModuleConfig`** in `shared/interfaces/config/config.interface.ts`:
+**3. Extend `IModuleConfig`** in `shared/interfaces/config/index.interface.ts`:
 ```typescript
 import { IMapsConfig } from "./maps.config.interface.js";
 
@@ -871,7 +871,7 @@ export type IModuleConfig = IWeatherConfig & INewsConfig & ICurrencyConfig
                           & IHolidayConfig & ISportsConfig & IMapsConfig;
 ```
 
-**4. Expose the new vars in `BootstrapModule`** (`shared/boostrap/bootstrap.module.ts`):
+**4. Expose the new vars in `ModuleConfig`** (`shared/boostrap/module.config.ts`):
 ```typescript
 public readonly mapsApiUrl: string;
 public readonly mapsApiKey: string;
@@ -883,7 +883,7 @@ constructor(config: IModuleConfig) {
 }
 ```
 
-**5. Map the new vars in `bootstrap.infisical.ts`:**
+**5. Map the new vars in `infisical.secrets.ts`:**
 ```typescript
 const moduleConfig = {
   // ...existing...
@@ -997,9 +997,9 @@ Only these five values belong in `.env`. Everything else lives in Infisical.
 ### Infisical secrets (runtime)
 
 Fetched at startup, injected into `process.env`, then mapped into two typed
-objects (`systemConfig` → `BootstrapSystem`, `moduleConfig` → `BootstrapModule`).
+objects (`systemConfig` → `SystemConfig`, `moduleConfig` → `ModuleConfig`).
 
-**System config** (`ISystemConfig` / `BootstrapSystem`):
+**System config** (`ISystemConfig` / `SystemConfig`):
 
 | Infisical variable | Config key | Purpose |
 |---|---|---|
@@ -1007,7 +1007,7 @@ objects (`systemConfig` → `BootstrapSystem`, `moduleConfig` → `BootstrapModu
 | `ENVIRONMENT` | `environment` | App environment label (default: `"dev"`) |
 | `LOG_LEVEL` | `logLevel` | Winston log level (default: `"info"`) |
 
-**Module config** (`IModuleConfig` / `BootstrapModule`):
+**Module config** (`IModuleConfig` / `ModuleConfig`):
 
 | Infisical variable | Config key | Purpose |
 |---|---|---|

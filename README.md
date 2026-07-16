@@ -7,7 +7,7 @@ An API gateway for public services built on Express 5 and TypeScript. The gatewa
 - Express 5 server written in TypeScript (ESM, `"type": "module"`)
 - Versioned API routes under `/v1`
 - Layered architecture: `BaseService` → service → controller → router, with constructor-injected dependencies
-- Config split into two typed objects: `BootstrapSystem` (server/logger settings) and `BootstrapModule` (per-module API keys and URLs)
+- Config split into two typed objects: `SystemConfig` (server/logger settings) and `ModuleConfig` (per-module API keys and URLs)
 - Secrets management via Infisical SDK zero secrets in source control
 - Shared `AxiosHttpClient` and `ControllerResponseHandler` used across all modules
 - Structured JSON logging via Winston, with Morgan piped through it
@@ -133,9 +133,9 @@ src/
 │
 └── shared/                              # Cross-cutting infrastructure
     ├── boostrap/
-    │   ├── bootstrap.infisical.ts       # Infisical auth & secret injection
-    │   ├── bootstrap.module.ts          # BootstrapModule (implements IModuleConfig)
-    │   ├── bootstrap.system.ts          # BootstrapSystem (implements ISystemConfig)
+    │   ├── infisical.secrets.ts       # Infisical auth & secret injection
+    │   ├── module.config.ts          # ModuleConfig (implements IModuleConfig)
+    │   ├── system.config.ts          # SystemConfig (implements ISystemConfig)
     │   ├── bootstrap.types.ts           # SharedDependencies, GatewayControllers, ModuleControllersProvider
     │   └── bootstrap.utils.ts           # bootGatewayControllers, getEnvVar, validateEnvs, etc.
     │
@@ -160,7 +160,7 @@ src/
 The gateway uses a layered architecture with constructor-injected dependencies. The startup sequence in `server.ts` enforces a strict initialization order:
 
 1. **Infisical bootstrap** `injectSecretsFromInfisical()` authenticates with Infisical and injects all runtime secrets into `process.env`, returning two typed config objects.
-2. **Config construction** `new BootstrapSystem(systemConfig)` and `new BootstrapModule(moduleConfig)` create immutable, typed config snapshots.
+2. **Config construction** `new SystemConfig(systemConfig)` and `new ModuleConfig(moduleConfig)` create immutable, typed config snapshots.
 3. **Infrastructure setup** `WinstonLogger` and `ControllerResponseHandler` are instantiated from the system config.
 4. **Controller boot** `bootGatewayControllers(sharedDependencies)` calls each module's provider function, which constructs its own `AxiosHttpClient`, service, and controller. All controllers are validated before the server starts.
 5. **Router mount** `useGatewayRouters(controllers)` passes each controller into its module's router factory and mounts them all under `/v1`.
