@@ -9,12 +9,12 @@ import { AxiosHttpClient } from "../../shared/http/clients/axios.client.js";
 export function provideNewsController(
   deps: SharedDependencies,
 ): Extract<ModuleControllersProvider, { name: "news" }> {
-  const newsHttpClient = new AxiosHttpClient(
+  const currentHttpClient = new AxiosHttpClient(
     deps.moduleConfig.newsApiUrl,
     deps.moduleConfig.newsApiKey,
     "apiKey",
   );
-  const newsService = new NewsService(newsHttpClient);
+  const newsService = new NewsService(currentHttpClient);
   const newsController = new NewsController(newsService, deps.responseHandler);
 
   return {

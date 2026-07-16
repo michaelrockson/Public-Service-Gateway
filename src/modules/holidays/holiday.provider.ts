@@ -9,12 +9,12 @@ import { AxiosHttpClient } from "../../shared/http/clients/axios.client.js";
 export function provideHolidayController(
   deps: SharedDependencies,
 ): Extract<ModuleControllersProvider, { name: "holiday" }> {
-  const holidayHttpClient = new AxiosHttpClient(
+  const currentHttpClient = new AxiosHttpClient(
     deps.moduleConfig.holidayApiUrl,
     "",
     "",
   );
-  const holidayService = new HolidayService(holidayHttpClient);
+  const holidayService = new HolidayService(currentHttpClient);
   const holidayController = new HolidayController(
     holidayService,
     deps.responseHandler,

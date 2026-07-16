@@ -27,7 +27,10 @@ export class SportsService {
     sportsParams: SearchTeamsParams,
   ): Promise<TeamsResponse | undefined> {
     try {
-      const response = await this.httpClient.makeApiRequest(`${this.apiKey}/searchteams.php`, sportsParams);
+      const response = await this.httpClient.makeApiRequest(
+        `${this.apiKey}/searchteams.php`,
+        sportsParams,
+      );
       return response.data as TeamsResponse;
     } catch (error) {
       this.httpClient.handleApiErrors(error);
@@ -38,7 +41,10 @@ export class SportsService {
     sportsParams: SearchEventsParams,
   ): Promise<EventsResponse | undefined> {
     try {
-      const response = await this.httpClient.makeApiRequest(`${this.apiKey}/searchevents.php`, sportsParams);
+      const response = await this.httpClient.makeApiRequest(
+        `${this.apiKey}/searchevents.php`,
+        sportsParams,
+      );
       return response.data as EventsResponse;
     } catch (error) {
       this.httpClient.handleApiErrors(error);
@@ -63,7 +69,10 @@ export class SportsService {
     sportsParams: SearchVenuesParams,
   ): Promise<VenuesResponse | undefined> {
     try {
-      const response = await this.httpClient.makeApiRequest(`${this.apiKey}/searchvenues.php`, sportsParams);
+      const response = await this.httpClient.makeApiRequest(
+        `${this.apiKey}/searchvenues.php`,
+        sportsParams,
+      );
       return response.data as VenuesResponse;
     } catch (error) {
       this.httpClient.handleApiErrors(error);
@@ -74,7 +83,10 @@ export class SportsService {
     sportsParams: LookupByIdParams,
   ): Promise<LeaguesResponse | undefined> {
     try {
-      const response = await this.httpClient.makeApiRequest(`${this.apiKey}/lookupleague.php`, sportsParams);
+      const response = await this.httpClient.makeApiRequest(
+        `${this.apiKey}/lookupleague.php`,
+        sportsParams,
+      );
       return response.data as LeaguesResponse;
     } catch (error) {
       this.httpClient.handleApiErrors(error);
@@ -85,7 +97,10 @@ export class SportsService {
     sportsParams: LookupTableParams,
   ): Promise<TableResponse | undefined> {
     try {
-      const response = await this.httpClient.makeApiRequest(`${this.apiKey}/lookuptable.php`, sportsParams);
+      const response = await this.httpClient.makeApiRequest(
+        `${this.apiKey}/lookuptable.php`,
+        sportsParams,
+      );
       return response.data as TableResponse;
     } catch (error) {
       this.httpClient.handleApiErrors(error);

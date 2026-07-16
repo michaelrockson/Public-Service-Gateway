@@ -9,7 +9,10 @@ export class CurrencyService {
 
   async getLiveRates(currencyParams: Record<string, string>): Promise<any> {
     try {
-      const response = await this.httpClient.makeApiRequest("live", currencyParams);
+      const response = await this.httpClient.makeApiRequest(
+        "live",
+        currencyParams,
+      );
       return response.data;
     } catch (error) {
       this.httpClient.handleApiErrors(error);
@@ -20,7 +23,10 @@ export class CurrencyService {
     currencyParams: Record<string, string>,
   ): Promise<any> {
     try {
-      const response = await this.httpClient.makeApiRequest("historical", currencyParams);
+      const response = await this.httpClient.makeApiRequest(
+        "historical",
+        currencyParams,
+      );
       return response.data;
     } catch (error) {
       this.httpClient.handleApiErrors(error);
@@ -31,7 +37,10 @@ export class CurrencyService {
     currencyParams: Record<string, string>,
   ): Promise<any> {
     try {
-      const response = await this.httpClient.makeApiRequest("convert", currencyParams);
+      const response = await this.httpClient.makeApiRequest(
+        "convert",
+        currencyParams,
+      );
       return response.data;
     } catch (error) {
       this.httpClient.handleApiErrors(error);
@@ -42,7 +51,10 @@ export class CurrencyService {
     currencyParams: Record<string, string>,
   ): Promise<any> {
     try {
-      const response = await this.httpClient.makeApiRequest("timeframe", currencyParams);
+      const response = await this.httpClient.makeApiRequest(
+        "timeframe",
+        currencyParams,
+      );
       return response.data;
     } catch (error) {
       this.httpClient.handleApiErrors(error);
@@ -51,7 +63,10 @@ export class CurrencyService {
 
   async getChangeRates(currencyParams: Record<string, string>): Promise<any> {
     try {
-      const response = await this.httpClient.makeApiRequest("change", currencyParams);
+      const response = await this.httpClient.makeApiRequest(
+        "change",
+        currencyParams,
+      );
       return response.data;
     } catch (error) {
       this.httpClient.handleApiErrors(error);
@@ -62,7 +77,10 @@ export class CurrencyService {
     currencyParams: Record<string, string>,
   ): Promise<any> {
     try {
-      const response = await this.httpClient.makeApiRequest("list", currencyParams);
+      const response = await this.httpClient.makeApiRequest(
+        "list",
+        currencyParams,
+      );
       return response.data;
     } catch (error) {
       this.httpClient.handleApiErrors(error);
