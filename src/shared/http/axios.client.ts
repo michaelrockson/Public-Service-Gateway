@@ -21,7 +21,7 @@ export class AxiosHttpClient implements IHttpClient {
    */
   public async makeApiRequest<T = unknown>(
     endpoint?: string,
-    params?: Record<string, unknown>,
+    params?: any,
     additionalUris?: string[],
   ): Promise<{ data: T; status: number }> {
     let fullEndpoint = endpoint ?? "";

@@ -10,6 +10,8 @@ export class BootstrapModule implements IModuleConfig {
   public readonly holidayApiUrl: string;
   public readonly sportsApiUrl: string;
   public readonly sportsApiKey: string;
+  public readonly aviationApiUrl: string;
+  public readonly aviationApiKey: string;
 
   constructor(config: IModuleConfig) {
     this.weatherApiUrl = config.weatherApiUrl;
@@ -21,5 +23,7 @@ export class BootstrapModule implements IModuleConfig {
     this.holidayApiUrl = config.holidayApiUrl;
     this.sportsApiUrl = config.sportsApiUrl;
     this.sportsApiKey = config.sportsApiKey;
+    this.aviationApiUrl = config.aviationApiUrl;
+    this.aviationApiKey = config.aviationApiKey;
   }
 }

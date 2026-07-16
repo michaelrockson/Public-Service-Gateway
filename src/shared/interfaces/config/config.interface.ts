@@ -5,6 +5,7 @@ import { INewsConfig } from "./news.config.interface.js";
 import { ICurrencyConfig } from "./currency.config.interface.js";
 import { IHolidayConfig } from "./holiday.config.interface.js";
 import { ISportsConfig } from "./sports.config.interface.js";
+import { IAviationConfig } from "./aviation.config.interface.js";
 
 /**
  * System-level config (port, environment, log levels).
@@ -18,7 +19,8 @@ export type IModuleConfig = IWeatherConfig &
   INewsConfig &
   ICurrencyConfig &
   IHolidayConfig &
-  ISportsConfig;
+  ISportsConfig &
+  IAviationConfig;
 
 export type {
   IServerConfig,
@@ -28,4 +30,5 @@ export type {
   ICurrencyConfig,
   IHolidayConfig,
   ISportsConfig,
+  IAviationConfig,
 };
