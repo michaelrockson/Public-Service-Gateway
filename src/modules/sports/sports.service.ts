@@ -1,4 +1,4 @@
-import { IHttpClient } from "../../shared/interfaces/infrastructure/http.interface.js";
+import { IHttpClient } from "../../app/interfaces/infrastructure/http.interface.js";
 import {
   EventsResponse,
   LeaguesResponse,

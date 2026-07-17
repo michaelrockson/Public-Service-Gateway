@@ -1,5 +1,5 @@
 import { HolidayResponse, PublicHolidaysParams } from "./holiday.types.js";
-import { IHttpClient } from "../../shared/interfaces/infrastructure/http.interface.js";
+import { IHttpClient } from "../../app/interfaces/infrastructure/http.interface.js";
 
 export class HolidayService {
   private readonly httpClient: IHttpClient;

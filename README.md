@@ -6,7 +6,7 @@ An API gateway for public services built on Express 5 and TypeScript. The gatewa
 
 - Express 5 server written in TypeScript (ESM, `"type": "module"`)
 - Versioned API routes under `/v1`
-- Layered architecture: `BaseService` → service → controller → router, with constructor-injected dependencies
+- Layered architecture: `AxiosHttpClient` → service → controller → router, with constructor-injected dependencies
 - Config split into two typed objects: `SystemConfig` (server/logger settings) and `ModuleConfig` (per-module API keys and URLs)
 - Secrets management via Infisical SDK zero secrets in source control
 - Shared `AxiosHttpClient` and `ControllerResponseHandler` used across all modules
@@ -131,20 +131,17 @@ src/
 │   ├── holidays/                        # Nager.Date integration
 │   └── sports/                          # TheSportsDB integration
 │
-└── shared/                              # Cross-cutting infrastructure
-    ├── boostrap/
-    │   ├── infisical.provider.ts       # Infisical auth & secret injection
-    │   ├── module.envs.ts          # ModuleConfig (implements IModuleConfig)
-    │   ├── system.envs.ts          # SystemConfig (implements ISystemConfig)
-    │   ├── bootstrap.types.ts           # SharedDependencies, GatewayControllers, ModuleControllersProvider
-    │   └── bootstrap.utils.ts           # bootGatewayControllers, getEnvVar, validateEnvs, etc.
-    │
+├── bootstrap/                           # Startup configuration and injection
+│   ├── envs/                            # System and Module environment parsing
+│   ├── providers/                       # Infisical auth & secret injection
+│   ├── bootstrap.types.ts               # SharedDependencies, GatewayControllers, ModuleControllersProvider
+│   └── bootstrap.utils.ts               # bootGatewayControllers, getEnvVar, validateEnvs, etc.
+│
+└── app/                                 # Cross-cutting infrastructure
     ├── http/
-    │   ├── api.errors.ts                # BadRequestError, NotFoundError
-    │   ├── axios.client.ts              # AxiosHttpClient (implements IHttpClient)
-    │   ├── base.service.ts              # Abstract BaseService (executeRequest / executeRawRequest)
-    │   ├── request.utils.ts             # parseParams, validateParams, validateResponse
-    │   └── response.handler.ts          # ControllerResponseHandler (implements IResponseHandler)
+    │   ├── clients/                     # AxiosHttpClient (implements IHttpClient)
+    │   ├── handlers/                    # ControllerResponseHandler (implements IResponseHandler)
+    │   └── request.utils.ts             # Error classes (e.g. BadRequestError), validation, and parsing
     │
     ├── interfaces/
     │   ├── config/                      # Per-concern config interfaces (ISystemConfig, IModuleConfig, etc.)
@@ -174,7 +171,7 @@ See **[docs/Architecture.md](docs/Architecture.md)** for a full breakdown of the
 
 - All API keys and base URLs are stored in Infisical, not in `.env`.
 - The `.env` file contains **only** the five Infisical bootstrap credentials.
-- All modules share the same `AxiosHttpClient` (via `BaseService`) and `ControllerResponseHandler` no module makes raw Axios calls or implements its own response formatting.
+- All modules share the same `AxiosHttpClient` and `ControllerResponseHandler` no module makes raw Axios calls or implements its own response formatting.
 - The Sports API key is embedded as a **path segment** (not a query param), so `SportsService` receives the key as a second constructor argument and builds the endpoint string itself.
 - When adding a new module, follow the 13-step guide in [docs/Architecture.md](docs/Architecture.md#14-adding-a-new-module).
 

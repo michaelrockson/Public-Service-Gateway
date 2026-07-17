@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { CurrencyService } from "./currency.service.js";
-import { IResponseHandler } from "../../shared/interfaces/infrastructure/response.handler.interface.js";
+import { IResponseHandler } from "../../app/interfaces/infrastructure/response.handler.interface.js";
 
 export class CurrencyController {
   private readonly httpClient: CurrencyService;
