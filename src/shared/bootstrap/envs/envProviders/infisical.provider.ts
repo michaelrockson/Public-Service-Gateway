@@ -5,14 +5,14 @@ import {
   consoleLogger,
   logProcess,
   logProcessError,
-} from "../../logger/logger.utils.js";
+} from "../../../logger/logger.utils.js";
 import {
   getEnvNumber,
   getEnvVar,
   validateEnvs,
   validateInfisicalCredentials,
   validateInfisicalSecrets,
-} from "../bootstrap.utils.js";
+} from "../../bootstrap.utils.js";
 
 export async function injectSecretsFromInfisical() {
   dotenv.config({ path: path.join(process.cwd(), ".env") });

@@ -1,7 +1,7 @@
 import express, { type Express } from "express";
 import morgan from "morgan";
 import { useGatewayRouters } from "./modules/routes.registry.js";
-import { injectSecretsFromInfisical } from "./shared/bootstrap/envs/infisical.secrets.js";
+import { injectSecretsFromInfisical } from "./shared/bootstrap/envs/envProviders/infisical.provider.js";
 import {
   consoleLogger,
   createMorganStream,

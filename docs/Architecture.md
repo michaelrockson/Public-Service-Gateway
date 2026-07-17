@@ -109,7 +109,7 @@ src/
 │
 └── shared/                              # Cross-cutting infrastructure
     ├── bootstrap/                       # Bootstrap lifecycle
-    │   ├── infisical.secrets.ts       # injectSecretsFromInfisical() — Infisical auth & secret injection
+    │   ├── infisical.provider.ts       # injectSecretsFromInfisical() — Infisical auth & secret injection
     │   ├── module.envs.ts          # ModuleConfig class (implements IModuleConfig)
     │   ├── system.envs.ts          # SystemConfig class (implements ISystemConfig)
     │   ├── bootstrap.types.ts           # SharedDependencies, GatewayControllers, ModuleControllersProvider
@@ -263,7 +263,7 @@ Key rules enforced by this flow:
 
 The local `.env` contains only these five values, read by dotenv on startup
 via `dotenv.config({ path: path.join(process.cwd(), ".env") })` inside
-`infisical.secrets.ts`:
+`infisical.provider.ts`:
 
 ```
 INFISICAL_SITE_URL
@@ -557,7 +557,7 @@ construction all nine API URL/key properties are `readonly`.
 Defines the three shared gateway types: `SharedDependencies`,
 `GatewayControllers`, and `ModuleControllersProvider`. See [Section 12](#12-type-system).
 
-### `boostrap/infisical.secrets.ts`
+### `boostrap/infisical.provider.ts`
 
 Single export: `injectSecretsFromInfisical()` orchestrates Infisical
 authentication (universal auth via `InfisicalSDK`), secret injection
@@ -883,7 +883,7 @@ constructor(config: IModuleConfig) {
 }
 ```
 
-**5. Map the new vars in `infisical.secrets.ts`:**
+**5. Map the new vars in `infisical.provider.ts`:**
 ```typescript
 const moduleConfig = {
   // ...existing...

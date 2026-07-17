@@ -133,7 +133,7 @@ src/
 │
 └── shared/                              # Cross-cutting infrastructure
     ├── boostrap/
-    │   ├── infisical.secrets.ts       # Infisical auth & secret injection
+    │   ├── infisical.provider.ts       # Infisical auth & secret injection
     │   ├── module.envs.ts          # ModuleConfig (implements IModuleConfig)
     │   ├── system.envs.ts          # SystemConfig (implements ISystemConfig)
     │   ├── bootstrap.types.ts           # SharedDependencies, GatewayControllers, ModuleControllersProvider
