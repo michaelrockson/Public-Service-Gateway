@@ -24,6 +24,7 @@ export type GatewayControllers = {
   currencyController: CurrencyController;
   holidayController: HolidayController;
   sportsController: SportsController;
+  aviationController: AviationController;
 };
 
 export type ModuleControllersProvider =
