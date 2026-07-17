@@ -30,92 +30,59 @@ export interface FlightsParams {
 
 export interface AirportsParams {
   airport_name?: string;
-
   iata_code?: string;
-
   icao_code?: string;
-
   country_name?: string;
-
   country_iso2?: string;
-
   city_iata_code?: string;
-
   limit?: number;
-
   offset?: number;
 }
 
 export interface AirlinesParams {
-  access_key: string;
-
   airline_name?: string;
-
   iata_code?: string;
-
   icao_code?: string;
-
   fleet_average_age?: number;
-
   country_name?: string;
-
   limit?: number;
-
   offset?: number;
 }
 
 export interface AircraftTypesParams {
   aircraft_name?: string;
-
   iata_code?: string;
-
   icao_code?: string;
-
   limit?: number;
-
   offset?: number;
 }
 
 export interface AircraftRegistrationParams {
   registration_number?: string;
-
   limit?: number;
-
   offset?: number;
 }
 
 export interface CitiesParams {
   city_name?: string;
-
   iata_code?: string;
-
   country_iso2?: string;
-
   limit?: number;
-
   offset?: number;
 }
 
 export interface CountriesParams {
   country_name?: string;
-
   country_iso2?: string;
-
   country_iso3?: string;
-
   limit?: number;
-
   offset?: number;
 }
 
 export interface TaxesParams {
   tax_name?: string;
-
   iata_code?: string;
-
   country_iso2?: string;
-
   limit?: number;
-
   offset?: number;
 }
