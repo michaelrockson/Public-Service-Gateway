@@ -10,12 +10,12 @@ import { IAviationConfig } from "./modules/aviation.config.interface.js";
 /**
  * System-level config (port, secrets, log levels).
  */
-export type ISystemConfig = IServerConfig & ILoggerConfig;
+export type ISystemSecretsRegistry = IServerConfig & ILoggerConfig;
 
 /**
  * Module-level config (API URLs, keys, etc.).
  */
-export type IModuleConfig = IWeatherConfig &
+export type IModuleSecretsRegistry = IWeatherConfig &
   INewsConfig &
   ICurrencyConfig &
   IHolidayConfig &

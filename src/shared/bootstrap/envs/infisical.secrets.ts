@@ -44,13 +44,13 @@ export async function injectSecretsFromInfisical() {
       attachToProcessEnv: true,
     });
 
-    const systemConfig = {
+    const systemEnvs = {
       environment: getEnvVar("ENVIRONMENT", "dev"),
       port: getEnvNumber("PORT", 3000),
       logLevel: getEnvVar("LOG_LEVEL", "info"),
     } as const;
 
-    const moduleConfig = {
+    const moduleEnvs = {
       weatherApiUrl: getEnvVar("WEATHER_API_URL", ""),
       weatherApiKey: getEnvVar("WEATHER_API_KEY", ""),
       newsApiUrl: getEnvVar("NEWS_API_URL", ""),
@@ -64,8 +64,8 @@ export async function injectSecretsFromInfisical() {
       aviationApiKey: getEnvVar("AVIATION_API_KEY", ""),
     } as const;
 
-    validateInfisicalSecrets({ ...systemConfig, ...moduleConfig });
-    return { systemConfig, moduleConfig };
+    validateInfisicalSecrets({ ...systemEnvs, ...moduleEnvs });
+    return { systemEnvs, moduleEnvs };
   } catch (error) {
     logProcessError(consoleLogger, "injectSecretsFromInfisical", error);
     throw new Error(`Error fetching secrets from Infisical: ${error}`);

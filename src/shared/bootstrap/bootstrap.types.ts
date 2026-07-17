@@ -11,8 +11,8 @@ import { ILogger } from "../interfaces/infrastructure/logger.interface.js";
 import { IResponseHandler } from "../interfaces/infrastructure/response.handler.interface.js";
 
 export type SharedDependencies = {
-  systemConfig: ISystemConfig;
-  moduleConfig: IModuleConfig;
+  systemEnvs: ISystemConfig;
+  moduleEnvs: IModuleConfig;
   logger: ILogger;
   responseHandler: IResponseHandler;
 };
