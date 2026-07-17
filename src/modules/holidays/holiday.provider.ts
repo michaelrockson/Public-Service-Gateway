@@ -3,14 +3,14 @@ import { HolidayController } from "./holiday.controller.js";
 import {
   ModuleControllersProvider,
   SharedDependencies,
-} from "../../shared/bootstrap/bootstrap.types.js";
-import { AxiosHttpClient } from "../../shared/http/clients/axios.client.js";
+} from "../../bootstrap/bootstrap.types.js";
+import { AxiosHttpClient } from "../../app/http/clients/axios.client.js";
 
 export function provideHolidayController(
   deps: SharedDependencies,
 ): Extract<ModuleControllersProvider, { name: "holiday" }> {
   const currentHttpClient = new AxiosHttpClient(
-    deps.moduleConfig.holidayApiUrl,
+    deps.moduleEnvs.holidayApiUrl,
     "",
     "",
   );

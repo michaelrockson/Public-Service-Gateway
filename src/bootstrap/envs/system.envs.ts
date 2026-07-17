@@ -1,4 +1,4 @@
-import { ISystemSecretsRegistry } from "../../interfaces/config/index.interface.js";
+import { ISystemSecretsRegistry } from "../../app/interfaces/config/index.interface.js";
 
 export class SystemEnvs implements ISystemSecretsRegistry {
   public readonly environment: string;

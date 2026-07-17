@@ -1,4 +1,6 @@
 import { ILogger } from "../interfaces/infrastructure/logger.interface.js";
+import { WinstonLogger } from "./winston.logger.js";
+import { getEnvVar } from "../../bootstrap/bootstrap.utils.js";
 
 export function logProcess(logger: ILogger, step: string): void {
   logger.info(`[PROCESS] ${step}`);
@@ -34,9 +36,7 @@ export function createMorganStream(logger: ILogger) {
   };
 }
 
-export const consoleLogger: ILogger = {
-  info: (msg, ...meta) => console.log(msg, ...meta),
-  error: (msg, ...meta) => console.error(msg, ...meta),
-  warn: (msg, ...meta) => console.warn(msg, ...meta),
-  debug: (msg, ...meta) => console.debug(msg, ...meta),
-};
+export const defaultLogger: ILogger = new WinstonLogger({
+  logLevel: getEnvVar("LOG_LEVEL", "info"),
+  environment: getEnvVar("ENVIRONMENT", "dev"),
+});

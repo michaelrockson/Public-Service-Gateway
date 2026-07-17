@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { WeatherService } from "./weather.service.js";
-import { IResponseHandler } from "../../shared/interfaces/infrastructure/response.handler.interface.js";
+import { IResponseHandler } from "../../app/interfaces/infrastructure/response.handler.interface.js";
 
 export class WeatherController {
   private readonly httpClient: WeatherService;

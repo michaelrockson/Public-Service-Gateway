@@ -16,7 +16,7 @@ the shared type system, and the conventions to follow when adding new modules.
 7. [Dependency Injection Pattern](#7-dependency-injection-pattern)
 8. [Resource Registration Pattern](#8-resource-registration-pattern)
 9. [Module Structure](#9-module-structure)
-10. [Shared Layer](#10-shared-layer)
+10. [Bootstrap & App Layers](#10-bootstrap--app-layers)
 11. [Interface Layer](#11-interface-layer)
 12. [Type System](#12-type-system)
 13. [Available Routes](#13-available-routes)
@@ -107,31 +107,28 @@ src/
 │       ├── sports.routes.ts
 │       └── sports.types.ts
 │
-└── shared/                              # Cross-cutting infrastructure
-    ├── bootstrap/                       # Bootstrap lifecycle
-    │   ├── infisical.provider.ts       # injectSecretsFromInfisical() — Infisical auth & secret injection
-    │   ├── module.envs.ts          # ModuleConfig class (implements IModuleConfig)
-    │   ├── system.envs.ts          # SystemConfig class (implements ISystemConfig)
-    │   ├── bootstrap.types.ts           # SharedDependencies, GatewayControllers, ModuleControllersProvider
-    │   └── bootstrap.utils.ts           # bootGatewayControllers(), getEnvVar/Number, validateEnvs, etc.
-    │
+├── bootstrap/                           # Startup configuration and injection
+│   ├── envs/                            # System and Module environment parsing
+│   │   ├── module.envs.ts          # ModuleConfig class (implements IModuleConfig)
+│   │   └── system.envs.ts          # SystemConfig class (implements ISystemConfig)
+│   ├── providers/                       # Providers
+│   │   └── infisical.provider.ts       # injectSecretsFromInfisical() — Infisical auth & secret injection
+│   ├── bootstrap.types.ts               # SharedDependencies, GatewayControllers, ModuleControllersProvider
+│   └── bootstrap.utils.ts               # bootGatewayControllers(), getEnvVar/Number, validateEnvs, etc.
+│
+└── app/                                 # Cross-cutting infrastructure
     ├── http/
-    │   ├── api.errors.ts                # BadRequestError, NotFoundError (typed Error subclasses)
-    │   ├── axios.client.ts              # AxiosHttpClient (implements IHttpClient)
-    │   ├── base.service.ts              # Abstract BaseService (executeRequest / executeRawRequest)
-    │   ├── request.utils.ts             # parseParams / validateParams / validateResponse
-    │   └── response.handler.ts          # ControllerResponseHandler (implements IResponseHandler)
+    │   ├── clients/                     # HTTP clients
+    │   │   └── axios.client.ts              # AxiosHttpClient (implements IHttpClient)
+    │   ├── handlers/                    # Response handlers
+    │   │   └── response.handler.ts          # ControllerResponseHandler (implements IResponseHandler)
+    │   └── request.utils.ts             # Error classes (e.g. BadRequestError), validation, and parsing
     │
     ├── interfaces/
     │   ├── config/                      # Per-concern config interfaces
     │   │   ├── index.interface.ts      # Composes ISystemConfig & IModuleConfig from sub-interfaces
-    │   │   ├── server.index.interface.ts
-    │   │   ├── logger.index.interface.ts
-    │   │   ├── weather.index.interface.ts
-    │   │   ├── news.index.interface.ts
-    │   │   ├── currency.index.interface.ts
-    │   │   ├── holiday.index.interface.ts
-    │   │   └── sports.index.interface.ts
+    │   │   ├── system/
+    │   │   └── modules/
     │   │
     │   └── infrastructure/              # Cross-cutting infrastructure contracts
     │       ├── http.interface.ts        # IHttpClient
@@ -457,7 +454,7 @@ Each feature module follows a five-file structure:
 
 ```
 module.provider.ts    — Factory: creates AxiosHttpClient → service → controller, returns typed pair
-module.service.ts     — Outbound HTTP calls to the third-party API (extends BaseService)
+module.service.ts     — Outbound HTTP calls to the third-party API
 module.controller.ts  — Receives HTTP requests, delegates to service via IResponseHandler
 module.routes.ts      — Defines routes, exported as a factory function
 module.types.ts       — TypeScript interfaces for request params and API response shapes
@@ -473,23 +470,31 @@ XxxController()` are called. See [Section 7](#7-dependency-injection-pattern) fo
 
 ### Service
 
-Owns all outbound HTTP communication with the upstream API. Extends
-`BaseService`, which accepts an `IHttpClient` via its constructor and
-provides:
-- `executeRequest<T>()` calls `makeApiRequest()` and returns `response.data`
-- `executeRawRequest<T>()` returns the full `{ data, status }` object, useful
-  when the HTTP status code itself carries meaning (e.g. `IsTodayPublicHoliday`)
+Owns all outbound HTTP communication with the upstream API. It receives an `IHttpClient` via its constructor.
 
 ```typescript
-export class WeatherService extends BaseService {
+export class WeatherService {
+  private readonly httpClient: IHttpClient;
+
   constructor(httpClient: IHttpClient) {
-    super(httpClient);
+    this.httpClient = httpClient;
   }
+  
   async getCurrentWeather(params: CurrentWeatherParams) {
-    return this.executeRequest("weather", params);
+    try {
+      const response = await this.httpClient.makeApiRequest("weather", params);
+      return response.data;
+    } catch (error) {
+      this.httpClient.handleApiErrors(error);
+    }
   }
   async getWeatherForecast(params: CurrentWeatherParams) {
-    return this.executeRequest("forecast", params);
+    try {
+      const response = await this.httpClient.makeApiRequest("forecast", params);
+      return response.data;
+    } catch (error) {
+      this.httpClient.handleApiErrors(error);
+    }
   }
 }
 ```
@@ -537,27 +542,27 @@ export function provideWeatherRouter(weatherController: WeatherController): Rout
 ```
 
 
-## 10. Shared Layer
+## 10. Bootstrap & App Layers
 
-### `boostrap/system.envs.ts`  `SystemConfig`
+### `bootstrap/envs/system.envs.ts` — `SystemConfig`
 
 A class implementing `ISystemConfig`. Constructed once in `server.ts` from
 the `systemConfig` slice returned by `injectSecretsFromInfisical()`. After
 construction its three properties (`environment`, `port`, `logLevel`) are
 `readonly`, making it a stable, immutable system config snapshot.
 
-### `boostrap/module.envs.ts` `ModuleConfig`
+### `bootstrap/envs/module.envs.ts` — `ModuleConfig`
 
 A class implementing `IModuleConfig`. Constructed once in `server.ts` from
 the `moduleConfig` slice returned by `injectSecretsFromInfisical()`. After
 construction all nine API URL/key properties are `readonly`.
 
-### `boostrap/bootstrap.types.ts`
+### `bootstrap/bootstrap.types.ts`
 
 Defines the three shared gateway types: `SharedDependencies`,
 `GatewayControllers`, and `ModuleControllersProvider`. See [Section 12](#12-type-system).
 
-### `boostrap/infisical.provider.ts`
+### `bootstrap/providers/infisical.provider.ts`
 
 Single export: `injectSecretsFromInfisical()` orchestrates Infisical
 authentication (universal auth via `InfisicalSDK`), secret injection
@@ -565,7 +570,7 @@ authentication (universal auth via `InfisicalSDK`), secret injection
 values into `systemConfig` and `moduleConfig` literals, validates them with
 `validateInfisicalSecrets()`, and returns `{ systemConfig, moduleConfig }`.
 
-### `boostrap/bootstrap.utils.ts`
+### `bootstrap/bootstrap.utils.ts`
 
 Several utilities used across the bootstrap lifecycle:
 
@@ -579,16 +584,7 @@ Several utilities used across the bootstrap lifecycle:
 | `validateInfisicalSecrets(secrets)` | Like `validateEnvs` but also logs the count of injected secrets |
 | `validateGatewayControllers(logger, controllers)` | Iterates the controller map; throws if any entry is falsy |
 
-### `http/base.service.ts` — `BaseService`
-
-Abstract base class for all feature services. Constructor accepts an
-`IHttpClient` instance (stored as `protected readonly httpService`). Exposes:
-
-- `executeRequest<T>()` — calls `makeApiRequest()` and returns `response.data`.
-- `executeRawRequest<T>()` — returns the full `{ data: T; status?: number }`
-  object, for when the status code carries semantic meaning.
-
-### `http/axios.client.ts` — `AxiosHttpClient`
+### `app/http/clients/axios.client.ts` — `AxiosHttpClient`
 
 Implements `IHttpClient`. Accepts `apiUrl`, `apiKey`, and `apiKeyName` at
 construction time.
@@ -663,7 +659,7 @@ Also exports `consoleLogger` — a lightweight `ILogger` backed by the native
 
 ## 11. Interface Layer
 
-All cross-cutting contracts live in `shared/interfaces/`. The directory is
+All cross-cutting contracts live in `app/interfaces/`. The directory is
 split into two sub-folders:
 
 ### `interfaces/config/` — Configuration contracts
@@ -733,7 +729,7 @@ export interface IResponseHandler {
 
 ## 12. Type System
 
-All shared gateway types live in `shared/boostrap/bootstrap.types.ts`.
+All shared gateway types live in `bootstrap/bootstrap.types.ts`.
 
 ### `SharedDependencies`
 
@@ -854,7 +850,7 @@ src/modules/maps/
     maps.provider.ts
 ```
 
-**2. Add a per-concern config interface** in `shared/interfaces/config/`:
+**2. Add a per-concern config interface** in `app/interfaces/config/modules/`:
 ```typescript
 // maps.index.interface.ts
 export interface IMapsConfig {
@@ -863,15 +859,15 @@ export interface IMapsConfig {
 }
 ```
 
-**3. Extend `IModuleConfig`** in `shared/interfaces/config/index.interface.ts`:
+**3. Extend `IModuleConfig`** in `app/interfaces/config/index.interface.ts`:
 ```typescript
-import { IMapsConfig } from "./maps.config.interface.js";
+import { IMapsConfig } from "./modules/maps.index.interface.js";
 
 export type IModuleConfig = IWeatherConfig & INewsConfig & ICurrencyConfig
                           & IHolidayConfig & ISportsConfig & IMapsConfig;
 ```
 
-**4. Expose the new vars in `ModuleConfig`** (`shared/boostrap/module.envs.ts`):
+**4. Expose the new vars in `ModuleConfig`** (`bootstrap/envs/module.envs.ts`):
 ```typescript
 public readonly mapsApiUrl: string;
 public readonly mapsApiKey: string;
@@ -892,14 +888,21 @@ const moduleConfig = {
 } as const;
 ```
 
-**6. Implement the service** — extend `BaseService`, accept `IHttpClient`:
+**6. Implement the service** — accept `IHttpClient`:
 ```typescript
-export class MapsService extends BaseService {
+export class MapsService {
+  private readonly httpClient: IHttpClient;
+
   constructor(httpClient: IHttpClient) {
-    super(httpClient);
+    this.httpClient = httpClient;
   }
   async geocode(params: Record<string, string>) {
-    return this.executeRequest("geocode/json", params);
+    try {
+      const response = await this.httpClient.makeApiRequest("geocode/json", params);
+      return response.data;
+    } catch (error) {
+      this.httpClient.handleApiErrors(error);
+    }
   }
 }
 ```

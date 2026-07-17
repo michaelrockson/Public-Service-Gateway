@@ -3,15 +3,15 @@ import { WeatherController } from "./weather.controller.js";
 import {
   ModuleControllersProvider,
   SharedDependencies,
-} from "../../shared/bootstrap/bootstrap.types.js";
-import { AxiosHttpClient } from "../../shared/http/clients/axios.client.js";
+} from "../../bootstrap/bootstrap.types.js";
+import { AxiosHttpClient } from "../../app/http/clients/axios.client.js";
 
 export function provideWeatherController(
   deps: SharedDependencies,
 ): Extract<ModuleControllersProvider, { name: "weather" }> {
   const currentHttpClient = new AxiosHttpClient(
-    deps.moduleConfig.weatherApiUrl,
-    deps.moduleConfig.weatherApiKey,
+    deps.moduleEnvs.weatherApiUrl,
+    deps.moduleEnvs.weatherApiKey,
     "appid",
   );
   const weatherService = new WeatherService(currentHttpClient);

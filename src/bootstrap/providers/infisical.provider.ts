@@ -2,17 +2,16 @@ import { InfisicalSDK } from "@infisical/sdk";
 import dotenv from "dotenv";
 import path from "path";
 import {
-  consoleLogger,
+  defaultLogger,
   logProcess,
   logProcessError,
-} from "../../../logger/logger.utils.js";
+} from "../../app/logger/logger.utils.js";
 import {
   getEnvNumber,
   getEnvVar,
   validateEnvs,
-  validateInfisicalCredentials,
   validateInfisicalSecrets,
-} from "../../bootstrap.utils.js";
+} from "../bootstrap.utils.js";
 
 export async function injectSecretsFromInfisical() {
   dotenv.config({ path: path.join(process.cwd(), ".env") });
@@ -25,19 +24,18 @@ export async function injectSecretsFromInfisical() {
     const projectId = getEnvVar("INFISICAL_PROJECT_ID");
 
     validateEnvs({ siteUrl, clientId, clientSecret, environment, projectId });
-    validateInfisicalCredentials(clientId, clientSecret);
 
-    logProcess(consoleLogger, "Authenticating Infisical Client.....");
+    logProcess(defaultLogger, "Authenticating Infisical Client.....");
     const client = new InfisicalSDK({ siteUrl });
     const infisicalClient = await client.auth().universalAuth.login({
       clientId,
       clientSecret,
     });
     if (infisicalClient) {
-      logProcess(consoleLogger, "Infisical Client Authenticated!");
+      logProcess(defaultLogger, "Infisical Client Authenticated!");
     }
 
-    logProcess(consoleLogger, "Fetching Secrets from Infisical.....");
+    logProcess(defaultLogger, "Fetching Secrets from Infisical.....");
     await client.secrets().listSecrets({
       environment,
       projectId,
@@ -67,7 +65,7 @@ export async function injectSecretsFromInfisical() {
     validateInfisicalSecrets({ ...systemEnvs, ...moduleEnvs });
     return { systemEnvs, moduleEnvs };
   } catch (error) {
-    logProcessError(consoleLogger, "injectSecretsFromInfisical", error);
+    logProcessError(defaultLogger, "injectSecretsFromInfisical", error);
     throw new Error(`Error fetching secrets from Infisical: ${error}`);
   }
 }

@@ -1,4 +1,4 @@
-import { IModuleSecretsRegistry } from "../../interfaces/config/index.interface.js";
+import { IModuleSecretsRegistry } from "../../app/interfaces/config/index.interface.js";
 
 export class ModuleEnvs implements IModuleSecretsRegistry {
   public readonly weatherApiUrl: string;

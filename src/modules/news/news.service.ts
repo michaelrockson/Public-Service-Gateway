@@ -1,5 +1,5 @@
 import { NewsSearchParams } from "./news.types.js";
-import { IHttpClient } from "../../shared/interfaces/infrastructure/http.interface.js";
+import { IHttpClient } from "../../app/interfaces/infrastructure/http.interface.js";
 
 export class NewsService {
   private readonly httpClient: IHttpClient;

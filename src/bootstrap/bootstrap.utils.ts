@@ -1,11 +1,11 @@
 import {
-  consoleLogger,
+  defaultLogger,
   logBootstrapError,
   logBootstrapStep,
   logProcess,
-} from "../logger/logger.utils.js";
+} from "../app/logger/logger.utils.js";
 import { GatewayControllers, SharedDependencies } from "./bootstrap.types.js";
-import { registerGatewayControllers } from "../../modules/controllers.registry.js";
+import { registerGatewayControllers } from "../modules/controllers.registry.js";
 
 /**
  * Boots and registers all gateway controllers.
@@ -95,22 +95,6 @@ export function validateEnvs(secrets: Record<string, unknown>) {
 }
 
 /**
- * Validates that Infisical authentication credentials are present.
- *
- * @param clientId - The Infisical client ID.
- * @param clientSecret - The Infisical client secret.
- * @throws {Error} If either the client ID or client secret is missing.
- */
-export function validateInfisicalCredentials(
-  clientId: string,
-  clientSecret: string,
-) {
-  if (!clientId || !clientSecret) {
-    throw new Error("Missing infisical credentials for authentication");
-  }
-}
-
-/**
  * Validates secrets fetched from Infisical, logging how many were successfully
  * injected and throwing if any required secrets are missing.
  *
@@ -129,7 +113,7 @@ export function validateInfisicalSecrets(secrets: Record<string, unknown>) {
   }
   if (fetchedSecrets.length > 0) {
     logProcess(
-      consoleLogger,
+      defaultLogger,
       `${fetchedSecrets.length} secret(s) injected from Infisical}`,
     );
   }

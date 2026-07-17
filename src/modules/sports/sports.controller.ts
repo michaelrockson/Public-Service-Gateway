@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { SportsService } from "./sports.service.js";
-import { IResponseHandler } from "../../shared/interfaces/infrastructure/response.handler.interface.js";
+import { IResponseHandler } from "../../app/interfaces/infrastructure/response.handler.interface.js";
 import {
   LookupByIdParams,
   LookupTableParams,

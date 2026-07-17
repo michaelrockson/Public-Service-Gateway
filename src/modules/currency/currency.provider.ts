@@ -3,15 +3,15 @@ import { CurrencyController } from "./currency.controller.js";
 import {
   ModuleControllersProvider,
   SharedDependencies,
-} from "../../shared/bootstrap/bootstrap.types.js";
-import { AxiosHttpClient } from "../../shared/http/clients/axios.client.js";
+} from "../../bootstrap/bootstrap.types.js";
+import { AxiosHttpClient } from "../../app/http/clients/axios.client.js";
 
 export function provideCurrencyController(
   deps: SharedDependencies,
 ): Extract<ModuleControllersProvider, { name: "currency" }> {
   const currentHttpClient = new AxiosHttpClient(
-    deps.moduleConfig.currencyApiUrl,
-    deps.moduleConfig.currencyApiKey,
+    deps.moduleEnvs.currencyApiUrl,
+    deps.moduleEnvs.currencyApiKey,
     "access_key",
   );
   const currencyService = new CurrencyService(currentHttpClient);

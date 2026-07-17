@@ -3,20 +3,20 @@ import { SportsController } from "./sports.controller.js";
 import {
   ModuleControllersProvider,
   SharedDependencies,
-} from "../../shared/bootstrap/bootstrap.types.js";
-import { AxiosHttpClient } from "../../shared/http/clients/axios.client.js";
+} from "../../bootstrap/bootstrap.types.js";
+import { AxiosHttpClient } from "../../app/http/clients/axios.client.js";
 
 export function provideSportsController(
   deps: SharedDependencies,
 ): Extract<ModuleControllersProvider, { name: "sports" }> {
   const currentHttpClient = new AxiosHttpClient(
-    deps.moduleConfig.sportsApiUrl,
-    deps.moduleConfig.sportsApiKey,
+    deps.moduleEnvs.sportsApiUrl,
+    deps.moduleEnvs.sportsApiKey,
     "",
   );
   const sportsService = new SportsService(
     currentHttpClient,
-    deps.moduleConfig.sportsApiKey,
+    deps.moduleEnvs.sportsApiKey,
   );
   const sportsController = new SportsController(
     sportsService,
