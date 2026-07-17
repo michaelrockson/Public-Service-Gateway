@@ -109,9 +109,9 @@ src/
 │
 └── shared/                              # Cross-cutting infrastructure
     ├── bootstrap/                       # Bootstrap lifecycle
-    │   ├── infisical.secrets.ts       # injectSecretsFromInfisical() — Infisical auth & secret injection
-    │   ├── module.config.ts          # ModuleConfig class (implements IModuleConfig)
-    │   ├── system.config.ts          # SystemConfig class (implements ISystemConfig)
+    │   ├── infisical.provider.ts       # injectSecretsFromInfisical() — Infisical auth & secret injection
+    │   ├── module.envs.ts          # ModuleConfig class (implements IModuleConfig)
+    │   ├── system.envs.ts          # SystemConfig class (implements ISystemConfig)
     │   ├── bootstrap.types.ts           # SharedDependencies, GatewayControllers, ModuleControllersProvider
     │   └── bootstrap.utils.ts           # bootGatewayControllers(), getEnvVar/Number, validateEnvs, etc.
     │
@@ -263,7 +263,7 @@ Key rules enforced by this flow:
 
 The local `.env` contains only these five values, read by dotenv on startup
 via `dotenv.config({ path: path.join(process.cwd(), ".env") })` inside
-`infisical.secrets.ts`:
+`infisical.provider.ts`:
 
 ```
 INFISICAL_SITE_URL
@@ -539,14 +539,14 @@ export function provideWeatherRouter(weatherController: WeatherController): Rout
 
 ## 10. Shared Layer
 
-### `boostrap/system.config.ts`  `SystemConfig`
+### `boostrap/system.envs.ts`  `SystemConfig`
 
 A class implementing `ISystemConfig`. Constructed once in `server.ts` from
 the `systemConfig` slice returned by `injectSecretsFromInfisical()`. After
 construction its three properties (`environment`, `port`, `logLevel`) are
 `readonly`, making it a stable, immutable system config snapshot.
 
-### `boostrap/module.config.ts` `ModuleConfig`
+### `boostrap/module.envs.ts` `ModuleConfig`
 
 A class implementing `IModuleConfig`. Constructed once in `server.ts` from
 the `moduleConfig` slice returned by `injectSecretsFromInfisical()`. After
@@ -557,7 +557,7 @@ construction all nine API URL/key properties are `readonly`.
 Defines the three shared gateway types: `SharedDependencies`,
 `GatewayControllers`, and `ModuleControllersProvider`. See [Section 12](#12-type-system).
 
-### `boostrap/infisical.secrets.ts`
+### `boostrap/infisical.provider.ts`
 
 Single export: `injectSecretsFromInfisical()` orchestrates Infisical
 authentication (universal auth via `InfisicalSDK`), secret injection
@@ -871,7 +871,7 @@ export type IModuleConfig = IWeatherConfig & INewsConfig & ICurrencyConfig
                           & IHolidayConfig & ISportsConfig & IMapsConfig;
 ```
 
-**4. Expose the new vars in `ModuleConfig`** (`shared/boostrap/module.config.ts`):
+**4. Expose the new vars in `ModuleConfig`** (`shared/boostrap/module.envs.ts`):
 ```typescript
 public readonly mapsApiUrl: string;
 public readonly mapsApiKey: string;
@@ -883,7 +883,7 @@ constructor(config: IModuleConfig) {
 }
 ```
 
-**5. Map the new vars in `infisical.secrets.ts`:**
+**5. Map the new vars in `infisical.provider.ts`:**
 ```typescript
 const moduleConfig = {
   // ...existing...
