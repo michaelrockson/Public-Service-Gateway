@@ -27,8 +27,8 @@ the shared type system, and the conventions to follow when adding new modules.
 ## 1. Project Overview
 
 Public Services API Gateway is a TypeScript/Express API gateway that
-aggregates five third-party public data APIs weather, news, currency,
-holidays, and sports behind a single, unified interface mounted at `/v1`.
+aggregates seven third-party public data APIs weather, news, currency,
+holidays, sports, aviation, and agriculture behind a single, unified interface mounted at `/v1`.
 
 Secrets management is handled by Infisical. No API keys or runtime
 configuration are stored locally in `.env`; `.env` contains only the five
@@ -100,12 +100,26 @@ src/
 │   │   ├── holiday.routes.ts
 │   │   └── holiday.types.ts
 │   │
-│   └── sports/
-│       ├── sports.provider.ts
-│       ├── sports.service.ts
-│       ├── sports.controller.ts
-│       ├── sports.routes.ts
-│       └── sports.types.ts
+│   ├── sports/
+│   │   ├── sports.provider.ts
+│   │   ├── sports.service.ts
+│   │   ├── sports.controller.ts
+│   │   ├── sports.routes.ts
+│   │   └── sports.types.ts
+│   │
+│   ├── aviation/
+│   │   ├── aviation.provider.ts
+│   │   ├── aviation.service.ts
+│   │   ├── aviation.controller.ts
+│   │   ├── aviation.routes.ts
+│   │   └── aviation.types.ts
+│   │
+│   └── agriculture/
+│       ├── argo.provider.ts
+│       ├── agro.service.ts
+│       ├── agro.controller.ts
+│       ├── agro.routes.ts
+│       └── agro.types.ts
 │
 ├── bootstrap/                           # Startup configuration and injection
 │   ├── envs/                            # System and Module environment parsing
@@ -293,6 +307,11 @@ const moduleConfig = {
   holidayApiUrl:  getEnvVar("HOLIDAY_API_URL", ""),
   sportsApiUrl:   getEnvVar("SPORTS_API_URL", ""),
   sportsApiKey:   getEnvVar("SPORTS_API_KEY", ""),
+  aviationApiUrl: getEnvVar("AVIATION_API_URL", ""),
+  aviationApiKey: getEnvVar("AVIATION_API_KEY", ""),
+  agroApiUrl:     getEnvVar("AGRO_API_URL", ""),
+  agroApiKey:     getEnvVar("AGRO_API_KEY", ""),
+  agroPolygonId:  getEnvVar("AGRO_POLYGON_ID", ""),
 } as const;
 ```
 
@@ -673,7 +692,7 @@ export type ISystemConfig = IServerConfig & ILoggerConfig;
 
 // Module-level: API URLs and keys for each feature module
 export type IModuleConfig = IWeatherConfig & INewsConfig & ICurrencyConfig
-                          & IHolidayConfig & ISportsConfig;
+                          & IHolidayConfig & ISportsConfig & IAviationConfig & IAgroConfig;
 ```
 
 Each sub-interface (`IServerConfig`, `ILoggerConfig`, `IWeatherConfig`, etc.)
@@ -758,7 +777,9 @@ export type ModuleControllersProvider =
   | { name: "news";     controller: NewsController     }
   | { name: "currency"; controller: CurrencyController }
   | { name: "holiday";  controller: HolidayController  }
-  | { name: "sports";   controller: SportsController   };
+  | { name: "sports";   controller: SportsController   }
+  | { name: "aviation"; controller: AviationController }
+  | { name: "argo";     controller: AgroController     };
 ```
 
 ### `GatewayControllers`
@@ -774,6 +795,8 @@ export type GatewayControllers = {
   currencyController: CurrencyController;
   holidayController:  HolidayController;
   sportsController:   SportsController;
+  aviationController: AviationController;
+  argoController:     AgroController;
 };
 ```
 
@@ -1023,3 +1046,8 @@ objects (`systemConfig` → `SystemConfig`, `moduleConfig` → `ModuleConfig`).
 | `HOLIDAY_API_URL` | `holidayApiUrl` | Nager.Date base URL (no key required) |
 | `SPORTS_API_URL` | `sportsApiUrl` | TheSportsDB base URL |
 | `SPORTS_API_KEY` | `sportsApiKey` | TheSportsDB API key (embedded in path segment) |
+| `AVIATION_API_URL` | `aviationApiUrl` | Aviationstack base URL |
+| `AVIATION_API_KEY` | `aviationApiKey` | Aviationstack API key |
+| `AGRO_API_URL` | `agroApiUrl` | Agromonitoringstack base URL |
+| `AGRO_API_KEY` | `agroApiKey` | Agromonitoringstack API key |
+| `AGRO_POLYGON_ID` | `agroPolygonId` | Agromonitoringstack polygon ID |

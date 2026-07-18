@@ -9,6 +9,7 @@ import { provideCurrencyController } from "./currency/currency.provider.js";
 import { provideHolidayController } from "./holidays/holiday.provider.js";
 import { provideSportsController } from "./sports/sports.provider.js";
 import { provideAviationController } from "./aviation/aviation.provider.js";
+import { provideArgoController } from "./agriculture/argo.provider.js";
 
 export function registerGatewayControllers(
   deps: SharedDependencies,
@@ -19,6 +20,7 @@ export function registerGatewayControllers(
   const holiday = provideHolidayController(deps);
   const sports = provideSportsController(deps);
   const aviation = provideAviationController(deps);
+  const argo = provideArgoController(deps);
 
   const gatewayControllerRegistry: GatewayControllers = {
     weatherController: weather.controller,
@@ -27,6 +29,7 @@ export function registerGatewayControllers(
     holidayController: holiday.controller,
     sportsController: sports.controller,
     aviationController: aviation.controller,
+    argoController: argo.controller,
   };
 
   validateGatewayControllers(deps.logger, gatewayControllerRegistry);

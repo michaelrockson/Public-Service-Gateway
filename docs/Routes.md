@@ -21,6 +21,8 @@ All routes are versioned under `/v1`. No authentication headers are required fro
 3. [Currency](#3-currency----v1currency)
 4. [Public Holidays](#4-public-holidays----v1holiday)
 5. [Sports](#5-sports----v1sports)
+6. [Aviation](#6-aviation----v1aviation)
+7. [Agriculture](#7-agriculture----v1argo)
 
 
 ---
@@ -1102,3 +1104,44 @@ GET {{baseUrl}}/v1/sports/lookUpTable?l=4328&s=2024-2025
 | `400 Bad Request` | `l` is missing |
 | `404 Not Found` | No table data found |
 | `500 Internal Server Error` | Upstream API request failed |
+
+---
+
+## 6. Aviation — `/v1/aviation`
+
+**Upstream API:** [Aviationstack](https://aviationstack.com/)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/v1/aviation/flights` | Retrieve current flights |
+| GET | `/v1/aviation/flights/pasts` | Retrieve past flights |
+| GET | `/v1/aviation/flights/schedules` | Retrieve flight schedules |
+| GET | `/v1/aviation/flights/futures` | Retrieve future flights |
+| GET | `/v1/aviation/airports` | Retrieve airports information |
+| GET | `/v1/aviation/airlines` | Retrieve airlines information |
+| GET | `/v1/aviation/aircraft/types` | Retrieve aircraft types |
+| GET | `/v1/aviation/aircraft/registration` | Retrieve aircraft registrations |
+| GET | `/v1/aviation/flights/cities` | Retrieve cities |
+| GET | `/v1/aviation/flights/countries` | Retrieve countries |
+| GET | `/v1/aviation/flights/taxes` | Retrieve flight taxes |
+
+---
+
+## 7. Agriculture — `/v1/argo`
+
+**Upstream API:** [Agromonitoringstack](https://agromonitoring.com/)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/v1/argo/polygons` | Create a new polygon |
+| GET | `/v1/argo/polygons` | Retrieve all polygons |
+| GET | `/v1/argo/polygons/specific` | Retrieve a specific polygon by ID |
+| DELETE | `/v1/argo/polygons/delete` | Delete a specific polygon by ID |
+| DELETE | `/v1/argo/polygons/history` | Clear polygon history |
+| GET | `/v1/argo/polygons/weather` | Retrieve current weather for a polygon |
+| GET | `/v1/argo/polygons/weather/history` | Retrieve historical weather for a polygon |
+| GET | `/v1/argo/polygons/uvi/history` | Retrieve historical UVI for a polygon |
+| GET | `/v1/argo/polygons/uvi/forecast` | Retrieve UVI forecast for a polygon |
+| GET | `/v1/argo/polygons/accumulated-temperature` | Retrieve accumulated temperature |
+| GET | `/v1/argo/polygons/accumulated-precipitation` | Retrieve accumulated precipitation |
+| GET | `/v1/argo/polygons/nvdi/history` | Retrieve NDVI history |

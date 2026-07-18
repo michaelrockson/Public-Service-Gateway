@@ -1,6 +1,6 @@
 # Public Services Gateway
 
-An API gateway for public services built on Express 5 and TypeScript. The gateway aggregates five public APIs weather, news, currency, public holidays, and sports behind a single, versioned interface mounted at `/v1`. Secrets and runtime configuration are managed via [Infisical](https://infisical.com/) no API keys are stored locally beyond the five credentials needed to bootstrap the Infisical connection.
+An API gateway for public services built on Express 5 and TypeScript. The gateway aggregates seven public APIs weather, news, currency, public holidays, sports, aviation, and agriculture behind a single, versioned interface mounted at `/v1`. Secrets and runtime configuration are managed via [Infisical](https://infisical.com/) no API keys are stored locally beyond the five credentials needed to bootstrap the Infisical connection.
 
 ## Features
 
@@ -11,7 +11,7 @@ An API gateway for public services built on Express 5 and TypeScript. The gatewa
 - Secrets management via Infisical SDK zero secrets in source control
 - Shared `AxiosHttpClient` and `ControllerResponseHandler` used across all modules
 - Structured JSON logging via Winston, with Morgan piped through it
-- Five fully implemented modules: **Weather**, **News**, **Currency**, **Public Holidays**, **Sports**
+- Seven fully implemented modules: **Weather**, **News**, **Currency**, **Public Holidays**, **Sports**, **Aviation**, **Agriculture**
 
 ## External APIs
 
@@ -22,6 +22,8 @@ An API gateway for public services built on Express 5 and TypeScript. The gatewa
 | [Currencylayer](https://currencylayer.com/) | Live and historical exchange rates | Implemented |
 | [Nager.Date](https://date.nager.at/) | Public holidays by country | Implemented |
 | [TheSportsDB](https://www.thesportsdb.com/api.php) | Teams, players, events, leagues | Implemented |
+| [Aviationstack](https://aviationstack.com/) | Real-time flights, schedules, and airports | Implemented |
+| [Agromonitoringstack](https://agromonitoring.com/) | Agricultural polygons, soil, and weather data | Implemented |
 
 Each integration follows the same modular provider / service / controller / router pattern. API keys and base URLs are stored in Infisical and injected at startup.
 
@@ -75,6 +77,10 @@ CURRENCY_API_KEY
 HOLIDAY_API_URL
 SPORTS_API_URL
 SPORTS_API_KEY
+AVIATION_API_URL
+AVIATION_API_KEY
+AGRO_API_URL
+AGRO_API_KEY
 ```
 
 See the [Environment Variables](#environment-variables) section for the purpose of each key.
@@ -108,6 +114,8 @@ Base URL for local testing: `http://localhost:3000`
 | Currency | `/v1/currency` |
 | Public Holidays | `/v1/holiday` |
 | Sports | `/v1/sports` |
+| Aviation | `/v1/aviation` |
+| Agriculture | `/v1/argo` |
 
 ## Project Structure
 
@@ -129,7 +137,9 @@ src/
 │   ├── news/                            # NewsAPI integration
 │   ├── currency/                        # Currencylayer integration
 │   ├── holidays/                        # Nager.Date integration
-│   └── sports/                          # TheSportsDB integration
+│   ├── sports/                          # TheSportsDB integration
+│   ├── aviation/                        # Aviationstack integration
+│   └── agriculture/                     # Agromonitoringstack integration
 │
 ├── bootstrap/                           # Startup configuration and injection
 │   ├── envs/                            # System and Module environment parsing
@@ -210,6 +220,11 @@ See **[docs/Architecture.md](docs/Architecture.md)** for a full breakdown of the
 | `HOLIDAY_API_URL` | Nager.Date base URL (no key required) |
 | `SPORTS_API_URL` | TheSportsDB base URL |
 | `SPORTS_API_KEY` | TheSportsDB API key (embedded as a path segment) |
+| `AVIATION_API_URL` | Aviationstack base URL |
+| `AVIATION_API_KEY` | Aviationstack API key |
+| `AGRO_API_URL` | Agromonitoringstack base URL |
+| `AGRO_API_KEY` | Agromonitoringstack API key |
+| `AGRO_POLYGON_ID` | Agromonitoringstack polygon ID |
 
 ## License
 

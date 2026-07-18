@@ -60,6 +60,9 @@ export async function injectSecretsFromInfisical() {
       sportsApiKey: getEnvVar("SPORTS_API_KEY", ""),
       aviationApiUrl: getEnvVar("AVIATION_API_URL", ""),
       aviationApiKey: getEnvVar("AVIATION_API_KEY", ""),
+      agroApiUrl: getEnvVar("AGRO_API_URL", ""),
+      agroApiKey: getEnvVar("AGRO_API_KEY", ""),
+      agroPolygonId: getEnvVar("AGRO_POLYGON_ID", ""),
     } as const;
 
     validateInfisicalSecrets({ ...systemEnvs, ...moduleEnvs });

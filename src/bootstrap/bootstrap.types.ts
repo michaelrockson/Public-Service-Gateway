@@ -8,8 +8,9 @@ import { IResponseHandler } from "../app/interfaces/infrastructure/response.hand
 import {
   IModuleSecretsRegistry,
   ISystemSecretsRegistry,
-} from "../app/interfaces/config/index.interface.js";
+} from "../app/interfaces/index.interface.js";
 import { AviationController } from "../modules/aviation/aviation.controller.js";
+import { AgroController } from "../modules/agriculture/agro.controller.js";
 
 export type SharedDependencies = {
   systemEnvs: ISystemSecretsRegistry;
@@ -25,6 +26,7 @@ export type GatewayControllers = {
   holidayController: HolidayController;
   sportsController: SportsController;
   aviationController: AviationController;
+  argoController: AgroController;
 };
 
 export type ModuleControllersProvider =
@@ -36,4 +38,5 @@ export type ModuleControllersProvider =
     }
   | { name: "holiday"; controller: HolidayController }
   | { name: "sports"; controller: SportsController }
-  | { name: "aviation"; controller: AviationController };
+  | { name: "aviation"; controller: AviationController }
+  | { name: "argo"; controller: AgroController };
