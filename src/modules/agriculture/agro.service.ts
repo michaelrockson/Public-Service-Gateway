@@ -1,13 +1,5 @@
 import { IHttpClient } from "../../app/interfaces/infrastructure/http.interface.js";
-import {
-  AccumulatedPrecipitationParams,
-  AccumulatedTempParams,
-  CoordParams,
-  GetPolygonParams,
-  NdviHistoryParams,
-  UviForecastParams,
-  UviHistoryParams,
-} from "./agro.types.js";
+import { GetPolygonParams } from "./agro.types.js";
 
 export class AgroService {
   private readonly httpClient: IHttpClient;
@@ -92,20 +84,20 @@ export class AgroService {
     }
   }
 
-  async getCurrentUvi(params: CoordParams) {
+  async getCurrentUvi() {
     try {
-      const response = await this.httpClient.makeApiRequest("uvi", params);
+      const response = await this.httpClient.makeApiRequest("uvi", undefined);
       return response.data;
     } catch (error) {
       this.httpClient.handleApiErrors(error);
     }
   }
 
-  async getUviForecast(params: UviForecastParams) {
+  async getUviForecast() {
     try {
       const response = await this.httpClient.makeApiRequest(
         "uvi/forecast",
-        params,
+        undefined,
       );
       return response.data;
     } catch (error) {
@@ -113,32 +105,29 @@ export class AgroService {
     }
   }
 
-  async getUviHistory(params: UviHistoryParams) {
+  async getUviHistory() {
     try {
-      const response = await this.httpClient.makeApiRequest(
-        "uvi/history",
-        params,
-      );
+      const response = await this.httpClient.makeApiRequest("uvi/history");
       return response.data;
     } catch (error) {
       this.httpClient.handleApiErrors(error);
     }
   }
 
-  async getAccumulatedTemperature(params: AccumulatedTempParams) {
+  async getAccumulatedTemperature() {
     try {
-      const response = await this.httpClient.makeApiRequest("temp", params);
+      const response = await this.httpClient.makeApiRequest("temp", undefined);
       return response.data;
     } catch (error) {
       this.httpClient.handleApiErrors(error);
     }
   }
 
-  async getAccumulatedPrecipitation(params: AccumulatedPrecipitationParams) {
+  async getAccumulatedPrecipitation() {
     try {
       const response = await this.httpClient.makeApiRequest(
         "precipitation",
-        params,
+        undefined,
       );
       return response.data;
     } catch (error) {
@@ -146,11 +135,11 @@ export class AgroService {
     }
   }
 
-  async getNdviHistory(params: NdviHistoryParams) {
+  async getNdviHistory() {
     try {
       const response = await this.httpClient.makeApiRequest(
         "ndvi/history",
-        params,
+        undefined,
       );
       return response.data;
     } catch (error) {
