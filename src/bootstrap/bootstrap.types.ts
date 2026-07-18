@@ -9,6 +9,7 @@ import {
   IModuleSecretsRegistry,
   ISystemSecretsRegistry,
 } from "../app/interfaces/config/index.interface.js";
+import { AviationController } from "../modules/aviation/aviation.controller.js";
 
 export type SharedDependencies = {
   systemEnvs: ISystemSecretsRegistry;
@@ -23,6 +24,7 @@ export type GatewayControllers = {
   currencyController: CurrencyController;
   holidayController: HolidayController;
   sportsController: SportsController;
+  aviationController: AviationController;
 };
 
 export type ModuleControllersProvider =
@@ -33,4 +35,5 @@ export type ModuleControllersProvider =
       controller: CurrencyController;
     }
   | { name: "holiday"; controller: HolidayController }
-  | { name: "sports"; controller: SportsController };
+  | { name: "sports"; controller: SportsController }
+  | { name: "aviation"; controller: AviationController };
