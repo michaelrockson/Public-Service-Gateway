@@ -8,7 +8,7 @@ import { IResponseHandler } from "../app/interfaces/infrastructure/response.hand
 import {
   IModuleSecretsRegistry,
   ISystemSecretsRegistry,
-} from "../app/interfaces/config/index.interface.js";
+} from "../app/interfaces/index.interface.js";
 import { AviationController } from "../modules/aviation/aviation.controller.js";
 
 export type SharedDependencies = {

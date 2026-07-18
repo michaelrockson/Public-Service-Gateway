@@ -1,4 +1,4 @@
-import { IModuleSecretsRegistry } from "../../app/interfaces/config/index.interface.js";
+import { IModuleSecretsRegistry } from "../../app/interfaces/index.interface.js";
 
 export class ModuleEnvs implements IModuleSecretsRegistry {
   public readonly weatherApiUrl: string;
@@ -12,6 +12,8 @@ export class ModuleEnvs implements IModuleSecretsRegistry {
   public readonly sportsApiKey: string;
   public readonly aviationApiUrl: string;
   public readonly aviationApiKey: string;
+  public readonly agroApiUrl: string;
+  public readonly agroApiKey: string;
 
   constructor(moduleEnvs: IModuleSecretsRegistry) {
     this.weatherApiUrl = moduleEnvs.weatherApiUrl;
@@ -25,5 +27,7 @@ export class ModuleEnvs implements IModuleSecretsRegistry {
     this.sportsApiKey = moduleEnvs.sportsApiKey;
     this.aviationApiUrl = moduleEnvs.aviationApiUrl;
     this.aviationApiKey = moduleEnvs.aviationApiKey;
+    this.agroApiUrl = moduleEnvs.agroApiUrl;
+    this.agroApiKey = moduleEnvs.agroApiKey;
   }
 }
