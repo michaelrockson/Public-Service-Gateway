@@ -14,6 +14,7 @@ export class ModuleEnvs implements IModuleSecretsRegistry {
   public readonly aviationApiKey: string;
   public readonly agroApiUrl: string;
   public readonly agroApiKey: string;
+  public readonly agroPolygonId: string;
 
   constructor(moduleEnvs: IModuleSecretsRegistry) {
     this.weatherApiUrl = moduleEnvs.weatherApiUrl;
@@ -29,5 +30,6 @@ export class ModuleEnvs implements IModuleSecretsRegistry {
     this.aviationApiKey = moduleEnvs.aviationApiKey;
     this.agroApiUrl = moduleEnvs.agroApiUrl;
     this.agroApiKey = moduleEnvs.agroApiKey;
+    this.agroPolygonId = moduleEnvs.agroPolygonId;
   }
 }
