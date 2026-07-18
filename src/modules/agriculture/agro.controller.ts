@@ -17,7 +17,7 @@ export class AgroController {
       req,
       res,
       () => this.httpClient.postPolygons(),
-      "postPolygons",
+      "New Polygon Created",
     );
   }
 
@@ -26,7 +26,7 @@ export class AgroController {
       req,
       res,
       () => this.httpClient.getPolygons(),
-      "getPolygons",
+      "Polygons",
     );
   }
 
