@@ -1,4 +1,4 @@
-# Public Services Gateway
+# General API Gateway 
 
 An API gateway for public services built on Express 5 and TypeScript. The gateway aggregates seven public APIs weather, news, currency, public holidays, sports, aviation, and agriculture behind a single, versioned interface mounted at `/v1`. Secrets and runtime configuration are managed via [Infisical](https://infisical.com/) no API keys are stored locally beyond the five credentials needed to bootstrap the Infisical connection.
 
@@ -37,8 +37,8 @@ Each integration follows the same modular provider / service / controller / rout
 
 **1. Clone the repository:**
 ```bash
-git clone https://github.com/michaelrockson/Public-Service-Gateway.git
-cd Public-Service-Gateway
+git clone https://github.com/michaelrockson/General-API-Gateway.git
+cd General-API-Gateway
 ```
 
 **2. Install dependencies:**
